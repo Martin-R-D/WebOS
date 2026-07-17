@@ -8,8 +8,8 @@ function App() {
         height: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#1a1a2e',
-        color: 'white',
+        background: 'var(--color-bg)',
+        color: 'var(--color-text)',
         fontFamily: 'sans-serif',
         fontSize: '24px',
       }}
