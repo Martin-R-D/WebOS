@@ -1,0 +1,48 @@
+.term {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #0b0b16;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px;
+  overflow: hidden;
+  cursor: text;
+}
+
+.term__out {
+  flex: 1;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.term__line--err {
+  color: #ff6b6b;
+}
+
+.term__line--in {
+  color: var(--color-text-dim);
+}
+
+.term__prompt-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.term__prompt {
+  color: var(--color-accent-2);
+  white-space: nowrap;
+}
+
+.term__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: inherit;
+}

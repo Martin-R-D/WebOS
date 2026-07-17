@@ -2,6 +2,7 @@ import type { AppDefinition, AppId, AppProps } from "../types";
 import { Calculator } from "./Calculator/Calculator";
 import { TextEditor } from "./TextEditor/TextEditor";
 import { FileExplorer } from "./FileExplorer/FileExplorer";
+import { Terminal } from "./Terminal/Terminal";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -34,7 +35,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "terminal",
     name: "Terminal",
     icon: "TerminalSquare",
-    component: Placeholder,
+    component: Terminal,
     defaultWidth: 640,
     defaultHeight: 400,
     minWidth: 380,
