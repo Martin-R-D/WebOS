@@ -2,17 +2,12 @@ import { useRef } from "react";
 import * as Icons from "lucide-react";
 import type { WindowState } from "../../types";
 import { useWindowStore } from "../../stores/useWindowStore";
+import { getApp } from "../../apps/registry";
 import { cx } from "../../lib/helpers";
 import "./Window.css";
 
-interface DragState {
-  startX: number;
-  startY: number;
-  origX: number;
-  origY: number;
-  onMouseMove: (e: MouseEvent) => void;
-  onMouseUp: (e: MouseEvent) => void;
-}
+const RESIZE_DIRS = ["n", "s", "e", "w", "ne", "nw", "se", "sw"] as const;
+type ResizeDir = (typeof RESIZE_DIRS)[number];
 
 export function Window({ win }: { win: WindowState }) {
   const focusedId = useWindowStore((s) => s.focusedId);
@@ -21,6 +16,11 @@ export function Window({ win }: { win: WindowState }) {
   const minimizeWindow = useWindowStore((s) => s.minimizeWindow);
   const toggleMaximize = useWindowStore((s) => s.toggleMaximize);
   const moveWindow = useWindowStore((s) => s.moveWindow);
+  const setBounds = useWindowStore((s) => s.setBounds);
+
+  const def = getApp(win.appId);
+  const minW = def.minWidth ?? 240;
+  const minH = def.minHeight ?? 160;
 
   const drag = useRef<DragState | null>(null);
 
@@ -53,6 +53,41 @@ export function Window({ win }: { win: WindowState }) {
     document.body.classList.add("dragging");
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
+  }
+
+  function onResizeStart(e: React.MouseEvent, dir: ResizeDir) {
+    e.stopPropagation();
+    focusWindow(win.id);
+
+    const start = { mx: e.clientX, my: e.clientY, x: win.x, y: win.y, w: win.width, h: win.height };
+
+    function onMove(ev: MouseEvent) {
+      const dx = ev.clientX - start.mx;
+      const dy = ev.clientY - start.my;
+      let { x, y } = start;
+      let w = start.w;
+      let h = start.h;
+
+      if (dir.includes("e")) w = start.w + dx;
+      if (dir.includes("s")) h = start.h + dy;
+      if (dir.includes("w")) { w = start.w - dx; x = start.x + dx; }
+      if (dir.includes("n")) { h = start.h - dy; y = start.y + dy; }
+
+      if (w < minW) { if (dir.includes("w")) x = start.x + (start.w - minW); w = minW; }
+      if (h < minH) { if (dir.includes("n")) y = start.y + (start.h - minH); h = minH; }
+
+      setBounds(win.id, { x, y, width: w, height: h });
+    }
+
+    function onUp() {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      document.body.classList.remove("is-resizing");
+    }
+
+    document.body.classList.add("is-resizing");
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
   }
 
   if (win.isMinimized) return null;
@@ -100,6 +135,14 @@ export function Window({ win }: { win: WindowState }) {
       <div className="window__body">
         <div style={{ padding: 16, color: "var(--color-text-dim)" }}>App content here</div>
       </div>
+      {!win.isMaximized &&
+        RESIZE_DIRS.map((dir) => (
+          <div
+            key={dir}
+            className={`window__resize window__resize--${dir}`}
+            onMouseDown={(e) => onResizeStart(e, dir)}
+          />
+        ))}
     </div>
   );
 }

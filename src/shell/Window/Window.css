@@ -6,7 +6,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-window);
-  overflow: hidden;
   min-width: 240px;
   min-height: 160px;
 }
@@ -25,6 +24,7 @@
   background: var(--color-titlebar);
   cursor: move;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .window__title-left {
@@ -65,4 +65,77 @@
   flex: 1;
   overflow: auto;
   background: var(--color-surface);
+}
+
+.window__resize {
+  position: absolute;
+  z-index: 5;
+}
+
+.window__resize--n {
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.window__resize--s {
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.window__resize--e {
+  right: -4px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+.window__resize--w {
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+.window__resize--ne {
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  cursor: nesw-resize;
+}
+
+.window__resize--nw {
+  top: -4px;
+  left: -4px;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+}
+
+.window__resize--se {
+  bottom: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+}
+
+.window__resize--sw {
+  bottom: -4px;
+  left: -4px;
+  width: 12px;
+  height: 12px;
+  cursor: nesw-resize;
+}
+
+body.is-resizing {
+  user-select: none;
 }
