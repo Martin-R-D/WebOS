@@ -1,6 +1,7 @@
 import type { AppDefinition, AppId, AppProps } from "../types";
 import { Calculator } from "./Calculator/Calculator";
 import { TextEditor } from "./TextEditor/TextEditor";
+import { FileExplorer } from "./FileExplorer/FileExplorer";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -13,7 +14,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "file-explorer",
     name: "File Explorer",
     icon: "Folder",
-    component: Placeholder,
+    component: FileExplorer,
     defaultWidth: 720,
     defaultHeight: 480,
     minWidth: 480,
