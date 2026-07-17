@@ -4,6 +4,7 @@ import { TextEditor } from "./TextEditor/TextEditor";
 import { FileExplorer } from "./FileExplorer/FileExplorer";
 import { Terminal } from "./Terminal/Terminal";
 import { Settings } from "./Settings/Settings";
+import { MiniBrowser } from "./MiniBrowser/MiniBrowser";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -68,7 +69,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "browser",
     name: "Browser",
     icon: "Globe",
-    component: Placeholder,
+    component: MiniBrowser,
     defaultWidth: 900,
     defaultHeight: 600,
     minWidth: 520,

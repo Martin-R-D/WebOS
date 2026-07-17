@@ -1,0 +1,86 @@
+.browser {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-surface);
+}
+
+.browser__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.browser__btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.browser__btn:hover:not(:disabled) {
+  background: var(--color-hover);
+}
+
+.browser__btn:disabled {
+  opacity: 0.4;
+}
+
+.browser__url {
+  flex: 1;
+  padding: 7px 12px;
+  border-radius: 18px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 13px;
+  outline: none;
+}
+
+.browser__bookmarks {
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.browser__bookmark {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.browser__bookmark:hover {
+  background: var(--color-hover);
+}
+
+.browser__hint {
+  font-size: 11px;
+  color: var(--color-text-dim);
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.browser__hint button {
+  font-size: 11px;
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.browser__frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+}
