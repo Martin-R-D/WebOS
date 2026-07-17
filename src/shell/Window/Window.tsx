@@ -1,8 +1,18 @@
+import { useRef } from "react";
 import * as Icons from "lucide-react";
 import type { WindowState } from "../../types";
 import { useWindowStore } from "../../stores/useWindowStore";
 import { cx } from "../../lib/helpers";
 import "./Window.css";
+
+interface DragState {
+  startX: number;
+  startY: number;
+  origX: number;
+  origY: number;
+  onMouseMove: (e: MouseEvent) => void;
+  onMouseUp: (e: MouseEvent) => void;
+}
 
 export function Window({ win }: { win: WindowState }) {
   const focusedId = useWindowStore((s) => s.focusedId);
@@ -10,6 +20,40 @@ export function Window({ win }: { win: WindowState }) {
   const closeWindow = useWindowStore((s) => s.closeWindow);
   const minimizeWindow = useWindowStore((s) => s.minimizeWindow);
   const toggleMaximize = useWindowStore((s) => s.toggleMaximize);
+  const moveWindow = useWindowStore((s) => s.moveWindow);
+
+  const drag = useRef<DragState | null>(null);
+
+  function onTitleMouseDown(e: React.MouseEvent) {
+    if ((e.target as HTMLElement).closest(".window__btn")) return;
+    if (win.isMaximized) return;
+    focusWindow(win.id);
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = win.x;
+    const origY = win.y;
+
+    function onMouseMove(ev: MouseEvent) {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      const nextX = Math.max(-win.width + 120, Math.min(origX + dx, window.innerWidth - 120));
+      const nextY = Math.max(0, Math.min(origY + dy, window.innerHeight - 80));
+      moveWindow(win.id, nextX, nextY);
+    }
+
+    function onMouseUp() {
+      document.body.classList.remove("dragging");
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      drag.current = null;
+    }
+
+    drag.current = { startX, startY, origX, origY, onMouseMove, onMouseUp };
+    document.body.classList.add("dragging");
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  }
 
   if (win.isMinimized) return null;
 
@@ -27,7 +71,7 @@ export function Window({ win }: { win: WindowState }) {
       }}
       onMouseDown={() => focusWindow(win.id)}
     >
-      <div className="window__titlebar">
+      <div className="window__titlebar" onMouseDown={onTitleMouseDown}>
         <div className="window__title-left">
           <AppIcon size={14} />
           <span className="window__title">{win.title}</span>
