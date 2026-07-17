@@ -15,6 +15,11 @@
   border-color: rgba(108, 92, 231, 0.5);
 }
 
+.window--maximized {
+  border-radius: 0;
+  border: none;
+}
+
 .window__titlebar {
   height: var(--titlebar-height);
   display: flex;

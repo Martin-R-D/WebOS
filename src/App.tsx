@@ -1,11 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Desktop } from "./shell/Desktop/Desktop";
 import { Window } from "./shell/Window/Window";
+import { Taskbar } from "./shell/Taskbar/Taskbar";
 import { useWindowStore } from "./stores/useWindowStore";
 
 function App() {
   const windows = useWindowStore((s) => s.windows);
   const openWindow = useWindowStore((s) => s.openWindow);
+  const [startOpen, setStartOpen] = useState(false);
 
   useEffect(() => {
     if (windows.length === 0) {
@@ -24,6 +26,7 @@ function App() {
       {windows.map((w) => (
         <Window key={w.id} win={w} />
       ))}
+      <Taskbar onToggleStart={() => setStartOpen((v) => !v)} startOpen={startOpen} />
     </Desktop>
   );
 }

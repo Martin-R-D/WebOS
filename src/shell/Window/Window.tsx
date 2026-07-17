@@ -22,7 +22,7 @@ export function Window({ win }: { win: WindowState }) {
   const minW = def.minWidth ?? 240;
   const minH = def.minHeight ?? 160;
 
-  const drag = useRef<DragState | null>(null);
+  const drag = useRef<{ active: boolean } | null>(null);
 
   function onTitleMouseDown(e: React.MouseEvent) {
     if ((e.target as HTMLElement).closest(".window__btn")) return;
@@ -49,7 +49,7 @@ export function Window({ win }: { win: WindowState }) {
       drag.current = null;
     }
 
-    drag.current = { startX, startY, origX, origY, onMouseMove, onMouseUp };
+    drag.current = { active: true };
     document.body.classList.add("dragging");
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
@@ -96,7 +96,7 @@ export function Window({ win }: { win: WindowState }) {
 
   return (
     <div
-      className={cx("window", win.id === focusedId && "window--focused")}
+      className={cx("window", win.id === focusedId && "window--focused", win.isMaximized && "window--maximized")}
       style={{
         left: win.x,
         top: win.y,
@@ -106,7 +106,13 @@ export function Window({ win }: { win: WindowState }) {
       }}
       onMouseDown={() => focusWindow(win.id)}
     >
-      <div className="window__titlebar" onMouseDown={onTitleMouseDown}>
+      <div
+        className="window__titlebar"
+        onMouseDown={onTitleMouseDown}
+        onDoubleClick={(e) => {
+          if (!(e.target as HTMLElement).closest(".window__btn")) toggleMaximize(win.id);
+        }}
+      >
         <div className="window__title-left">
           <AppIcon size={14} />
           <span className="window__title">{win.title}</span>
