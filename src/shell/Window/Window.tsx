@@ -93,6 +93,7 @@ export function Window({ win }: { win: WindowState }) {
   if (win.isMinimized) return null;
 
   const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
+  const AppComponent = def.component;
 
   return (
     <div
@@ -139,7 +140,7 @@ export function Window({ win }: { win: WindowState }) {
         </div>
       </div>
       <div className="window__body">
-        <div style={{ padding: 16, color: "var(--color-text-dim)" }}>App content here</div>
+        <AppComponent windowId={win.id} launchProps={win.launchProps} />
       </div>
       {!win.isMaximized &&
         RESIZE_DIRS.map((dir) => (

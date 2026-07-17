@@ -1,0 +1,53 @@
+.ctx-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+}
+
+.ctx-menu {
+  position: absolute;
+  min-width: 200px;
+  background: rgba(30, 31, 58, 0.98);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  padding: 6px;
+  list-style: none;
+  animation: ctx-in 0.1s ease;
+}
+
+@keyframes ctx-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ctx-item:hover {
+  background: var(--color-hover);
+}
+
+.ctx-item--danger {
+  color: var(--color-danger);
+}
+
+.ctx-sep {
+  height: 1px;
+  background: var(--color-border);
+  margin: 4px 6px;
+}
