@@ -1,0 +1,68 @@
+.window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-window);
+  overflow: hidden;
+  min-width: 240px;
+  min-height: 160px;
+}
+
+.window--focused {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+  border-color: rgba(108, 92, 231, 0.5);
+}
+
+.window__titlebar {
+  height: var(--titlebar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  background: var(--color-titlebar);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.window__title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.window__controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.window__btn {
+  width: 30px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.window__btn:hover {
+  background: var(--color-hover);
+}
+
+.window__btn--close:hover {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.window__body {
+  flex: 1;
+  overflow: auto;
+  background: var(--color-surface);
+}
