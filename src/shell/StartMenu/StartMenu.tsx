@@ -1,7 +1,7 @@
 import * as Icons from "lucide-react";
 import { appRegistry } from "../../apps/registry";
-import { useWindowStore } from "../../stores/useWindowStore";
 import { useSystemStore } from "../../stores/useSystemStore";
+import { launchApp } from "../../lib/launch";
 import "./StartMenu.css";
 
 interface StartMenuProps {
@@ -10,33 +10,12 @@ interface StartMenuProps {
 }
 
 export function StartMenu({ open, onClose }: StartMenuProps) {
-  const openWindow = useWindowStore((s) => s.openWindow);
-  const windows = useWindowStore((s) => s.windows);
-  const focusWindow = useWindowStore((s) => s.focusWindow);
   const username = useSystemStore((s) => s.username);
 
   if (!open) return null;
 
-  function launchApp(appId: string) {
-    const app = appRegistry[appId as keyof typeof appRegistry];
-    if (!app) return;
-
-    if (app.singleInstance) {
-      const existing = windows.find((w) => w.appId === app.id);
-      if (existing) {
-        focusWindow(existing.id);
-        onClose();
-        return;
-      }
-    }
-
-    openWindow({
-      appId: app.id,
-      title: app.name,
-      icon: app.icon,
-      width: app.defaultWidth,
-      height: app.defaultHeight,
-    });
+  function handleLaunch(appId: string) {
+    launchApp(appId as keyof typeof appRegistry);
     onClose();
   }
 
@@ -65,7 +44,7 @@ export function StartMenu({ open, onClose }: StartMenuProps) {
               <button
                 key={app.id}
                 className="startmenu__app"
-                onClick={() => launchApp(app.id)}
+                onClick={() => handleLaunch(app.id)}
               >
                 <AppIcon size={26} />
                 {app.name}
