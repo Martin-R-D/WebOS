@@ -5,6 +5,7 @@ import { FileExplorer } from "./FileExplorer/FileExplorer";
 import { Terminal } from "./Terminal/Terminal";
 import { Settings } from "./Settings/Settings";
 import { MiniBrowser } from "./MiniBrowser/MiniBrowser";
+import { AboutMe } from "./AboutMe/AboutMe";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -79,7 +80,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "about-me",
     name: "About Me",
     icon: "User",
-    component: Placeholder,
+    component: AboutMe,
     defaultWidth: 560,
     defaultHeight: 520,
     minWidth: 380,
