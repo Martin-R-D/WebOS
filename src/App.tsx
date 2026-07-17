@@ -1,22 +1,7 @@
-import './App.css'
+import { Desktop } from "./shell/Desktop/Desktop";
 
 function App() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--color-bg)',
-        color: 'var(--color-text)',
-        fontFamily: 'sans-serif',
-        fontSize: '24px',
-      }}
-    >
-      WebOS loading...
-    </div>
-  )
+  return <Desktop />;
 }
 
-export default App
+export default App;
