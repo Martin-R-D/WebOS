@@ -66,6 +66,12 @@ function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
   return { nodes, rootId: root.id };
 }
 
+function hasSiblingName(nodes: Record<string, FsNode>, parentId: string, name: string, excludeId?: string): boolean {
+  return Object.values(nodes).some(
+    (n) => n.parentId === parentId && n.name === name && n.id !== excludeId,
+  );
+}
+
 function collectDescendants(nodes: Record<string, FsNode>, id: string): string[] {
   const ids: string[] = [];
   const queue = [id];
@@ -99,6 +105,8 @@ export const useFileSystemStore = create<FsState>()(
       getNode: (id: string) => get().nodes[id],
 
       createNode: (parentId: string, name: string, type: NodeType, content?: string) => {
+        const { nodes } = get();
+        if (hasSiblingName(nodes, parentId, name)) return "";
         const node = makeNode(name, type, parentId, content);
         set((state) => ({
           nodes: { ...state.nodes, [node.id]: node },
@@ -110,6 +118,7 @@ export const useFileSystemStore = create<FsState>()(
         set((state) => {
           const existing = state.nodes[id];
           if (!existing) return state;
+          if (existing.parentId && hasSiblingName(state.nodes, existing.parentId, newName, id)) return state;
           return {
             nodes: {
               ...state.nodes,
@@ -148,6 +157,7 @@ export const useFileSystemStore = create<FsState>()(
         set((state) => {
           const existing = state.nodes[id];
           if (!existing || id === state.rootId) return state;
+          if (hasSiblingName(state.nodes, newParentId, existing.name, id)) return state;
           return {
             nodes: {
               ...state.nodes,
