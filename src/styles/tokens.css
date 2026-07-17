@@ -38,3 +38,21 @@
 
   --transition: 0.15s ease;
 }
+
+:root[data-theme="light"] {
+  --color-bg: #e9e9f5;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f0f8;
+  --color-titlebar: #e2e2ee;
+  --color-text: #1a1a2e;
+  --color-text-dim: #555;
+  --color-border: rgba(0, 0, 0, 0.12);
+  --color-hover: rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="midnight"] {
+  --color-bg: #05060f;
+  --color-surface: #0d0e1f;
+  --color-surface-2: #141530;
+  --color-titlebar: #10122a;
+}

@@ -3,6 +3,7 @@ import { Calculator } from "./Calculator/Calculator";
 import { TextEditor } from "./TextEditor/TextEditor";
 import { FileExplorer } from "./FileExplorer/FileExplorer";
 import { Terminal } from "./Terminal/Terminal";
+import { Settings } from "./Settings/Settings";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -56,7 +57,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "settings",
     name: "Settings",
     icon: "Settings",
-    component: Placeholder,
+    component: Settings,
     defaultWidth: 640,
     defaultHeight: 480,
     minWidth: 480,

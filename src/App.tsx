@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Desktop } from "./shell/Desktop/Desktop";
 import { Window } from "./shell/Window/Window";
 import { Taskbar } from "./shell/Taskbar/Taskbar";
 import { StartMenu } from "./shell/StartMenu/StartMenu";
 import { useWindowStore } from "./stores/useWindowStore";
+import { useSystemStore } from "./stores/useSystemStore";
 
 function App() {
   const windows = useWindowStore((s) => s.windows);
+  const theme = useSystemStore((s) => s.theme);
+  const accentColor = useSystemStore((s) => s.accentColor);
   const [startOpen, setStartOpen] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty("--color-accent", accentColor);
+  }, [accentColor]);
 
   return (
     <Desktop>
