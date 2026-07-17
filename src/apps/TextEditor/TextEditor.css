@@ -1,0 +1,49 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.editor__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.editor__toolbar .spacer {
+  flex: 1;
+}
+
+.editor__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.editor__btn:hover {
+  background: var(--color-hover);
+}
+
+.editor__count {
+  color: var(--color-text-dim);
+}
+
+.editor__area {
+  flex: 1;
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}

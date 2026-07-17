@@ -1,5 +1,6 @@
 import type { AppDefinition, AppId, AppProps } from "../types";
 import { Calculator } from "./Calculator/Calculator";
+import { TextEditor } from "./TextEditor/TextEditor";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -22,7 +23,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "text-editor",
     name: "Text Editor",
     icon: "FileText",
-    component: Placeholder,
+    component: TextEditor,
     defaultWidth: 640,
     defaultHeight: 460,
     minWidth: 380,
