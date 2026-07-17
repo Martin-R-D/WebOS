@@ -1,4 +1,5 @@
 import type { AppDefinition, AppId, AppProps } from "../types";
+import { Calculator } from "./Calculator/Calculator";
 
 const Placeholder = ({}: AppProps) => (
   <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
@@ -41,7 +42,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     id: "calculator",
     name: "Calculator",
     icon: "Calculator",
-    component: Placeholder,
+    component: Calculator,
     defaultWidth: 300,
     defaultHeight: 440,
     minWidth: 260,
