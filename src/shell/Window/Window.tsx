@@ -4,6 +4,7 @@ import type { WindowState } from "../../types";
 import { useWindowStore } from "../../stores/useWindowStore";
 import { getApp } from "../../apps/registry";
 import { cx } from "../../lib/helpers";
+import { playSound } from "../../lib/sound";
 import "./Window.css";
 
 const RESIZE_DIRS = ["n", "s", "e", "w", "ne", "nw", "se", "sw"] as const;
@@ -133,7 +134,7 @@ export function Window({ win }: { win: WindowState }) {
           </button>
           <button
             className="window__btn window__btn--close"
-            onClick={(e) => { e.stopPropagation(); closeWindow(win.id); }}
+            onClick={(e) => { e.stopPropagation(); playSound("close"); closeWindow(win.id); }}
           >
             <Icons.X size={14} />
           </button>

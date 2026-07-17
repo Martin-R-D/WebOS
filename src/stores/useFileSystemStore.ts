@@ -174,6 +174,7 @@ export const useFileSystemStore = create<FsState>()(
     }),
     {
       name: "webos-filesystem",
+      version: 1,
       partialize: (state) => ({ nodes: state.nodes, rootId: state.rootId }),
     },
   ),

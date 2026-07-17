@@ -36,6 +36,7 @@
   border-radius: 6px;
   font-size: 13px;
   cursor: pointer;
+  transition: background var(--transition);
 }
 
 .ctx-item:hover {
@@ -50,4 +51,8 @@
   height: 1px;
   background: var(--color-border);
   margin: 4px 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctx-menu { animation: none; }
 }

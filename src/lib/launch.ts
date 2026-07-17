@@ -1,6 +1,7 @@
 import type { AppId } from "../types";
 import { appRegistry } from "../apps/registry";
 import { useWindowStore } from "../stores/useWindowStore";
+import { playSound } from "./sound";
 
 export function launchApp(appId: AppId) {
   const app = appRegistry[appId];
@@ -23,4 +24,5 @@ export function launchApp(appId: AppId) {
     width: app.defaultWidth,
     height: app.defaultHeight,
   });
+  playSound("open");
 }

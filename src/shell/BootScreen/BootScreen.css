@@ -1,0 +1,167 @@
+/* ---- Boot Screen ---- */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: var(--color-bg);
+  animation: boot-fadein 0.4s ease;
+}
+
+@keyframes boot-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.boot__icon {
+  color: var(--color-accent);
+  animation: boot-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes boot-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.08); }
+}
+
+.boot__logo {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: var(--color-text);
+}
+
+.boot__logo span {
+  color: var(--color-accent);
+}
+
+.boot__bar {
+  width: 200px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.boot__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
+  width: 0;
+  animation: boot-fill 2s ease forwards;
+}
+
+@keyframes boot-fill {
+  to { width: 100%; }
+}
+
+.boot__fadeout {
+  animation: boot-fadeout 0.3s ease forwards;
+}
+
+@keyframes boot-fadeout {
+  to { opacity: 0; }
+}
+
+/* ---- Lock Screen ---- */
+.lock {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  animation: lock-fadein 0.35s ease;
+}
+
+@keyframes lock-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lock__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) brightness(0.55);
+  transform: scale(1.1);
+}
+
+.lock__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.lock__content {
+  position: relative;
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.lock__clock {
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.lock__date {
+  font-size: 18px;
+  font-weight: 500;
+  opacity: 0.85;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.lock__avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.lock__user {
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.lock__hint {
+  font-size: 13px;
+  opacity: 0.6;
+  margin-top: 8px;
+  animation: lock-hint-pulse 2s ease-in-out infinite;
+}
+
+@keyframes lock-hint-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot,
+  .boot__fadeout,
+  .lock,
+  .lock__hint { animation: none; }
+  .boot__icon  { animation: none; }
+  .boot__fill  { animation: none; width: 100%; }
+}

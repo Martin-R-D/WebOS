@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import type { AppProps } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useSystemStore } from "../../stores/useSystemStore";
+import { playSound } from "../../lib/sound";
 import "./Terminal.css";
 
 interface Line {
@@ -62,7 +63,7 @@ export function Terminal({}: AppProps) {
     const argStr = args.join(" ");
 
     function out(text: string) { newLines.push({ text, kind: "out" }); }
-    function err(text: string) { newLines.push({ text, kind: "err" }); }
+    function err(text: string) { newLines.push({ text, kind: "err" }); playSound("error"); }
 
     switch (cmd) {
       case "help":

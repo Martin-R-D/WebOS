@@ -84,6 +84,7 @@ export const useProfileStore = create<ProfileState>()(
     }),
     {
       name: "webos-profile",
+      version: 1,
       partialize: (state) => ({ profile: state.profile }),
     },
   ),

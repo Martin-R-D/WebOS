@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { AppProps, ThemeName } from "../../types";
 import { useSystemStore } from "../../stores/useSystemStore";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
-import { cx } from "../../lib/helpers";
+import { cx, factoryReset } from "../../lib/helpers";
 import "./Settings.css";
 
 const WALLPAPERS = [
@@ -56,6 +56,12 @@ export function Settings({}: AppProps) {
     if (window.confirm("Reset the file system? All files will be deleted.")) {
       useFileSystemStore.getState().resetFileSystem();
       location.reload();
+    }
+  }
+
+  function handleFactoryReset() {
+    if (window.confirm("Factory reset WebOS? All settings, files, and profile data will be erased.")) {
+      factoryReset();
     }
   }
 
@@ -156,12 +162,15 @@ export function Settings({}: AppProps) {
 
             <div className="settings__row">
               <div className="settings__label">Danger Zone</div>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <button className="settings__danger" onClick={handleResetSettings}>
                   Reset Settings
                 </button>
                 <button className="settings__danger" onClick={handleResetFs}>
                   Reset File System
+                </button>
+                <button className="settings__danger" onClick={handleFactoryReset}>
+                  Factory Reset
                 </button>
               </div>
             </div>

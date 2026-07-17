@@ -41,6 +41,7 @@ export const useSystemStore = create<SystemStoreState>()(
     }),
     {
       name: "webos-system",
+      version: 1,
       partialize: (state) => ({
         theme: state.theme,
         wallpaper: state.wallpaper,

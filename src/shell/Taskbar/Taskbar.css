@@ -21,6 +21,7 @@
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 13px;
+  transition: background var(--transition);
 }
 
 .taskbar__start:hover,
@@ -47,6 +48,7 @@
   overflow: hidden;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
+  transition: background var(--transition), opacity var(--transition);
 }
 
 .taskbar__app:hover {

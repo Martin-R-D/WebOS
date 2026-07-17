@@ -23,3 +23,10 @@ export function formatClock(date: Date): { time: string; dateStr: string } {
 export function cx(...classes: (string | false | undefined | null)[]): string {
   return classes.filter(Boolean).join(" ");
 }
+
+export function factoryReset() {
+  localStorage.removeItem("webos-filesystem");
+  localStorage.removeItem("webos-system");
+  localStorage.removeItem("webos-profile");
+  location.reload();
+}
