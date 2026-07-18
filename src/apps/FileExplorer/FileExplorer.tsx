@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, ArrowUp, FolderPlus, FilePlus, Folder, FileText } from "lucide-react";
-import type { AppProps, ContextMenuItem } from "../../types";
+import type { AppProps, ContextMenuItem, FsNode } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useWindowStore } from "../../stores/useWindowStore";
 import { getApp } from "../registry";
 import { ContextMenu } from "../../shell/ContextMenu/ContextMenu";
+import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../../shell/FileDialogs/FileDialogs";
+import { isProtectedNode } from "../../lib/fsGuards";
 import { cx } from "../../lib/helpers";
 import "./FileExplorer.css";
 
@@ -16,11 +18,15 @@ export function FileExplorer({}: AppProps) {
   const createNode = useFileSystemStore((s) => s.createNode);
   const renameNode = useFileSystemStore((s) => s.renameNode);
   const deleteNode = useFileSystemStore((s) => s.deleteNode);
+  const moveNode = useFileSystemStore((s) => s.moveNode);
   const openWindow = useWindowStore((s) => s.openWindow);
 
   const [history, setHistory] = useState<string[]>([rootId]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<FsNode | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
+  const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
 
   const currentFolderId = history[historyIndex];
   const children = getChildren(currentFolderId);
@@ -84,24 +90,16 @@ export function FileExplorer({}: AppProps) {
         icon: node.type === "folder" ? "Folder" : "FileText",
         onClick: () => handleDoubleClick(nodeId),
       },
-      {
-        label: "Rename",
-        icon: "Pencil",
-        onClick: () => {
-          const name = window.prompt("Rename to:", node.name);
-          if (name && name !== node.name) renameNode(nodeId, name);
-        },
-      },
-      {
-        label: "Delete",
-        icon: "Trash2",
-        danger: true,
-        separatorBefore: true,
-        onClick: () => {
-          if (window.confirm(`Delete "${node.name}"?`)) deleteNode(nodeId);
-        },
-      },
     ];
+
+    if (!isProtectedNode(node, rootId)) {
+      items.push(
+        { label: "Rename", icon: "Pencil", onClick: () => setRenameTarget(node) },
+        { label: "Move to…", icon: "FolderInput", onClick: () => setMoveTarget(node) },
+        { label: "Delete", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
+      );
+    }
+
     setMenu({ x: e.clientX, y: e.clientY, items });
   }
 
@@ -186,6 +184,27 @@ export function FileExplorer({}: AppProps) {
           y={menu.y}
           items={menu.items}
           onClose={() => setMenu(null)}
+        />
+      )}
+      {renameTarget && (
+        <RenameDialog
+          node={renameTarget}
+          onRename={(name) => { renameNode(renameTarget.id, name); setRenameTarget(null); }}
+          onCancel={() => setRenameTarget(null)}
+        />
+      )}
+      {deleteTarget && (
+        <ConfirmDeleteDialog
+          node={deleteTarget}
+          onConfirm={() => { deleteNode(deleteTarget.id); setDeleteTarget(null); }}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
+      {moveTarget && (
+        <MoveDialog
+          node={moveTarget}
+          onMove={(destId) => { moveNode(moveTarget.id, destId); setMoveTarget(null); }}
+          onCancel={() => setMoveTarget(null)}
         />
       )}
     </div>

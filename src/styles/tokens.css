@@ -10,6 +10,8 @@
   --color-danger: #e74c3c;
   --color-border: rgba(255, 255, 255, 0.12);
   --color-hover: rgba(255, 255, 255, 0.08);
+  --color-taskbar: rgba(20, 20, 40, 0.85);
+  --color-panel: rgba(25, 26, 48, 0.97);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -48,6 +50,8 @@
   --color-text-dim: #555;
   --color-border: rgba(0, 0, 0, 0.12);
   --color-hover: rgba(0, 0, 0, 0.06);
+  --color-taskbar: rgba(240, 241, 250, 0.85);
+  --color-panel: rgba(255, 255, 255, 0.97);
 }
 
 :root[data-theme="midnight"] {
@@ -55,4 +59,6 @@
   --color-surface: #0d0e1f;
   --color-surface-2: #141530;
   --color-titlebar: #10122a;
+  --color-taskbar: rgba(6, 7, 18, 0.9);
+  --color-panel: rgba(13, 14, 31, 0.98);
 }

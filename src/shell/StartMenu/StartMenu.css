@@ -10,7 +10,8 @@
   left: 8px;
   width: 380px;
   max-height: 520px;
-  background: rgba(25, 26, 48, 0.97);
+  background: var(--color-panel);
+  color: var(--color-text);
   backdrop-filter: blur(20px);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);

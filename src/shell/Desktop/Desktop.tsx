@@ -5,7 +5,9 @@ import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { appRegistry } from "../../apps/registry";
 import { launchApp } from "../../lib/launch";
 import { cx } from "../../lib/helpers";
+import { isProtectedNode } from "../../lib/fsGuards";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
+import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../FileDialogs/FileDialogs";
 import type { AppId, ContextMenuItem, FsNode } from "../../types";
 import { useWindowStore } from "../../stores/useWindowStore";
 import "./Desktop.css";
@@ -28,13 +30,10 @@ function findDesktopFolderId(nodes: Record<string, FsNode>, rootId: string): str
 }
 
 function openFileNode(node: FsNode) {
+  const { windows, openWindow, focusWindow } = useWindowStore.getState();
   if (node.type === "folder") {
-    const { windows, openWindow, focusWindow } = useWindowStore.getState();
     const existing = windows.find((w) => w.appId === "file-explorer" && w.launchProps?.folderId === node.id);
-    if (existing) {
-      focusWindow(existing.id);
-      return;
-    }
+    if (existing) { focusWindow(existing.id); return; }
     openWindow({
       appId: "file-explorer",
       title: node.name,
@@ -44,12 +43,8 @@ function openFileNode(node: FsNode) {
       launchProps: { folderId: node.id },
     });
   } else {
-    const { windows, openWindow, focusWindow } = useWindowStore.getState();
     const existing = windows.find((w) => w.appId === "text-editor" && w.launchProps?.fileId === node.id);
-    if (existing) {
-      focusWindow(existing.id);
-      return;
-    }
+    if (existing) { focusWindow(existing.id); return; }
     openWindow({
       appId: "text-editor",
       title: node.name,
@@ -66,9 +61,15 @@ export function Desktop({ children }: { children?: ReactNode }) {
   const nodes = useFileSystemStore((s) => s.nodes);
   const rootId = useFileSystemStore((s) => s.rootId);
   const getChildren = useFileSystemStore((s) => s.getChildren);
+  const renameNode = useFileSystemStore((s) => s.renameNode);
+  const deleteNode = useFileSystemStore((s) => s.deleteNode);
+  const moveNode = useFileSystemStore((s) => s.moveNode);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<FsNode | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
+  const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
 
   const desktopFolderId = findDesktopFolderId(nodes, rootId);
   const desktopFiles = desktopFolderId ? getChildren(desktopFolderId) : [];
@@ -78,9 +79,44 @@ export function Desktop({ children }: { children?: ReactNode }) {
     setSelectedId(null);
   }
 
-  function handleContextMenu(e: React.MouseEvent) {
+  function handleDesktopContext(e: React.MouseEvent) {
     e.preventDefault();
-    setMenu({ x: e.clientX, y: e.clientY });
+    setMenu({ x: e.clientX, y: e.clientY, items: desktopMenuItems });
+  }
+
+  function handleAppContext(e: React.MouseEvent, appId: AppId) {
+    e.preventDefault();
+    e.stopPropagation();
+    const app = appRegistry[appId];
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      items: [{ label: "Open", icon: app.icon, onClick: () => launchApp(appId) }],
+    });
+  }
+
+  function handleNodeContext(e: React.MouseEvent, node: FsNode) {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedId(`fs-${node.id}`);
+
+    const items: ContextMenuItem[] = [
+      {
+        label: "Open",
+        icon: node.type === "folder" ? "Folder" : "FileText",
+        onClick: () => openFileNode(node),
+      },
+    ];
+
+    if (!isProtectedNode(node, rootId)) {
+      items.push(
+        { label: "Rename", icon: "Pencil", onClick: () => setRenameTarget(node) },
+        { label: "Move to…", icon: "FolderInput", onClick: () => setMoveTarget(node) },
+        { label: "Delete", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
+      );
+    }
+
+    setMenu({ x: e.clientX, y: e.clientY, items });
   }
 
   return (
@@ -88,7 +124,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
       className="desktop"
       style={{ background: wallpaper }}
       onClick={handleDesktopClick}
-      onContextMenu={handleContextMenu}
+      onContextMenu={handleDesktopContext}
     >
       <div className="desktop__icons">
         {APP_SHORTCUTS.map((appId) => {
@@ -100,6 +136,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
               className={cx("desktop__icon", selectedId === `app-${app.id}` && "desktop__icon--selected")}
               onClick={(e) => { e.stopPropagation(); setSelectedId(`app-${app.id}`); }}
               onDoubleClick={() => launchApp(app.id)}
+              onContextMenu={(e) => handleAppContext(e, appId)}
             >
               <AppIcon size={30} />
               <span>{app.name}</span>
@@ -115,6 +152,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
               className={cx("desktop__icon", selectedId === `fs-${node.id}` && "desktop__icon--selected")}
               onClick={(e) => { e.stopPropagation(); setSelectedId(`fs-${node.id}`); }}
               onDoubleClick={() => openFileNode(node)}
+              onContextMenu={(e) => handleNodeContext(e, node)}
             >
               <Icon size={30} />
               <span>{node.name}</span>
@@ -127,8 +165,29 @@ export function Desktop({ children }: { children?: ReactNode }) {
         <ContextMenu
           x={menu.x}
           y={menu.y}
-          items={desktopMenuItems}
+          items={menu.items}
           onClose={() => setMenu(null)}
+        />
+      )}
+      {renameTarget && (
+        <RenameDialog
+          node={renameTarget}
+          onRename={(name) => { renameNode(renameTarget.id, name); setRenameTarget(null); }}
+          onCancel={() => setRenameTarget(null)}
+        />
+      )}
+      {deleteTarget && (
+        <ConfirmDeleteDialog
+          node={deleteTarget}
+          onConfirm={() => { deleteNode(deleteTarget.id); setDeleteTarget(null); }}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
+      {moveTarget && (
+        <MoveDialog
+          node={moveTarget}
+          onMove={(destId) => { moveNode(moveTarget.id, destId); setMoveTarget(null); }}
+          onCancel={() => setMoveTarget(null)}
         />
       )}
     </div>
