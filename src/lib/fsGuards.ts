@@ -1,7 +1,7 @@
 import type { FsNode } from "../types";
 
 // Seed folders that back core OS features — protected from rename/move/delete.
-const SYSTEM_FOLDERS = ["Desktop", "Documents", "Pictures"];
+const SYSTEM_FOLDERS = ["Desktop", "Documents", "Pictures", "System Apps"];
 
 export function isProtectedNode(node: FsNode | undefined, rootId: string): boolean {
   if (!node) return true;
@@ -13,6 +13,8 @@ export function isProtectedNode(node: FsNode | undefined, rootId: string): boole
   ) {
     return true;
   }
+  // .app files are system shortcuts — always protected
+  if (node.name.endsWith(".app")) return true;
   return false;
 }
 

@@ -1,10 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { SystemSettings, ThemeName } from "../types";
+import type { AppId, SystemSettings, ThemeName } from "../types";
 
 interface SystemStoreState extends SystemSettings {
   booted: boolean;
   locked: boolean;
+  pinnedApps: AppId[];
   setTheme: (t: ThemeName) => void;
   setWallpaper: (w: string) => void;
   setUsername: (n: string) => void;
@@ -12,6 +13,8 @@ interface SystemStoreState extends SystemSettings {
   toggleSound: () => void;
   setBooted: (v: boolean) => void;
   setLocked: (v: boolean) => void;
+  pinApp: (id: AppId) => void;
+  unpinApp: (id: AppId) => void;
   resetSettings: () => void;
 }
 
@@ -29,6 +32,7 @@ export const useSystemStore = create<SystemStoreState>()(
       ...defaults,
       booted: false,
       locked: false,
+      pinnedApps: [],
 
       setTheme: (t) => set({ theme: t }),
       setWallpaper: (w) => set({ wallpaper: w }),
@@ -37,7 +41,13 @@ export const useSystemStore = create<SystemStoreState>()(
       toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
       setBooted: (v) => set({ booted: v }),
       setLocked: (v) => set({ locked: v }),
-      resetSettings: () => set({ ...defaults }),
+      pinApp: (id) => set((s) => ({
+        pinnedApps: s.pinnedApps.includes(id) ? s.pinnedApps : [...s.pinnedApps, id],
+      })),
+      unpinApp: (id) => set((s) => ({
+        pinnedApps: s.pinnedApps.filter((a) => a !== id),
+      })),
+      resetSettings: () => set({ ...defaults, pinnedApps: [] }),
     }),
     {
       name: "webos-system",
@@ -49,6 +59,7 @@ export const useSystemStore = create<SystemStoreState>()(
         accentColor: state.accentColor,
         soundEnabled: state.soundEnabled,
         locked: state.locked,
+        pinnedApps: state.pinnedApps,
       }),
     },
   ),

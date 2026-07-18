@@ -1,17 +1,30 @@
 import { useState } from "react";
+import * as Icons from "lucide-react";
 import { ChevronLeft, ChevronRight, ArrowUp, FolderPlus, FilePlus, Folder, FileText } from "lucide-react";
-import type { AppProps, ContextMenuItem, FsNode } from "../../types";
+import type { AppProps, AppId, ContextMenuItem, FsNode } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useWindowStore } from "../../stores/useWindowStore";
-import { getApp } from "../registry";
+import { useSystemStore } from "../../stores/useSystemStore";
+import { appRegistry, getApp } from "../registry";
+import { launchApp } from "../../lib/launch";
 import { ContextMenu } from "../../shell/ContextMenu/ContextMenu";
 import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../../shell/FileDialogs/FileDialogs";
 import { isProtectedNode } from "../../lib/fsGuards";
 import { cx } from "../../lib/helpers";
 import "./FileExplorer.css";
 
+function findDesktopFolderId(nodes: Record<string, import("../../types").FsNode>, rootId: string): string | null {
+  for (const node of Object.values(nodes)) {
+    if (node.parentId === rootId && node.type === "folder" && node.name === "Desktop") {
+      return node.id;
+    }
+  }
+  return null;
+}
+
 export function FileExplorer({}: AppProps) {
   const rootId = useFileSystemStore((s) => s.rootId);
+  const nodes = useFileSystemStore((s) => s.nodes);
   const getChildren = useFileSystemStore((s) => s.getChildren);
   const getNode = useFileSystemStore((s) => s.getNode);
   const getPath = useFileSystemStore((s) => s.getPath);
@@ -73,6 +86,8 @@ export function FileExplorer({}: AppProps) {
     if (!node) return;
     if (node.type === "folder") {
       navigateTo(node.id);
+    } else if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
+      launchApp(node.content as AppId);
     } else {
       openFile(node.id);
     }
@@ -83,6 +98,22 @@ export function FileExplorer({}: AppProps) {
     e.stopPropagation();
     const node = getNode(nodeId);
     if (!node) return;
+
+    // .app files get app-specific context menu
+    if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
+      const appId = node.content as AppId;
+      const app = appRegistry[appId];
+      const { pinnedApps, pinApp, unpinApp } = useSystemStore.getState();
+      const isPinned = pinnedApps.includes(appId);
+      const items: ContextMenuItem[] = [
+        { label: "Open", icon: app.icon, onClick: () => launchApp(appId) },
+        isPinned
+          ? { label: "Unpin from Taskbar", icon: "PinOff", onClick: () => unpinApp(appId) }
+          : { label: "Add to Taskbar", icon: "Pin", onClick: () => pinApp(appId) },
+      ];
+      setMenu({ x: e.clientX, y: e.clientY, items });
+      return;
+    }
 
     const items: ContextMenuItem[] = [
       {
@@ -96,6 +127,18 @@ export function FileExplorer({}: AppProps) {
       items.push(
         { label: "Rename", icon: "Pencil", onClick: () => setRenameTarget(node) },
         { label: "Move to…", icon: "FolderInput", onClick: () => setMoveTarget(node) },
+      );
+
+      const desktopId = findDesktopFolderId(nodes, rootId);
+      if (desktopId && node.parentId !== desktopId) {
+        items.push({
+          label: "Move to Desktop",
+          icon: "MonitorDown",
+          onClick: () => moveNode(node.id, desktopId),
+        });
+      }
+
+      items.push(
         { label: "Delete", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
       );
     }
@@ -164,17 +207,28 @@ export function FileExplorer({}: AppProps) {
           {children.length === 0 && (
             <div className="fx__empty">This folder is empty</div>
           )}
-          {children.map((node) => (
-            <button
-              key={node.id}
-              className="fx__item"
-              onDoubleClick={() => handleDoubleClick(node.id)}
-              onContextMenu={(e) => handleItemContext(e, node.id)}
-            >
-              {node.type === "folder" ? <Folder size={28} /> : <FileText size={28} />}
-              <span>{node.name}</span>
-            </button>
-          ))}
+          {children.map((node) => {
+            let NodeIcon: Icons.LucideIcon = node.type === "folder" ? Folder : FileText;
+            let displayName = node.name;
+
+            if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
+              const appDef = appRegistry[node.content as AppId];
+              NodeIcon = (Icons as Record<string, Icons.LucideIcon>)[appDef.icon] ?? FileText;
+              displayName = node.name.replace(/\.app$/, "");
+            }
+
+            return (
+              <button
+                key={node.id}
+                className="fx__item"
+                onDoubleClick={() => handleDoubleClick(node.id)}
+                onContextMenu={(e) => handleItemContext(e, node.id)}
+              >
+                <NodeIcon size={28} />
+                <span>{displayName}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

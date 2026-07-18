@@ -65,6 +65,19 @@
   opacity: 0.6;
 }
 
+.taskbar__app--pinned {
+  opacity: 0.55;
+  border-bottom: 2px dotted var(--color-accent);
+}
+
+.taskbar__app--pinned:hover {
+  opacity: 1;
+}
+
+.taskbar__app--pinned-running {
+  border-bottom: 2px solid var(--color-accent);
+}
+
 .taskbar__app span {
   overflow: hidden;
   text-overflow: ellipsis;

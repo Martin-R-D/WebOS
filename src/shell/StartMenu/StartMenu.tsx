@@ -1,7 +1,10 @@
+import { useState } from "react";
 import * as Icons from "lucide-react";
 import { appRegistry } from "../../apps/registry";
 import { useSystemStore } from "../../stores/useSystemStore";
 import { launchApp } from "../../lib/launch";
+import { ContextMenu } from "../ContextMenu/ContextMenu";
+import type { AppId, ContextMenuItem } from "../../types";
 import "./StartMenu.css";
 
 interface StartMenuProps {
@@ -11,17 +14,36 @@ interface StartMenuProps {
 
 export function StartMenu({ open, onClose }: StartMenuProps) {
   const username = useSystemStore((s) => s.username);
+  const pinnedApps = useSystemStore((s) => s.pinnedApps);
+  const pinApp = useSystemStore((s) => s.pinApp);
+  const unpinApp = useSystemStore((s) => s.unpinApp);
+
+  const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
 
   if (!open) return null;
 
   function handleLaunch(appId: string) {
-    launchApp(appId as keyof typeof appRegistry);
+    launchApp(appId as AppId);
     onClose();
   }
 
   function handleLock() {
     useSystemStore.getState().setLocked(true);
     onClose();
+  }
+
+  function handleAppContext(e: React.MouseEvent, appId: AppId) {
+    e.preventDefault();
+    e.stopPropagation();
+    const app = appRegistry[appId];
+    const isPinned = pinnedApps.includes(appId);
+    const items: ContextMenuItem[] = [
+      { label: "Open", icon: app.icon, onClick: () => { launchApp(appId); onClose(); } },
+      isPinned
+        ? { label: "Unpin from Taskbar", icon: "PinOff", onClick: () => unpinApp(appId) }
+        : { label: "Add to Taskbar", icon: "Pin", onClick: () => pinApp(appId) },
+    ];
+    setMenu({ x: e.clientX, y: e.clientY, items });
   }
 
   return (
@@ -45,6 +67,7 @@ export function StartMenu({ open, onClose }: StartMenuProps) {
                 key={app.id}
                 className="startmenu__app"
                 onClick={() => handleLaunch(app.id)}
+                onContextMenu={(e) => handleAppContext(e, app.id)}
               >
                 <AppIcon size={26} />
                 {app.name}
@@ -60,6 +83,15 @@ export function StartMenu({ open, onClose }: StartMenuProps) {
           </button>
         </div>
       </div>
+
+      {menu && (
+        <ContextMenu
+          x={menu.x}
+          y={menu.y}
+          items={menu.items}
+          onClose={() => setMenu(null)}
+        />
+      )}
     </div>
   );
 }

@@ -58,6 +58,9 @@ function openFileNode(node: FsNode) {
 
 export function Desktop({ children }: { children?: ReactNode }) {
   const wallpaper = useSystemStore((s) => s.wallpaper);
+  const pinnedApps = useSystemStore((s) => s.pinnedApps);
+  const pinApp = useSystemStore((s) => s.pinApp);
+  const unpinApp = useSystemStore((s) => s.unpinApp);
   const nodes = useFileSystemStore((s) => s.nodes);
   const rootId = useFileSystemStore((s) => s.rootId);
   const getChildren = useFileSystemStore((s) => s.getChildren);
@@ -88,11 +91,14 @@ export function Desktop({ children }: { children?: ReactNode }) {
     e.preventDefault();
     e.stopPropagation();
     const app = appRegistry[appId];
-    setMenu({
-      x: e.clientX,
-      y: e.clientY,
-      items: [{ label: "Open", icon: app.icon, onClick: () => launchApp(appId) }],
-    });
+    const isPinned = pinnedApps.includes(appId);
+    const items: ContextMenuItem[] = [
+      { label: "Open", icon: app.icon, onClick: () => launchApp(appId) },
+      isPinned
+        ? { label: "Unpin from Taskbar", icon: "PinOff", onClick: () => unpinApp(appId) }
+        : { label: "Add to Taskbar", icon: "Pin", onClick: () => pinApp(appId) },
+    ];
+    setMenu({ x: e.clientX, y: e.clientY, items });
   }
 
   function handleNodeContext(e: React.MouseEvent, node: FsNode) {
