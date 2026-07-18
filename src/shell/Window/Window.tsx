@@ -99,13 +99,11 @@ export function Window({ win }: { win: WindowState }) {
   return (
     <div
       className={cx("window", win.id === focusedId && "window--focused", win.isMaximized && "window--maximized")}
-      style={{
-        left: win.x,
-        top: win.y,
-        width: win.width,
-        height: win.height,
-        zIndex: win.zIndex,
-      }}
+      style={
+        win.isMaximized
+          ? { left: 0, top: 0, width: "100vw", height: "calc(100vh - var(--taskbar-height))", zIndex: win.zIndex }
+          : { left: win.x, top: win.y, width: win.width, height: win.height, zIndex: win.zIndex }
+      }
       onMouseDown={() => focusWindow(win.id)}
     >
       <div

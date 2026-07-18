@@ -17,7 +17,7 @@
 }
 
 .window--focused {
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 52px rgba(0, 0, 0, 0.55), 0 4px 16px rgba(108, 92, 231, 0.12);
   border-color: rgba(108, 92, 231, 0.5);
 }
 

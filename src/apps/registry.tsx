@@ -1,4 +1,4 @@
-import type { AppDefinition, AppId, AppProps } from "../types";
+import type { AppDefinition, AppId } from "../types";
 import { Calculator } from "./Calculator/Calculator";
 import { TextEditor } from "./TextEditor/TextEditor";
 import { FileExplorer } from "./FileExplorer/FileExplorer";
@@ -6,12 +6,9 @@ import { Terminal } from "./Terminal/Terminal";
 import { Settings } from "./Settings/Settings";
 import { MiniBrowser } from "./MiniBrowser/MiniBrowser";
 import { AboutMe } from "./AboutMe/AboutMe";
-
-const Placeholder = ({}: AppProps) => (
-  <div style={{ padding: 20, color: "var(--color-text-dim)" }}>
-    Coming soon…
-  </div>
-);
+import { Paint } from "./Paint/Paint";
+import { Clock } from "./Clock/Clock";
+import { TaskManager } from "./TaskManager/TaskManager";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
   "file-explorer": {
@@ -49,10 +46,10 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     name: "Calculator",
     icon: "Calculator",
     component: Calculator,
-    defaultWidth: 300,
-    defaultHeight: 440,
-    minWidth: 260,
-    minHeight: 380,
+    defaultWidth: 320,
+    defaultHeight: 500,
+    minWidth: 280,
+    minHeight: 440,
     singleInstance: true,
   },
   "settings": {
@@ -84,6 +81,38 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     defaultWidth: 560,
     defaultHeight: 520,
     minWidth: 380,
+    minHeight: 320,
+    singleInstance: true,
+  },
+  "paint": {
+    id: "paint",
+    name: "Paint",
+    icon: "Paintbrush",
+    component: Paint,
+    defaultWidth: 860,
+    defaultHeight: 580,
+    minWidth: 520,
+    minHeight: 400,
+  },
+  "clock": {
+    id: "clock",
+    name: "Clock",
+    icon: "Clock",
+    component: Clock,
+    defaultWidth: 380,
+    defaultHeight: 540,
+    minWidth: 320,
+    minHeight: 420,
+    singleInstance: true,
+  },
+  "task-manager": {
+    id: "task-manager",
+    name: "Task Manager",
+    icon: "Activity",
+    component: TaskManager,
+    defaultWidth: 560,
+    defaultHeight: 440,
+    minWidth: 440,
     minHeight: 320,
     singleInstance: true,
   },

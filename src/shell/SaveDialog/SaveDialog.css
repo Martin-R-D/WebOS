@@ -188,6 +188,12 @@
   filter: brightness(1.1);
 }
 
+.save-dialog__folder-error {
+  font-size: 11px;
+  color: var(--color-danger);
+  white-space: nowrap;
+}
+
 /* ---- Overwrite confirmation popup ---- */
 .save-confirm-overlay {
   position: fixed;

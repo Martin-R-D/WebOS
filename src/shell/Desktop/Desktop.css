@@ -34,6 +34,7 @@
 
 .desktop__icon:hover {
   background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
 }
 
 .desktop__icon--selected {

@@ -1,111 +1,127 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { AppProps } from "../../types";
 import { cx } from "../../lib/helpers";
+import { evaluateExpression } from "./evaluate";
 import "./Calculator.css";
 
-function compute(a: number, b: number, op: string): string {
-  switch (op) {
-    case "+": return String(a + b);
-    case "−": return String(a - b);
-    case "×": return String(a * b);
-    case "÷": return b === 0 ? "Error" : String(a / b);
-    default: return String(b);
-  }
+// pretty-print ASCII operators for the display
+function pretty(expr: string): string {
+  return expr.replace(/\*/g, "×").replace(/\//g, "÷").replace(/-/g, "−");
+}
+
+function formatResult(n: number): string {
+  const s = String(n);
+  return s.length > 14 ? n.toExponential(8) : s;
 }
 
 export function Calculator({}: AppProps) {
-  const [display, setDisplay] = useState("0");
-  const [previous, setPrevious] = useState<number | null>(null);
-  const [operator, setOperator] = useState<string | null>(null);
-  const [overwrite, setOverwrite] = useState(false);
+  const [expr, setExpr] = useState("");
+  const [justEvaluated, setJustEvaluated] = useState(false);
+  const [error, setError] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
-  function inputDigit(d: string) {
-    if (overwrite) {
-      setDisplay(d);
-      setOverwrite(false);
-    } else {
-      setDisplay(display === "0" ? d : display + d);
-    }
-  }
+  useEffect(() => {
+    wrapRef.current?.focus();
+  }, []);
 
-  function inputDot() {
-    if (overwrite) {
-      setDisplay("0.");
-      setOverwrite(false);
-      return;
+  const preview = evaluateExpression(expr);
+
+  function append(s: string) {
+    setError(false);
+    // typing a digit right after "=" starts fresh; an operator continues the result
+    if (justEvaluated) {
+      setJustEvaluated(false);
+      if (/[0-9.(]/.test(s)) {
+        setExpr(s);
+        return;
+      }
     }
-    if (!display.includes(".")) {
-      setDisplay(display + ".");
-    }
+    setExpr((prev) => prev + s);
   }
 
   function clearAll() {
-    setDisplay("0");
-    setPrevious(null);
-    setOperator(null);
-    setOverwrite(false);
+    setExpr("");
+    setError(false);
+    setJustEvaluated(false);
   }
 
   function backspace() {
-    if (overwrite) return;
-    const next = display.slice(0, -1);
-    setDisplay(next === "" || next === "-" ? "0" : next);
-  }
-
-  function percent() {
-    setDisplay(String(parseFloat(display) / 100));
-    setOverwrite(true);
-  }
-
-  function chooseOperator(op: string) {
-    if (previous !== null && operator && !overwrite) {
-      const result = compute(previous, parseFloat(display), operator);
-      setDisplay(result);
-      setPrevious(result === "Error" ? null : parseFloat(result));
-    } else {
-      setPrevious(parseFloat(display));
-    }
-    setOperator(op);
-    setOverwrite(true);
+    setError(false);
+    setExpr((prev) => prev.slice(0, -1));
   }
 
   function equals() {
-    if (operator && previous !== null) {
-      const result = compute(previous, parseFloat(display), operator);
-      setDisplay(result);
-      setPrevious(null);
-      setOperator(null);
-      setOverwrite(true);
+    const result = evaluateExpression(expr);
+    if (result === null) {
+      if (expr.trim()) setError(true);
+      return;
     }
+    setExpr(String(result));
+    setJustEvaluated(true);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    const k = e.key;
+    if (/^[0-9.]$/.test(k)) { append(k); e.preventDefault(); }
+    else if ("+-*/^%()".includes(k)) { append(k); e.preventDefault(); }
+    else if (k === "Enter" || k === "=") { equals(); e.preventDefault(); }
+    else if (k === "Backspace") { backspace(); e.preventDefault(); }
+    else if (k === "Escape") { clearAll(); e.preventDefault(); }
+  }
+
+  const KEYS: { label: string; onClick: () => void; cls?: string; span?: boolean }[] = [
+    { label: "C", onClick: clearAll, cls: "calc__key--fn" },
+    { label: "(", onClick: () => append("("), cls: "calc__key--fn" },
+    { label: ")", onClick: () => append(")"), cls: "calc__key--fn" },
+    { label: "⌫", onClick: backspace, cls: "calc__key--fn" },
+
+    { label: "7", onClick: () => append("7") },
+    { label: "8", onClick: () => append("8") },
+    { label: "9", onClick: () => append("9") },
+    { label: "÷", onClick: () => append("/"), cls: "calc__key--op" },
+
+    { label: "4", onClick: () => append("4") },
+    { label: "5", onClick: () => append("5") },
+    { label: "6", onClick: () => append("6") },
+    { label: "×", onClick: () => append("*"), cls: "calc__key--op" },
+
+    { label: "1", onClick: () => append("1") },
+    { label: "2", onClick: () => append("2") },
+    { label: "3", onClick: () => append("3") },
+    { label: "−", onClick: () => append("-"), cls: "calc__key--op" },
+
+    { label: "0", onClick: () => append("0") },
+    { label: ".", onClick: () => append(".") },
+    { label: "%", onClick: () => append("%") },
+    { label: "+", onClick: () => append("+"), cls: "calc__key--op" },
+
+    { label: "xʸ", onClick: () => append("^"), cls: "calc__key--op" },
+    { label: "=", onClick: equals, cls: "calc__key--accent", span: true },
+  ];
+
   return (
-    <div className="calc">
-      <div className="calc__display">{display}</div>
+    <div className="calc" ref={wrapRef} tabIndex={0} onKeyDown={handleKeyDown}>
+      <div className="calc__display">
+        <div className={cx("calc__expr", error && "calc__expr--error")}>
+          {error ? "Invalid expression" : pretty(expr) || "0"}
+        </div>
+        <div className="calc__preview">
+          {!error && !justEvaluated && preview !== null && expr && !/^-?[0-9.]+$/.test(expr)
+            ? `= ${formatResult(preview)}`
+            : " "}
+        </div>
+      </div>
       <div className="calc__pad">
-        <button className="calc__key" onClick={clearAll}>AC</button>
-        <button className="calc__key" onClick={backspace}>⌫</button>
-        <button className="calc__key" onClick={percent}>%</button>
-        <button className={cx("calc__key", "calc__key--op")} onClick={() => chooseOperator("÷")}>÷</button>
-
-        <button className="calc__key" onClick={() => inputDigit("7")}>7</button>
-        <button className="calc__key" onClick={() => inputDigit("8")}>8</button>
-        <button className="calc__key" onClick={() => inputDigit("9")}>9</button>
-        <button className={cx("calc__key", "calc__key--op")} onClick={() => chooseOperator("×")}>×</button>
-
-        <button className="calc__key" onClick={() => inputDigit("4")}>4</button>
-        <button className="calc__key" onClick={() => inputDigit("5")}>5</button>
-        <button className="calc__key" onClick={() => inputDigit("6")}>6</button>
-        <button className={cx("calc__key", "calc__key--op")} onClick={() => chooseOperator("−")}>−</button>
-
-        <button className="calc__key" onClick={() => inputDigit("1")}>1</button>
-        <button className="calc__key" onClick={() => inputDigit("2")}>2</button>
-        <button className="calc__key" onClick={() => inputDigit("3")}>3</button>
-        <button className={cx("calc__key", "calc__key--op")} onClick={() => chooseOperator("+")}>+</button>
-
-        <button className={cx("calc__key", "calc__key--wide")} onClick={() => inputDigit("0")}>0</button>
-        <button className="calc__key" onClick={inputDot}>.</button>
-        <button className={cx("calc__key", "calc__key--accent")} onClick={equals}>=</button>
+        {KEYS.map((key) => (
+          <button
+            key={key.label}
+            className={cx("calc__key", key.cls, key.span && "calc__key--span3")}
+            onClick={key.onClick}
+            tabIndex={-1}
+          >
+            {key.label}
+          </button>
+        ))}
       </div>
     </div>
   );

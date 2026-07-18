@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import type { AppProps } from "../../types";
+import type { AppProps, AppId } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useSystemStore } from "../../stores/useSystemStore";
+import { appRegistry } from "../registry";
+import { launchApp } from "../../lib/launch";
 import { playSound } from "../../lib/sound";
 import "./Terminal.css";
 
@@ -80,8 +82,21 @@ export function Terminal({}: AppProps) {
         out("  mkdir     Create a folder");
         out("  touch     Create an empty file");
         out("  rm        Remove a file or folder");
+        out("  open      Launch an app (e.g. open calculator)");
         out("  neofetch  System info");
         break;
+
+      case "open": {
+        if (!argStr) { err("open: missing app name (try: open calculator)"); break; }
+        const query = argStr.toLowerCase().replace(/\s+/g, "-");
+        const app = Object.values(appRegistry).find(
+          (a) => a.id === query || a.name.toLowerCase() === argStr.toLowerCase(),
+        );
+        if (!app) { err(`open: no app named '${argStr}'`); break; }
+        launchApp(app.id as AppId);
+        out(`Launching ${app.name}…`);
+        break;
+      }
 
       case "whoami":
         out(username);
@@ -191,7 +206,7 @@ export function Terminal({}: AppProps) {
     setHistoryPos(-1);
   }
 
-  const COMMANDS = ["help", "whoami", "date", "echo", "clear", "pwd", "ls", "cd", "cat", "mkdir", "touch", "rm", "neofetch"];
+  const COMMANDS = ["help", "whoami", "date", "echo", "clear", "pwd", "ls", "cd", "cat", "mkdir", "touch", "rm", "open", "neofetch"];
 
   function handleTab() {
     const parts = input.split(/\s+/);

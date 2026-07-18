@@ -68,6 +68,7 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
     }
 
     const newId = createNode(folderId, name, "file", text);
+    if (!newId) return; // name collision (e.g. a folder with this name) — keep dialog open
     setFileId(newId);
     setFileName(name);
     setDirty(false);

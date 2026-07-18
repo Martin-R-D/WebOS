@@ -1,6 +1,6 @@
 import { useSystemStore } from "../stores/useSystemStore";
 
-type SoundName = "open" | "close" | "click" | "error";
+type SoundName = "open" | "close" | "click" | "error" | "chime";
 
 let ctx: AudioContext | null = null;
 
@@ -19,6 +19,7 @@ const TONES: Record<SoundName, { freq: number; dur: number; type: OscillatorType
   close: { freq: 440, dur: 0.08, type: "sine" },
   click: { freq: 520, dur: 0.06, type: "triangle" },
   error: { freq: 200, dur: 0.12, type: "square" },
+  chime: { freq: 880, dur: 0.35, type: "sine" },
 };
 
 export function playSound(name: SoundName) {

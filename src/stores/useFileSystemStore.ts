@@ -34,6 +34,19 @@ function makeNode(
   };
 }
 
+const SYSTEM_APP_FILES: [string, string][] = [
+  ["File Explorer.app", "file-explorer"],
+  ["Text Editor.app", "text-editor"],
+  ["Terminal.app", "terminal"],
+  ["Calculator.app", "calculator"],
+  ["Settings.app", "settings"],
+  ["Browser.app", "browser"],
+  ["About Me.app", "about-me"],
+  ["Paint.app", "paint"],
+  ["Clock.app", "clock"],
+  ["Task Manager.app", "task-manager"],
+];
+
 function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
   const root = makeNode("/", "folder", null);
   const desktop = makeNode("Desktop", "folder", root.id);
@@ -60,17 +73,13 @@ function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
   );
 
   // System app shortcuts (.app files contain the appId)
-  const appFileExplorer = makeNode("File Explorer.app", "file", systemApps.id, "file-explorer");
-  const appTextEditor = makeNode("Text Editor.app", "file", systemApps.id, "text-editor");
-  const appTerminal = makeNode("Terminal.app", "file", systemApps.id, "terminal");
-  const appCalculator = makeNode("Calculator.app", "file", systemApps.id, "calculator");
-  const appSettings = makeNode("Settings.app", "file", systemApps.id, "settings");
-  const appBrowser = makeNode("Browser.app", "file", systemApps.id, "browser");
-  const appAboutMe = makeNode("About Me.app", "file", systemApps.id, "about-me");
+  const appFiles = SYSTEM_APP_FILES.map(([name, content]) =>
+    makeNode(name, "file", systemApps.id, content),
+  );
 
   const all = [
     root, desktop, documents, pictures, systemApps, aboutMe, readme, todo,
-    appFileExplorer, appTextEditor, appTerminal, appCalculator, appSettings, appBrowser, appAboutMe,
+    ...appFiles,
   ];
   const nodes: Record<string, FsNode> = {};
   for (const node of all) {
@@ -197,27 +206,25 @@ export const useFileSystemStore = create<FsState>()(
     }),
     {
       name: "webos-filesystem",
-      version: 2,
+      version: 3,
       partialize: (state) => ({ nodes: state.nodes, rootId: state.rootId }),
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as { nodes: Record<string, FsNode>; rootId: string };
-        if (version < 2) {
-          const hasSystemApps = Object.values(state.nodes).some(
-            (n) => n.parentId === state.rootId && n.name === "System Apps",
+        if (version < 3) {
+          // ensure the System Apps folder exists
+          let sysFolder = Object.values(state.nodes).find(
+            (n) => n.parentId === state.rootId && n.type === "folder" && n.name === "System Apps",
           );
-          if (!hasSystemApps) {
-            const sysFolder = makeNode("System Apps", "folder", state.rootId);
-            const apps: [string, string][] = [
-              ["File Explorer.app", "file-explorer"],
-              ["Text Editor.app", "text-editor"],
-              ["Terminal.app", "terminal"],
-              ["Calculator.app", "calculator"],
-              ["Settings.app", "settings"],
-              ["Browser.app", "browser"],
-              ["About Me.app", "about-me"],
-            ];
+          if (!sysFolder) {
+            sysFolder = makeNode("System Apps", "folder", state.rootId);
             state.nodes[sysFolder.id] = sysFolder;
-            for (const [name, content] of apps) {
+          }
+          // add any app shortcuts that are missing
+          for (const [name, content] of SYSTEM_APP_FILES) {
+            const exists = Object.values(state.nodes).some(
+              (n) => n.parentId === sysFolder!.id && n.name === name,
+            );
+            if (!exists) {
               const appNode = makeNode(name, "file", sysFolder.id, content);
               state.nodes[appNode.id] = appNode;
             }

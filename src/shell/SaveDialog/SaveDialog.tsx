@@ -18,6 +18,7 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
   const [folderId, setFolderId] = useState(initialFolderId ?? rootId);
   const [fileName, setFileName] = useState(initialName);
   const [conflictId, setConflictId] = useState<string | null>(null);
+  const [folderConflict, setFolderConflict] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -49,6 +50,12 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
   function handleSave() {
     const trimmed = fileName.trim();
     if (!trimmed) return;
+
+    // a folder with this name can't be overwritten by a file
+    if (children.some((n) => n.name === trimmed && n.type === "folder")) {
+      setFolderConflict(true);
+      return;
+    }
 
     const existing = children.find(
       (n) => n.name === trimmed && n.type === "file",
@@ -129,9 +136,12 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
             ref={inputRef}
             className="save-dialog__input"
             value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
+            onChange={(e) => { setFileName(e.target.value); setFolderConflict(false); }}
             onKeyDown={handleKeyDown}
           />
+          {folderConflict && (
+            <span className="save-dialog__folder-error">A folder with this name exists here</span>
+          )}
           <div className="save-dialog__actions">
             <button className="save-dialog__btn save-dialog__btn--cancel" onClick={onCancel}>
               Cancel

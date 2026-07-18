@@ -21,7 +21,10 @@ export type AppId =
   | "calculator"
   | "settings"
   | "browser"
-  | "about-me";
+  | "about-me"
+  | "paint"
+  | "clock"
+  | "task-manager";
 
 export interface AppDefinition {
   id: AppId;
