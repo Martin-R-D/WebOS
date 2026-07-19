@@ -61,7 +61,7 @@ export function StartMenu({ open, onClose }: StartMenuProps) {
 
         <div className="startmenu__grid">
           {Object.values(appRegistry).map((app) => {
-            const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
+            const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
             return (
               <button
                 key={app.id}

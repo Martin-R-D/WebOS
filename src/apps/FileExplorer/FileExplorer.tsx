@@ -231,7 +231,7 @@ export function FileExplorer({}: AppProps) {
 
             if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
               const appDef = appRegistry[node.content as AppId];
-              NodeIcon = (Icons as Record<string, Icons.LucideIcon>)[appDef.icon] ?? FileText;
+              NodeIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[appDef.icon] ?? FileText;
               displayName = node.name.replace(/\.app$/, "");
             } else if (isImageFile(node.name)) {
               NodeIcon = Icons.Image;

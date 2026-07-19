@@ -65,7 +65,7 @@ export function TaskManager({ windowId }: AppProps) {
 
       <div className="tm__list">
         {windows.map((win) => {
-          const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[win.icon] ?? Square;
+          const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Square;
           const isSelf = win.id === windowId;
           return (
             <div

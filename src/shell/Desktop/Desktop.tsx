@@ -190,7 +190,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
       <div className="desktop__icons">
         {APP_SHORTCUTS.map((appId) => {
           const app = appRegistry[appId];
-          const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
+          const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
           const pos = iconPositions[`app-${app.id}`];
           return (
             <button
@@ -214,7 +214,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
           let label = node.name;
           if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
             const appDef = appRegistry[node.content as AppId];
-            Icon = (Icons as Record<string, Icons.LucideIcon>)[appDef.icon] ?? Icons.FileText;
+            Icon = (Icons as unknown as Record<string, Icons.LucideIcon>)[appDef.icon] ?? Icons.FileText;
             label = node.name.replace(/\.app$/, "");
           } else if (isImageFile(node.name)) {
             Icon = Icons.Image;

@@ -77,7 +77,7 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
           .map((appId) => {
             const app = appRegistry[appId];
             if (!app) return null;
-            const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
+            const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
             return (
               <button
                 key={`pin-${appId}`}
@@ -94,7 +94,7 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
 
         {/* Running windows */}
         {windows.map((win) => {
-          const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
+          const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
           const isPinned = pinnedApps.includes(win.appId);
           return (
             <button

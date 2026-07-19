@@ -93,7 +93,7 @@ export function Window({ win }: { win: WindowState }) {
 
   if (win.isMinimized) return null;
 
-  const AppIcon = (Icons as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
+  const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
   const AppComponent = def.component;
 
   return (
