@@ -17,7 +17,6 @@ interface TaskbarProps {
 export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
   const windows = useWindowStore((s) => s.windows);
   const focusedId = useWindowStore((s) => s.focusedId);
-  const focusWindow = useWindowStore((s) => s.focusWindow);
   const minimizeWindow = useWindowStore((s) => s.minimizeWindow);
   const restoreWindow = useWindowStore((s) => s.restoreWindow);
   const closeWindow = useWindowStore((s) => s.closeWindow);
