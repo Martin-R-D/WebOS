@@ -7,9 +7,10 @@ import { useSystemStore } from "../../stores/useSystemStore";
 import { appRegistry } from "../registry";
 import { launchApp } from "../../lib/launch";
 import { openFsNode, isImageFile } from "../../lib/openNode";
+import { startNodeDrag, allowNodeDrop, dropNodeInto } from "../../lib/dragDrop";
 import { ContextMenu } from "../../shell/ContextMenu/ContextMenu";
 import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../../shell/FileDialogs/FileDialogs";
-import { isProtectedNode } from "../../lib/fsGuards";
+import { isProtectedNode, isSystemAppsFolder } from "../../lib/fsGuards";
 import { cx } from "../../lib/helpers";
 import "./FileExplorer.css";
 
@@ -39,6 +40,26 @@ export function FileExplorer({}: AppProps) {
   const [renameTarget, setRenameTarget] = useState<FsNode | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
   const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  // Shared drop-target props for anything that represents a folder.
+  // System Apps is locked: it never becomes a drop target.
+  function dropTargetProps(folderId: string) {
+    if (isSystemAppsFolder(getNode(folderId), rootId)) return {};
+    return {
+      onDragOver: (e: React.DragEvent) => {
+        e.stopPropagation();
+        if (allowNodeDrop(e)) setDragOverId(folderId);
+      },
+      onDragLeave: () => setDragOverId((cur) => (cur === folderId ? null : cur)),
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragOverId(null);
+        dropNodeInto(e, folderId);
+      },
+    };
+  }
 
   const currentFolderId = history[historyIndex];
   const children = getChildren(currentFolderId);
@@ -170,23 +191,37 @@ export function FileExplorer({}: AppProps) {
       <div className="fx__body">
         <div className="fx__sidebar">
           <button
-            className={cx("fx__side-item", currentFolderId === rootId && "fx__side-item--active")}
+            className={cx(
+              "fx__side-item",
+              currentFolderId === rootId && "fx__side-item--active",
+              dragOverId === rootId && "fx__side-item--dragover",
+            )}
             onClick={() => navigateTo(rootId)}
+            {...dropTargetProps(rootId)}
           >
             <Folder size={14} /> Root
           </button>
           {topFolders.map((f) => (
             <button
               key={f.id}
-              className={cx("fx__side-item", currentFolderId === f.id && "fx__side-item--active")}
+              className={cx(
+                "fx__side-item",
+                currentFolderId === f.id && "fx__side-item--active",
+                dragOverId === f.id && "fx__side-item--dragover",
+              )}
               onClick={() => navigateTo(f.id)}
+              {...dropTargetProps(f.id)}
             >
               <Folder size={14} /> {f.name}
             </button>
           ))}
         </div>
 
-        <div className="fx__grid" onContextMenu={handleEmptyContext}>
+        <div
+          className={cx("fx__grid", dragOverId === currentFolderId && "fx__grid--dragover")}
+          onContextMenu={handleEmptyContext}
+          {...dropTargetProps(currentFolderId)}
+        >
           {children.length === 0 && (
             <div className="fx__empty">This folder is empty</div>
           )}
@@ -202,12 +237,16 @@ export function FileExplorer({}: AppProps) {
               NodeIcon = Icons.Image;
             }
 
+            const isFolder = node.type === "folder";
             return (
               <button
                 key={node.id}
-                className="fx__item"
+                className={cx("fx__item", dragOverId === node.id && "fx__item--dragover")}
                 onDoubleClick={() => handleDoubleClick(node.id)}
                 onContextMenu={(e) => handleItemContext(e, node.id)}
+                draggable={!isProtectedNode(node, rootId) && !isSystemAppsFolder(currentNode, rootId)}
+                onDragStart={(e) => startNodeDrag(e, node.id)}
+                {...(isFolder ? dropTargetProps(node.id) : {})}
               >
                 <NodeIcon size={28} />
                 <span>{displayName}</span>

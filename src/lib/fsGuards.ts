@@ -18,6 +18,17 @@ export function isProtectedNode(node: FsNode | undefined, rootId: string): boole
   return false;
 }
 
+// The System Apps folder is fully locked for drag & drop: nothing can be
+// dragged into it, and nothing can be dragged out of it.
+export function isSystemAppsFolder(node: FsNode | undefined, rootId: string): boolean {
+  return (
+    !!node &&
+    node.type === "folder" &&
+    node.parentId === rootId &&
+    node.name === "System Apps"
+  );
+}
+
 // True if `maybeDescendantId` is inside the subtree rooted at `ancestorId`
 // (including the ancestor itself). Used to stop moving a folder into itself.
 export function isSelfOrDescendant(

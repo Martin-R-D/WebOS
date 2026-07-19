@@ -116,3 +116,21 @@
   font-size: 13px;
   padding: 32px;
 }
+
+/* ---- Drag & drop feedback ---- */
+.fx__item--dragover,
+.fx__side-item--dragover {
+  background: rgba(108, 92, 231, 0.25);
+  outline: 1px dashed var(--color-accent);
+  outline-offset: -1px;
+}
+
+.fx__grid--dragover {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: -6px;
+  border-radius: var(--radius-md);
+}
+
+.fx__item[draggable="true"] {
+  cursor: grab;
+}

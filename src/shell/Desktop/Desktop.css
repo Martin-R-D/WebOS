@@ -9,16 +9,13 @@
 
 .desktop__icons {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-height: calc(100vh - 80px);
+  inset: 0;
+  pointer-events: none; /* clicks on empty space fall through to the desktop */
 }
 
 .desktop__icon {
+  position: absolute;
+  pointer-events: auto;
   width: 88px;
   display: flex;
   flex-direction: column;
@@ -49,4 +46,15 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+/* ---- Drag & drop feedback ---- */
+.desktop__icon--dragover {
+  background: rgba(108, 92, 231, 0.35);
+  outline: 1px dashed rgba(255, 255, 255, 0.6);
+  outline-offset: -1px;
+}
+
+.desktop__icon[draggable="true"] {
+  cursor: grab;
 }

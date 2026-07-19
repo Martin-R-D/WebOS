@@ -2,10 +2,18 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AppId, SystemSettings, ThemeName } from "../types";
 
+export interface IconPos {
+  x: number;
+  y: number;
+}
+
 interface SystemStoreState extends SystemSettings {
   booted: boolean;
   locked: boolean;
   pinnedApps: AppId[];
+  // Saved desktop icon positions, keyed by icon key ("app-<id>" or fs node id)
+  desktopIconPos: Record<string, IconPos>;
+  setDesktopIconPos: (key: string, pos: IconPos) => void;
   setTheme: (t: ThemeName) => void;
   setWallpaper: (w: string) => void;
   setUsername: (n: string) => void;
@@ -33,6 +41,11 @@ export const useSystemStore = create<SystemStoreState>()(
       booted: false,
       locked: false,
       pinnedApps: [],
+      desktopIconPos: {},
+
+      setDesktopIconPos: (key, pos) => set((s) => ({
+        desktopIconPos: { ...s.desktopIconPos, [key]: pos },
+      })),
 
       setTheme: (t) => set({ theme: t }),
       setWallpaper: (w) => set({ wallpaper: w }),
@@ -47,7 +60,7 @@ export const useSystemStore = create<SystemStoreState>()(
       unpinApp: (id) => set((s) => ({
         pinnedApps: s.pinnedApps.filter((a) => a !== id),
       })),
-      resetSettings: () => set({ ...defaults, pinnedApps: [] }),
+      resetSettings: () => set({ ...defaults, pinnedApps: [], desktopIconPos: {} }),
     }),
     {
       name: "webos-system",
@@ -60,6 +73,7 @@ export const useSystemStore = create<SystemStoreState>()(
         soundEnabled: state.soundEnabled,
         locked: state.locked,
         pinnedApps: state.pinnedApps,
+        desktopIconPos: state.desktopIconPos,
       }),
     },
   ),
