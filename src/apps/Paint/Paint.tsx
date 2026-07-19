@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect } from "react";
-import { Paintbrush, Eraser, Undo2, Trash2, Download } from "lucide-react";
+import { Paintbrush, Eraser, Undo2, Trash2, Download, Save, SaveAll } from "lucide-react";
 import type { AppProps } from "../../types";
+import { useFileSystemStore } from "../../stores/useFileSystemStore";
+import { useWindowStore } from "../../stores/useWindowStore";
+import { SaveDialog } from "../../shell/SaveDialog/SaveDialog";
 import { cx } from "../../lib/helpers";
 import "./Paint.css";
 
@@ -15,24 +18,57 @@ const CANVAS_W = 1000;
 const CANVAS_H = 620;
 const MAX_UNDO = 25;
 
-export function Paint({}: AppProps) {
+export function Paint({ windowId, launchProps }: AppProps) {
+  const getNode = useFileSystemStore((s) => s.getNode);
+  const getChildren = useFileSystemStore((s) => s.getChildren);
+  const updateContent = useFileSystemStore((s) => s.updateContent);
+  const createNode = useFileSystemStore((s) => s.createNode);
+  const rootId = useFileSystemStore((s) => s.rootId);
+  const setTitle = useWindowStore((s) => s.setTitle);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const undoStack = useRef<ImageData[]>([]);
+
+  const initialFileId = (launchProps?.fileId as string) ?? null;
+  const [fileId, setFileId] = useState<string | null>(initialFileId);
+  const [fileName, setFileName] = useState("Untitled.png");
+  const [dirty, setDirty] = useState(false);
+  const [showSaveAs, setShowSaveAs] = useState(false);
 
   const [color, setColor] = useState(COLORS[7]);
   const [size, setSize] = useState(SIZES[1]);
   const [eraser, setEraser] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
 
+  // Initialise the canvas: white background, then load an existing image if opened from a file.
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+    if (initialFileId) {
+      const node = getNode(initialFileId);
+      if (node) {
+        setFileName(node.name);
+        setFileId(node.id);
+        if (node.content) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0, CANVAS_W, CANVAS_H);
+          };
+          img.src = node.content;
+        }
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    setTitle(windowId, dirty ? `${fileName} •` : fileName);
+  }, [fileName, dirty, windowId]);
 
   // map pointer position to internal canvas coordinates (canvas is CSS-scaled)
   function toCanvasPoint(e: React.PointerEvent): { x: number; y: number } {
@@ -57,6 +93,7 @@ export function Paint({}: AppProps) {
     if (!ctx) return;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     pushUndo();
+    setDirty(true);
     drawing.current = true;
 
     const { x, y } = toCanvasPoint(e);
@@ -88,6 +125,7 @@ export function Paint({}: AppProps) {
     if (!ctx || !prev) return;
     ctx.putImageData(prev, 0, 0);
     setCanUndo(undoStack.current.length > 0);
+    setDirty(true);
   }
 
   function clearCanvas() {
@@ -96,6 +134,40 @@ export function Paint({}: AppProps) {
     pushUndo();
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    setDirty(true);
+  }
+
+  function toDataUrl(): string {
+    return canvasRef.current?.toDataURL("image/png") ?? "";
+  }
+
+  function handleSave() {
+    if (fileId) {
+      updateContent(fileId, toDataUrl());
+      setDirty(false);
+    } else {
+      setShowSaveAs(true);
+    }
+  }
+
+  function handleSaveDialogConfirm(folderId: string, name: string, overwriteId?: string) {
+    const data = toDataUrl();
+
+    if (overwriteId) {
+      updateContent(overwriteId, data);
+      setFileId(overwriteId);
+      setFileName(name);
+      setDirty(false);
+      setShowSaveAs(false);
+      return;
+    }
+
+    const newId = createNode(folderId, name, "file", data);
+    if (!newId) return; // name collision with a folder — keep dialog open
+    setFileId(newId);
+    setFileName(name);
+    setDirty(false);
+    setShowSaveAs(false);
   }
 
   function download() {
@@ -103,13 +175,28 @@ export function Paint({}: AppProps) {
     if (!canvas) return;
     const a = document.createElement("a");
     a.href = canvas.toDataURL("image/png");
-    a.download = "painting.png";
+    a.download = fileName;
     a.click();
   }
+
+  // default the Save As dialog to the file's folder, else the Pictures folder
+  const currentParentId = fileId ? getNode(fileId)?.parentId : undefined;
+  const picturesId = getChildren(rootId).find(
+    (n) => n.type === "folder" && n.name === "Pictures",
+  )?.id;
 
   return (
     <div className="paint">
       <div className="paint__toolbar">
+        <div className="paint__actions">
+          <button className="paint__tool" onClick={handleSave} title="Save">
+            <Save size={15} />
+          </button>
+          <button className="paint__tool" onClick={() => setShowSaveAs(true)} title="Save As…">
+            <SaveAll size={15} />
+          </button>
+        </div>
+
         <div className="paint__tools">
           <button
             className={cx("paint__tool", !eraser && "paint__tool--active")}
@@ -159,7 +246,7 @@ export function Paint({}: AppProps) {
           <button className="paint__tool" onClick={clearCanvas} title="Clear">
             <Trash2 size={15} />
           </button>
-          <button className="paint__tool" onClick={download} title="Save as PNG">
+          <button className="paint__tool" onClick={download} title="Download as PNG">
             <Download size={15} />
           </button>
         </div>
@@ -177,6 +264,15 @@ export function Paint({}: AppProps) {
           onPointerLeave={handlePointerUp}
         />
       </div>
+
+      {showSaveAs && (
+        <SaveDialog
+          initialName={fileName}
+          initialFolderId={currentParentId ?? picturesId ?? undefined}
+          onSave={handleSaveDialogConfirm}
+          onCancel={() => setShowSaveAs(false)}
+        />
+      )}
     </div>
   );
 }

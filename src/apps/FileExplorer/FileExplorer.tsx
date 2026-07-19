@@ -3,10 +3,10 @@ import * as Icons from "lucide-react";
 import { ChevronLeft, ChevronRight, ArrowUp, FolderPlus, FilePlus, Folder, FileText } from "lucide-react";
 import type { AppProps, AppId, ContextMenuItem, FsNode } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
-import { useWindowStore } from "../../stores/useWindowStore";
 import { useSystemStore } from "../../stores/useSystemStore";
-import { appRegistry, getApp } from "../registry";
+import { appRegistry } from "../registry";
 import { launchApp } from "../../lib/launch";
+import { openFsNode, isImageFile } from "../../lib/openNode";
 import { ContextMenu } from "../../shell/ContextMenu/ContextMenu";
 import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../../shell/FileDialogs/FileDialogs";
 import { isProtectedNode } from "../../lib/fsGuards";
@@ -32,7 +32,6 @@ export function FileExplorer({}: AppProps) {
   const renameNode = useFileSystemStore((s) => s.renameNode);
   const deleteNode = useFileSystemStore((s) => s.deleteNode);
   const moveNode = useFileSystemStore((s) => s.moveNode);
-  const openWindow = useWindowStore((s) => s.openWindow);
 
   const [history, setHistory] = useState<string[]>([rootId]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -67,29 +66,13 @@ export function FileExplorer({}: AppProps) {
     if (currentNode && currentNode.parentId) navigateTo(currentNode.parentId);
   }
 
-  function openFile(nodeId: string) {
-    const node = getNode(nodeId);
-    if (!node) return;
-    const def = getApp("text-editor");
-    openWindow({
-      appId: "text-editor",
-      title: node.name,
-      icon: "FileText",
-      width: def.defaultWidth,
-      height: def.defaultHeight,
-      launchProps: { fileId: node.id },
-    });
-  }
-
   function handleDoubleClick(nodeId: string) {
     const node = getNode(nodeId);
     if (!node) return;
     if (node.type === "folder") {
       navigateTo(node.id);
-    } else if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
-      launchApp(node.content as AppId);
     } else {
-      openFile(node.id);
+      openFsNode(node);
     }
   }
 
@@ -215,6 +198,8 @@ export function FileExplorer({}: AppProps) {
               const appDef = appRegistry[node.content as AppId];
               NodeIcon = (Icons as Record<string, Icons.LucideIcon>)[appDef.icon] ?? FileText;
               displayName = node.name.replace(/\.app$/, "");
+            } else if (isImageFile(node.name)) {
+              NodeIcon = Icons.Image;
             }
 
             return (

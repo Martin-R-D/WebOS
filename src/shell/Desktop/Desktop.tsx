@@ -4,12 +4,12 @@ import { useSystemStore } from "../../stores/useSystemStore";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { appRegistry } from "../../apps/registry";
 import { launchApp } from "../../lib/launch";
+import { openFsNode, isImageFile } from "../../lib/openNode";
 import { cx } from "../../lib/helpers";
 import { isProtectedNode } from "../../lib/fsGuards";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
 import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../FileDialogs/FileDialogs";
 import type { AppId, ContextMenuItem, FsNode } from "../../types";
-import { useWindowStore } from "../../stores/useWindowStore";
 import "./Desktop.css";
 
 const APP_SHORTCUTS: AppId[] = ["about-me", "file-explorer", "terminal", "browser", "settings"];
@@ -27,33 +27,6 @@ function findDesktopFolderId(nodes: Record<string, FsNode>, rootId: string): str
     }
   }
   return null;
-}
-
-function openFileNode(node: FsNode) {
-  const { windows, openWindow, focusWindow } = useWindowStore.getState();
-  if (node.type === "folder") {
-    const existing = windows.find((w) => w.appId === "file-explorer" && w.launchProps?.folderId === node.id);
-    if (existing) { focusWindow(existing.id); return; }
-    openWindow({
-      appId: "file-explorer",
-      title: node.name,
-      icon: "Folder",
-      width: 720,
-      height: 480,
-      launchProps: { folderId: node.id },
-    });
-  } else {
-    const existing = windows.find((w) => w.appId === "text-editor" && w.launchProps?.fileId === node.id);
-    if (existing) { focusWindow(existing.id); return; }
-    openWindow({
-      appId: "text-editor",
-      title: node.name,
-      icon: "FileText",
-      width: 640,
-      height: 460,
-      launchProps: { fileId: node.id },
-    });
-  }
 }
 
 export function Desktop({ children }: { children?: ReactNode }) {
@@ -110,7 +83,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
       {
         label: "Open",
         icon: node.type === "folder" ? "Folder" : "FileText",
-        onClick: () => openFileNode(node),
+        onClick: () => openFsNode(node),
       },
     ];
 
@@ -151,17 +124,25 @@ export function Desktop({ children }: { children?: ReactNode }) {
         })}
 
         {desktopFiles.map((node) => {
-          const Icon = node.type === "folder" ? Icons.Folder : Icons.FileText;
+          let Icon: Icons.LucideIcon = node.type === "folder" ? Icons.Folder : Icons.FileText;
+          let label = node.name;
+          if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
+            const appDef = appRegistry[node.content as AppId];
+            Icon = (Icons as Record<string, Icons.LucideIcon>)[appDef.icon] ?? Icons.FileText;
+            label = node.name.replace(/\.app$/, "");
+          } else if (isImageFile(node.name)) {
+            Icon = Icons.Image;
+          }
           return (
             <button
               key={`fs-${node.id}`}
               className={cx("desktop__icon", selectedId === `fs-${node.id}` && "desktop__icon--selected")}
               onClick={(e) => { e.stopPropagation(); setSelectedId(`fs-${node.id}`); }}
-              onDoubleClick={() => openFileNode(node)}
+              onDoubleClick={() => openFsNode(node)}
               onContextMenu={(e) => handleNodeContext(e, node)}
             >
               <Icon size={30} />
-              <span>{node.name}</span>
+              <span>{label}</span>
             </button>
           );
         })}
