@@ -7,6 +7,7 @@ import { BootScreen } from "./shell/BootScreen/BootScreen";
 import { LockScreen } from "./shell/BootScreen/LockScreen";
 import { useWindowStore } from "./stores/useWindowStore";
 import { useSystemStore } from "./stores/useSystemStore";
+import { useKeyboardShortcuts } from "./lib/useKeyboardShortcuts";
 
 function App() {
   const windows = useWindowStore((s) => s.windows);
@@ -17,6 +18,14 @@ function App() {
   const setBooted = useSystemStore((s) => s.setBooted);
   const setLocked = useSystemStore((s) => s.setLocked);
   const [startOpen, setStartOpen] = useState(false);
+
+  useKeyboardShortcuts();
+
+  useEffect(() => {
+    const close = () => setStartOpen(false);
+    window.addEventListener("webos:close-menus", close);
+    return () => window.removeEventListener("webos:close-menus", close);
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
