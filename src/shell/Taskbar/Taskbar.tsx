@@ -22,7 +22,6 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
   const restoreWindow = useWindowStore((s) => s.restoreWindow);
   const closeWindow = useWindowStore((s) => s.closeWindow);
   const pinnedApps = useSystemStore((s) => s.pinnedApps);
-  const pinApp = useSystemStore((s) => s.pinApp);
   const unpinApp = useSystemStore((s) => s.unpinApp);
 
   const [now, setNow] = useState(new Date());
@@ -43,27 +42,19 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
     }
   }
 
-  function handlePinnedContext(e: React.MouseEvent, appId: AppId) {
+  function handleAppContext(e: React.MouseEvent, appId: AppId, winId?: string) {
     e.preventDefault();
     e.stopPropagation();
-    const app = appRegistry[appId];
-    const items: ContextMenuItem[] = [
-      { label: "Open", icon: app.icon, onClick: () => launchApp(appId) },
-      { label: "Unpin from Taskbar", icon: "PinOff", onClick: () => unpinApp(appId) },
-    ];
-    setMenu({ x: e.clientX, y: e.clientY, items });
-  }
-
-  function handleRunningContext(e: React.MouseEvent, winId: string, appId: AppId) {
-    e.preventDefault();
-    e.stopPropagation();
-    const isPinned = pinnedApps.includes(appId);
-    const items: ContextMenuItem[] = [
-      isPinned
-        ? { label: "Unpin from Taskbar", icon: "PinOff", onClick: () => unpinApp(appId) }
-        : { label: "Add to Taskbar", icon: "Pin", onClick: () => pinApp(appId) },
-      { label: "Close", icon: "X", danger: true, separatorBefore: true, onClick: () => closeWindow(winId) },
-    ];
+    const items: ContextMenuItem[] = [];
+    // "Close" only when the app is actually open (has a window)
+    if (winId) {
+      items.push({ label: "Close", icon: "X", danger: true, onClick: () => closeWindow(winId) });
+    }
+    // "Unpin" only when the app is pinned to the taskbar
+    if (pinnedApps.includes(appId)) {
+      items.push({ label: "Unpin", icon: "PinOff", onClick: () => unpinApp(appId) });
+    }
+    if (items.length === 0) return;
     setMenu({ x: e.clientX, y: e.clientY, items });
   }
 
@@ -92,7 +83,7 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
                 key={`pin-${appId}`}
                 className="taskbar__app taskbar__app--pinned"
                 onClick={() => launchApp(appId)}
-                onContextMenu={(e) => handlePinnedContext(e, appId)}
+                onContextMenu={(e) => handleAppContext(e, appId)}
                 title={app.name}
               >
                 <AppIcon size={14} />
@@ -115,7 +106,7 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
                 isPinned && "taskbar__app--pinned-running",
               )}
               onClick={() => handleAppClick(win.id, win.isMinimized)}
-              onContextMenu={(e) => handleRunningContext(e, win.id, win.appId)}
+              onContextMenu={(e) => handleAppContext(e, win.appId, win.id)}
             >
               <AppIcon size={14} />
               <span>{win.title}</span>
