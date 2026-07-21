@@ -9,7 +9,7 @@
 
 <p align="center">
   A fully functional desktop operating system running entirely in the browser.<br/>
-  Built with React, TypeScript, and Zustand — no backend, no database, just pure front-end magic.
+  Built with React, TypeScript, and Zustand - no backend, no database, just pure front-end magic.
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ## Overview
 
-WebOS is an interactive portfolio project that recreates the desktop OS experience in a web browser. It features a complete window manager, a virtual file system persisted in localStorage, drag-and-drop file management, multiple built-in applications, theming, keyboard shortcuts, and more — all without a single server-side dependency.
+WebOS is a fully functional desktop operating system that runs entirely in the browser. It features a complete window manager, a virtual file system persisted in localStorage, drag-and-drop file management, 10 built-in applications, theming, keyboard shortcuts, and more - all without a single server-side dependency.
 
 ---
 
@@ -50,13 +50,13 @@ WebOS is an interactive portfolio project that recreates the desktop OS experien
 | `Ctrl + ,` | Launch or focus Settings |
 | `Escape` | Close the Start Menu |
 
-These shortcuts work globally and are safe — they never interfere with typing in the Text Editor or Terminal.
+These shortcuts work globally and are safe  - they never interfere with typing in the Text Editor or Terminal.
 
 ### Virtual File System
 
 - Flat-map architecture (`Record<string, FsNode>`) with parent-child relationships
 - Persisted in localStorage with version-based migrations (currently v3)
-- Duplicate name prevention — creating, renaming, or moving a file/folder with a conflicting name is blocked
+- Duplicate name prevention  - creating, renaming, or moving a file/folder with a conflicting name is blocked
 - Protected system nodes (root folders, System Apps, `.app` shortcuts) cannot be renamed, moved, or deleted
 - The **System Apps** folder is fully locked: nothing can be dragged in or out
 - Corruption recovery: if the persisted state fails to load, it auto-resets and reloads
@@ -85,7 +85,7 @@ These shortcuts work globally and are safe — they never interfere with typing 
 - 25-step undo stack and clear canvas
 - **Save / Save As** into the virtual file system (stored as PNG data URL)
 - **Download** as a real PNG file to your computer
-- Reopen saved `.png` files for further editing — full round-trip persistence
+- Reopen saved `.png` files for further editing  - full round-trip persistence
 - Opens automatically when you double-click an image file (`.png`, `.jpg`, `.gif`, `.webp`, `.bmp`)
 
 #### Terminal
@@ -96,7 +96,7 @@ These shortcuts work globally and are safe — they never interfere with typing 
 - Error sound on invalid commands
 
 #### Calculator
-- Full expression engine (not simple A op B) — type complex expressions like `2^(3+4)*5`
+- Full expression engine (not simple A op B)  - type complex expressions like `2^(3+4)*5`
 - Supports: `+`, `-`, `*`, `/`, `^` (power), `%` (percent), parentheses `()`
 - Implicit multiplication: `2(3+4)` = 14
 - Unary minus: `-(5+3)` = -8
@@ -106,11 +106,11 @@ These shortcuts work globally and are safe — they never interfere with typing 
 
 #### Browser
 - Native start page with live clock, search bar, and speed-dial tiles
-- Searches go to Wikipedia (which allows embedding) — type a URL for direct navigation
+- Searches go to Wikipedia (which allows embedding)  - type a URL for direct navigation
 - Loading progress bar animation
 - Home button to return to the start page
 - "Open in new tab" button for sites that block iframes
-- No iframe loaded until you navigate — lightweight by default
+- No iframe loaded until you navigate  - lightweight by default
 
 #### Clock
 - **World Clock** tab: live time in 5 time zones (New York, London, Sofia, Tokyo, Sydney)
@@ -137,7 +137,7 @@ These shortcuts work globally and are safe — they never interfere with typing 
 ### Persistence & Safety
 
 - **Zustand + persist middleware** for file system and system settings
-- **Window state is never persisted** — fresh session every reload (intentional)
+- **Window state is never persisted**  - fresh session every reload (intentional)
 - **Version migrations** ensure new features (like added apps) appear for existing users without losing their files
 - **Factory reset** available in Settings or via Terminal (`open settings`)
 - **Corruption recovery** in `main.tsx`: if React fails to render due to corrupt state, all `webos-*` keys are cleared and the page reloads (guarded to prevent infinite loops)
@@ -145,7 +145,7 @@ These shortcuts work globally and are safe — they never interfere with typing 
 ### Design Details
 
 - Fully responsive token system with CSS custom properties
-- `prefers-reduced-motion` support — all animations disabled for users who prefer it
+- `prefers-reduced-motion` support  - all animations disabled for users who prefer it
 - Backdrop blur on taskbar, start menu, and context menus
 - Accent glow on focused windows
 - Desktop icons lift on hover
