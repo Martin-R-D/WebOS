@@ -9,7 +9,7 @@
 
 <p align="center">
   A fully functional desktop operating system running entirely in the browser.<br/>
-  Built with React, TypeScript, and Zustand - no backend, no database, just pure front-end magic.
+  Built with React, TypeScript, and Zustand - no backend, no database.
 </p>
 
 <p align="center">
