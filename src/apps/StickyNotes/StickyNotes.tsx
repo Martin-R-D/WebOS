@@ -30,6 +30,9 @@ export function StickyNotes({}: AppProps) {
         </button>
       </div>
       <div className="sticky-notes__grid">
+        {notes.length === 0 && (
+          <div className="sticky-notes__empty">No notes yet. Click "Add Note" to create one.</div>
+        )}
         {notes.map((note) => (
           <div key={note.id} className="sticky-notes__item" style={{ backgroundColor: note.color }}>
             <div className="sticky-notes__header">
