@@ -1,0 +1,7 @@
+#!/bin/sh
+# Runs the test suite before every commit; the commit is aborted if any test fails.
+echo "Running tests before commit..."
+npm test --silent || {
+  echo "Tests failed - commit aborted."
+  exit 1
+}
