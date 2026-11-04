@@ -236,6 +236,21 @@ src/
 
 ---
 
+## Testing
+
+The project uses [Vitest](https://vitest.dev) with jsdom and Testing Library.
+
+```bash
+npm test            # run the whole suite once
+npm run test:watch  # re-run on change
+```
+
+Tests live next to the code they cover (`*.test.ts` / `*.test.tsx`) and cover the stores, file system rules, drag and drop, app launching, keyboard shortcuts, the window manager, the shell (taskbar, start menu, context menu) and the apps.
+
+A pre-commit hook in `.githooks/` runs the suite before every commit and aborts the commit if a test fails. `npm install` enables it automatically (the `prepare` script points `core.hooksPath` at `.githooks`).
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
