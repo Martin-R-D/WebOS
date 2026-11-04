@@ -103,7 +103,11 @@ export function Window({ win }: { win: WindowState }) {
       const distToRight = vw - (finalX + win.width);
       const distToTop = finalY;
 
-      if (distToLeft < SNAP_THRESHOLD) {
+      const moved = Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3;
+
+      if (!moved) {
+        // plain click, no snapping
+      } else if (distToLeft < SNAP_THRESHOLD) {
         setBounds(win.id, { x: 0, y: 0, width: vw / 2, height: vh });
       } else if (distToRight < SNAP_THRESHOLD) {
         setBounds(win.id, { x: vw / 2, y: 0, width: vw / 2, height: vh });

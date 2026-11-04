@@ -55,7 +55,7 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 ### Virtual File System
 
 - Flat-map architecture (`Record<string, FsNode>`) with parent-child relationships
-- Persisted in localStorage with version-based migrations (currently v3)
+- Persisted in localStorage with version-based migrations (currently v4)
 - Duplicate name prevention  - creating, renaming, or moving a file/folder with a conflicting name is blocked
 - Protected system nodes (root folders, System Apps, `.app` shortcuts) cannot be renamed, moved, or deleted
 - The **System Apps** folder is fully locked: nothing can be dragged in or out
