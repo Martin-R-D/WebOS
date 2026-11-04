@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-secondary);
+  background-color: var(--color-surface);
+  color: var(--color-text);
   padding: 12px;
   gap: 12px;
 }
@@ -18,7 +19,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background-color: var(--accent-color);
+  background-color: var(--color-accent);
   color: white;
   border: none;
   border-radius: 4px;
@@ -44,6 +45,14 @@
   gap: 12px;
   flex: 1;
   overflow-y: auto;
+}
+
+.sticky-notes__empty {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  color: var(--color-text-dim);
+  font-size: 13px;
 }
 
 .sticky-notes__item {
