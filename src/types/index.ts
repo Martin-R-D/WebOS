@@ -24,7 +24,8 @@ export type AppId =
   | "about-me"
   | "paint"
   | "clock"
-  | "task-manager";
+  | "task-manager"
+  | "sticky-notes";
 
 export interface AppDefinition {
   id: AppId;

@@ -45,6 +45,7 @@ const SYSTEM_APP_FILES: [string, string][] = [
   ["Paint.app", "paint"],
   ["Clock.app", "clock"],
   ["Task Manager.app", "task-manager"],
+  ["Sticky Notes.app", "sticky-notes"],
 ];
 
 function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
