@@ -20,7 +20,7 @@
 
 ## Overview
 
-WebOS is a fully functional desktop operating system that runs entirely in the browser. It features a complete window manager, a virtual file system persisted in localStorage, drag-and-drop file management, 10 built-in applications, theming, keyboard shortcuts, and more - all without a single server-side dependency.
+WebOS is a fully functional desktop operating system that runs entirely in the browser. It features a complete window manager, a virtual file system persisted in localStorage, drag-and-drop file management, 11 built-in applications, window snapping, theming, keyboard shortcuts, and more - all without a single server-side dependency.
 
 ---
 
@@ -30,7 +30,7 @@ WebOS is a fully functional desktop operating system that runs entirely in the b
 
 | Feature | Description |
 |---------|-------------|
-| **Window Management** | Drag, resize (8-directional), minimize, maximize, and close windows. Z-index stacking with focus tracking. |
+| **Window Management** | Drag, resize (8-directional), minimize, maximize, and close windows. Edge snapping to left/right halves and top (maximize). Z-index stacking with focus tracking. |
 | **Movable Desktop Icons** | Freely drag icons anywhere on the desktop. Positions are saved and persist across sessions. |
 | **Drag & Drop File Management** | Move files between the desktop and File Explorer by dragging. Drop onto folders to move files inside them. |
 | **Taskbar** | Shows pinned apps and running windows. Click to focus/minimize. Right-click for Close/Unpin options. |
@@ -134,6 +134,12 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 #### About Me
 - Portfolio information page (editable in the file system as `About Me.txt`)
 
+#### Sticky Notes
+- Create, edit, and delete notes
+- Pick note color from 5 preset options (yellow, pink, blue, green, purple)
+- Notes persisted to localStorage with Zustand
+- Grid layout with responsive columns
+
 ### Persistence & Safety
 
 - **Zustand + persist middleware** for file system and system settings
@@ -203,6 +209,7 @@ src/
 │   ├── MiniBrowser/       # Embedded web browser
 │   ├── Paint/             # Canvas drawing app with save/load
 │   ├── Settings/          # System preferences
+│   ├── StickyNotes/       # Quick notes with color picker
 │   ├── TaskManager/       # Running processes & stats
 │   ├── Terminal/           # Command-line interface
 │   ├── TextEditor/        # Text editor with Save As dialog
@@ -226,6 +233,7 @@ src/
 │   └── Window/            # Window chrome (drag, resize, controls)
 ├── stores/                # Zustand state stores
 │   ├── useFileSystemStore.ts  # Virtual file system (persisted)
+│   ├── useNotesStore.ts       # Sticky notes (persisted)
 │   ├── useSystemStore.ts      # Settings & icon positions (persisted)
 │   └── useWindowStore.ts      # Window state (session only)
 ├── styles/                # Global CSS & design tokens
