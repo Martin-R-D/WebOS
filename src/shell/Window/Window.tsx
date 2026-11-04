@@ -23,7 +23,7 @@ export function Window({ win }: { win: WindowState }) {
   const minW = def.minWidth ?? 240;
   const minH = def.minHeight ?? 160;
 
-  const drag = useRef<{ active: boolean } | null>(null);
+  const drag = useRef<{ active: boolean; preview?: HTMLDivElement } | null>(null);
 
   function onTitleMouseDown(e: React.MouseEvent) {
     if ((e.target as HTMLElement).closest(".window__btn")) return;
@@ -34,23 +34,92 @@ export function Window({ win }: { win: WindowState }) {
     const startY = e.clientY;
     const origX = win.x;
     const origY = win.y;
+    const TASKBAR_HEIGHT = 48;
+    const SNAP_THRESHOLD = 20;
+
+    // Create preview overlay
+    const preview = document.createElement("div");
+    preview.style.position = "fixed";
+    preview.style.pointerEvents = "none";
+    preview.style.zIndex = "999999";
+    preview.style.backgroundColor = "rgba(108, 92, 231, 0.2)";
+    preview.style.border = "2px solid rgba(108, 92, 231, 0.6)";
+    preview.style.display = "none";
+    document.body.appendChild(preview);
 
     function onMouseMove(ev: MouseEvent) {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
-      const nextX = Math.max(-win.width + 120, Math.min(origX + dx, window.innerWidth - 120));
-      const nextY = Math.max(0, Math.min(origY + dy, window.innerHeight - 80));
+      let nextX = origX + dx;
+      let nextY = origY + dy;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - TASKBAR_HEIGHT;
+
+      // Boundary constraints
+      nextX = Math.max(-win.width + 120, Math.min(nextX, vw - 120));
+      nextY = Math.max(0, Math.min(nextY, vh - 80));
       moveWindow(win.id, nextX, nextY);
+
+      // Show snap preview based on proximity to edges
+      const distToLeft = nextX;
+      const distToRight = vw - (nextX + win.width);
+      const distToTop = nextY;
+
+      if (distToLeft < SNAP_THRESHOLD) {
+        preview.style.display = "block";
+        preview.style.left = "0";
+        preview.style.top = "0";
+        preview.style.width = vw / 2 + "px";
+        preview.style.height = vh + "px";
+      } else if (distToRight < SNAP_THRESHOLD) {
+        preview.style.display = "block";
+        preview.style.left = vw / 2 + "px";
+        preview.style.top = "0";
+        preview.style.width = vw / 2 + "px";
+        preview.style.height = vh + "px";
+      } else if (distToTop < SNAP_THRESHOLD) {
+        preview.style.display = "block";
+        preview.style.left = "0";
+        preview.style.top = "0";
+        preview.style.width = vw + "px";
+        preview.style.height = vh + "px";
+      } else {
+        preview.style.display = "none";
+      }
     }
 
-    function onMouseUp() {
+    function onMouseUp(ev: MouseEvent) {
       document.body.classList.remove("dragging");
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
+
+      // Snap to edges
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - TASKBAR_HEIGHT;
+      const finalX = origX + (ev.clientX - startX);
+      const finalY = origY + (ev.clientY - startY);
+
+      const distToLeft = finalX;
+      const distToRight = vw - (finalX + win.width);
+      const distToTop = finalY;
+
+      const moved = Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3;
+
+      if (!moved) {
+        // plain click, no snapping
+      } else if (distToLeft < SNAP_THRESHOLD) {
+        setBounds(win.id, { x: 0, y: 0, width: vw / 2, height: vh });
+      } else if (distToRight < SNAP_THRESHOLD) {
+        setBounds(win.id, { x: vw / 2, y: 0, width: vw / 2, height: vh });
+      } else if (distToTop < SNAP_THRESHOLD) {
+        toggleMaximize(win.id);
+      }
+
+      preview.remove();
       drag.current = null;
     }
 
-    drag.current = { active: true };
+    drag.current = { active: true, preview };
     document.body.classList.add("dragging");
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);

@@ -1,0 +1,118 @@
+.sticky-notes {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-secondary);
+  padding: 12px;
+  gap: 12px;
+}
+
+.sticky-notes__toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sticky-notes__btn-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.sticky-notes__btn-add:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.sticky-notes__btn-add:active {
+  transform: translateY(0);
+  opacity: 0.8;
+}
+
+.sticky-notes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sticky-notes__item {
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.sticky-notes__item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sticky-notes__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 6px;
+}
+
+.sticky-notes__color-picker {
+  flex: 1;
+  padding: 4px;
+  font-size: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.sticky-notes__color-picker:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.sticky-notes__btn-delete {
+  padding: 4px 6px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.5);
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sticky-notes__btn-delete:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: rgba(255, 0, 0, 0.7);
+}
+
+.sticky-notes__text {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.sticky-notes__text::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}

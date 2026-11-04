@@ -9,6 +9,7 @@ import { AboutMe } from "./AboutMe/AboutMe";
 import { Paint } from "./Paint/Paint";
 import { Clock } from "./Clock/Clock";
 import { TaskManager } from "./TaskManager/TaskManager";
+import { StickyNotes } from "./StickyNotes/StickyNotes";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
   "file-explorer": {
@@ -115,6 +116,16 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minWidth: 440,
     minHeight: 320,
     singleInstance: true,
+  },
+  "sticky-notes": {
+    id: "sticky-notes",
+    name: "Sticky Notes",
+    icon: "Sticky",
+    component: StickyNotes,
+    defaultWidth: 640,
+    defaultHeight: 480,
+    minWidth: 320,
+    minHeight: 300,
   },
 };
 
