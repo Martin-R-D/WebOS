@@ -7,6 +7,7 @@ interface FsState {
   rootId: string;
   getChildren: (parentId: string) => FsNode[];
   getNode: (id: string) => FsNode | undefined;
+  searchNodes: (query: string) => FsNode[];
   createNode: (parentId: string, name: string, type: NodeType, content?: string) => string;
   renameNode: (id: string, newName: string) => void;
   deleteNode: (id: string) => void;
@@ -125,6 +126,18 @@ export const useFileSystemStore = create<FsState>()(
       },
 
       getNode: (id: string) => get().nodes[id],
+
+      searchNodes: (query: string) => {
+        if (!query.trim()) return [];
+        const { nodes, rootId } = get();
+        const lower = query.toLowerCase();
+        return Object.values(nodes)
+          .filter((n) => n.id !== rootId && n.name.toLowerCase().includes(lower))
+          .sort((a, b) => {
+            if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
+            return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+          });
+      },
 
       createNode: (parentId: string, name: string, type: NodeType, content?: string) => {
         const { nodes } = get();
