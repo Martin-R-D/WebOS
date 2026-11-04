@@ -47,20 +47,6 @@ export function Window({ win }: { win: WindowState }) {
     preview.style.display = "none";
     document.body.appendChild(preview);
 
-    function getSnapBounds() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight - TASKBAR_HEIGHT;
-      return {
-        left: 0,
-        right: vw / 2,
-        top: 0,
-        bottom: vh,
-        fullLeft: { x: 0, y: 0, width: vw / 2, height: vh },
-        fullRight: { x: vw / 2, y: 0, width: vw / 2, height: vh },
-        fullTop: { x: 0, y: 0, width: vw, height: vh },
-      };
-    }
-
     function onMouseMove(ev: MouseEvent) {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;

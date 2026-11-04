@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import type { AppProps } from "../../types";
 import { useNotesStore } from "../../stores/useNotesStore";
-import { cx } from "../../lib/helpers";
 import "./StickyNotes.css";
 
 const COLORS = [
