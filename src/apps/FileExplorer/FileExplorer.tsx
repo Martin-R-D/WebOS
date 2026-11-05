@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as Icons from "lucide-react";
-import { ChevronLeft, ChevronRight, ArrowUp, FolderPlus, FilePlus, Folder, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUp, FolderPlus, FilePlus, Folder, FileText, Search, X } from "lucide-react";
 import type { AppProps, AppId, ContextMenuItem, FsNode } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useSystemStore } from "../../stores/useSystemStore";
@@ -29,6 +29,7 @@ export function FileExplorer({}: AppProps) {
   const getChildren = useFileSystemStore((s) => s.getChildren);
   const getNode = useFileSystemStore((s) => s.getNode);
   const getPath = useFileSystemStore((s) => s.getPath);
+  const searchNodes = useFileSystemStore((s) => s.searchNodes);
   const createNode = useFileSystemStore((s) => s.createNode);
   const renameNode = useFileSystemStore((s) => s.renameNode);
   const deleteNode = useFileSystemStore((s) => s.deleteNode);
@@ -41,6 +42,8 @@ export function FileExplorer({}: AppProps) {
   const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
   const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Shared drop-target props for anything that represents a folder.
   // System Apps is locked: it never becomes a drop target.
@@ -62,13 +65,17 @@ export function FileExplorer({}: AppProps) {
   }
 
   const currentFolderId = history[historyIndex];
-  const children = getChildren(currentFolderId);
+  const searchResults = searchQuery ? searchNodes(searchQuery) : [];
+  const children = searchQuery ? searchResults : getChildren(currentFolderId);
   const currentPath = getPath(currentFolderId);
   const currentNode = getNode(currentFolderId);
+  const isSearching = searchQuery.length > 0;
 
   const topFolders = getChildren(rootId).filter((n) => n.type === "folder");
 
   function navigateTo(folderId: string) {
+    setSearchQuery("");
+    setSearchOpen(false);
     const next = history.slice(0, historyIndex + 1);
     next.push(folderId);
     setHistory(next);
@@ -186,6 +193,29 @@ export function FileExplorer({}: AppProps) {
         <button className="fx__btn" onClick={() => createNode(currentFolderId, "untitled.txt", "file", "")}>
           <FilePlus size={16} />
         </button>
+        {searchOpen ? (
+          <div className="fx__search">
+            <Search size={14} />
+            <input
+              className="fx__search-input"
+              type="text"
+              placeholder="Search files…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+            <button
+              className="fx__btn fx__search-clear"
+              onClick={() => { setSearchQuery(""); setSearchOpen(false); }}
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ) : (
+          <button className="fx__btn" onClick={() => setSearchOpen(true)} aria-label="Search">
+            <Search size={16} />
+          </button>
+        )}
       </div>
 
       <div className="fx__body">
@@ -223,7 +253,9 @@ export function FileExplorer({}: AppProps) {
           {...dropTargetProps(currentFolderId)}
         >
           {children.length === 0 && (
-            <div className="fx__empty">This folder is empty</div>
+            <div className="fx__empty">
+              {isSearching ? `No results for "${searchQuery}"` : "This folder is empty"}
+            </div>
           )}
           {children.map((node) => {
             let NodeIcon: Icons.LucideIcon = node.type === "folder" ? Folder : FileText;
@@ -250,6 +282,9 @@ export function FileExplorer({}: AppProps) {
               >
                 <NodeIcon size={28} />
                 <span>{displayName}</span>
+                {isSearching && node.parentId && (
+                  <span className="fx__item-path">{getPath(node.parentId)}</span>
+                )}
               </button>
             );
           })}
