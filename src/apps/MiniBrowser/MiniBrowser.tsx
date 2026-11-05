@@ -21,7 +21,7 @@ const SPEED_DIAL: { label: string; url: string; icon: LucideIcon }[] = [
   { label: "OpenLibrary", url: "https://openlibrary.org", icon: Globe },
 ];
 
-function normalize(raw: string): string {
+export function normalize(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) return START;
   if (trimmed === START) return START;
