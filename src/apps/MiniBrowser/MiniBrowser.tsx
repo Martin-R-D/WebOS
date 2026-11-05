@@ -26,9 +26,8 @@ function normalize(raw: string): string {
   if (!trimmed) return START;
   if (trimmed === START) return START;
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  // looks like a domain -> url, otherwise -> search wikipedia (frame-friendly)
   if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(trimmed)) return "https://" + trimmed;
-  return "https://en.wikipedia.org/w/index.php?search=" + encodeURIComponent(trimmed);
+  return "https://duckduckgo.com/?q=" + encodeURIComponent(trimmed);
 }
 
 export function MiniBrowser({}: AppProps) {
