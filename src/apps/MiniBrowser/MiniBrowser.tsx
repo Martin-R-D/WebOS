@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   ChevronLeft, ChevronRight, RotateCw, ExternalLink, Home, Search,
-  Globe, BookOpen, Map, Code2, FlaskConical, Newspaper,
+  Globe, BookOpen, Map, Code2, Archive, Bird,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AppProps } from "../../types";
@@ -13,11 +13,11 @@ const START = "webos://start";
 // Sites known to allow iframe embedding. Most big sites (google, youtube,
 // twitter…) send X-Frame-Options / CSP and will refuse to render in a frame.
 const SPEED_DIAL: { label: string; url: string; icon: LucideIcon }[] = [
+  { label: "DuckDuckGo", url: "https://duckduckgo.com", icon: Bird },
   { label: "Wikipedia", url: "https://www.wikipedia.org", icon: BookOpen },
   { label: "OpenStreetMap", url: "https://www.openstreetmap.org", icon: Map },
   { label: "MDN Play", url: "https://developer.mozilla.org/en-US/play", icon: Code2 },
-  { label: "Example", url: "https://example.com", icon: FlaskConical },
-  { label: "Wiktionary", url: "https://www.wiktionary.org", icon: Newspaper },
+  { label: "Archive.org", url: "https://archive.org", icon: Archive },
   { label: "OpenLibrary", url: "https://openlibrary.org", icon: Globe },
 ];
 
