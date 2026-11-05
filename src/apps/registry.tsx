@@ -120,7 +120,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
   "sticky-notes": {
     id: "sticky-notes",
     name: "Sticky Notes",
-    icon: "Sticky",
+    icon: "StickyNote",
     component: StickyNotes,
     defaultWidth: 640,
     defaultHeight: 480,

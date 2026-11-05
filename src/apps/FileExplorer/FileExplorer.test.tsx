@@ -18,7 +18,7 @@ function renderExplorer() {
     width: 720,
     height: 480,
   });
-  return render(<FileExplorer winId={winId} />);
+  return render(<FileExplorer windowId={winId} />);
 }
 
 describe("FileExplorer search", () => {

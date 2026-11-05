@@ -88,7 +88,7 @@ describe("Window", () => {
       fireEvent.mouseDown(container.querySelector(".window__titlebar")!, { clientX: 200, clientY: 100 });
       fireEvent.mouseMove(window, { clientX: 260, clientY: 140 });
       expect(current(id)).toMatchObject({ x: x + 60, y: y + 40 });
-      fireEvent.mouseUp(window);
+      fireEvent.mouseUp(window, { clientX: 260, clientY: 140 });
       fireEvent.mouseMove(window, { clientX: 900, clientY: 700 });
       expect(current(id)).toMatchObject({ x: x + 60, y: y + 40 });
       expect(document.body).not.toHaveClass("dragging");
@@ -103,8 +103,8 @@ describe("Window", () => {
       expect(current(id).x).toBe(-current(id).width + 120);
       fireEvent.mouseMove(window, { clientX: 9000, clientY: 9000 });
       expect(current(id).x).toBe(window.innerWidth - 120);
-      expect(current(id).y).toBe(window.innerHeight - 80);
-      fireEvent.mouseUp(window);
+      expect(current(id).y).toBe(window.innerHeight - 48 - 80);
+      fireEvent.mouseUp(window, { clientX: 400, clientY: 300 });
     });
 
     it("cannot be dragged while maximized", () => {
