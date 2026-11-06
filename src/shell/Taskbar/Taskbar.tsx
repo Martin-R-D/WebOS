@@ -8,6 +8,7 @@ import { launchApp } from "../../lib/launch";
 import { formatClock, cx } from "../../lib/helpers";
 import { weatherIcon, weatherColor, toF } from "../../apps/Weather/weatherApi";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
+import { ClockPopup } from "./ClockPopup";
 import type { AppId, ContextMenuItem } from "../../types";
 import "./Taskbar.css";
 
@@ -52,6 +53,7 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
 
   const [now, setNow] = useState(new Date());
   const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
+  const [clockPopupOpen, setClockPopupOpen] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -145,9 +147,18 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
         <Icons.Wifi size={14} />
         <Icons.Volume2 size={14} />
         <TaskbarWeather />
-        <div className="taskbar__clock">
-          <span>{time}</span>
-          <small>{dateStr}</small>
+        <div className="taskbar__clock-wrapper">
+          <button
+            className={cx("taskbar__clock", clockPopupOpen && "taskbar__clock--active")}
+            onClick={() => setClockPopupOpen((v) => !v)}
+            aria-label="Toggle calendar popup"
+          >
+            <span>{time}</span>
+            <small>{dateStr}</small>
+          </button>
+          {clockPopupOpen && (
+            <ClockPopup onClose={() => setClockPopupOpen(false)} />
+          )}
         </div>
       </div>
 

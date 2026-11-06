@@ -26,7 +26,8 @@ export type AppId =
   | "clock"
   | "task-manager"
   | "sticky-notes"
-  | "weather";
+  | "weather"
+  | "calendar";
 
 export interface AppDefinition {
   id: AppId;

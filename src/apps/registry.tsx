@@ -11,6 +11,7 @@ import { Clock } from "./Clock/Clock";
 import { TaskManager } from "./TaskManager/TaskManager";
 import { StickyNotes } from "./StickyNotes/StickyNotes";
 import { Weather } from "./Weather/Weather";
+import { Calendar } from "./Calendar/Calendar";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
   "file-explorer": {
@@ -137,6 +138,17 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     defaultHeight: 480,
     minWidth: 320,
     minHeight: 380,
+    singleInstance: true,
+  },
+  "calendar": {
+    id: "calendar",
+    name: "Calendar",
+    icon: "CalendarDays",
+    component: Calendar,
+    defaultWidth: 900,
+    defaultHeight: 600,
+    minWidth: 700,
+    minHeight: 500,
     singleInstance: true,
   },
 };
