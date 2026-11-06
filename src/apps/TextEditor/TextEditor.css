@@ -170,21 +170,19 @@
   white-space: pre-wrap;
   word-break: break-word;
   overflow: hidden;
-  color: transparent;
+  color: var(--color-text);
   pointer-events: none;
-  background: transparent;
+  background: var(--color-surface);
 }
 
 .editor__mark {
-  background: rgba(255, 200, 0, 0.35);
+  background: rgba(255, 200, 0, 0.45);
   border-radius: 2px;
-  color: transparent;
 }
 
 .editor__mark--current {
-  background: rgba(255, 140, 0, 0.6);
+  background: rgba(255, 140, 0, 0.7);
   border-radius: 2px;
-  color: transparent;
 }
 
 .editor__area {

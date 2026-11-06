@@ -476,7 +476,7 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
               value={text}
               onChange={handleChange}
               spellCheck={false}
-              style={{ ...textareaStyle, ...(findOpen && matches.length > 0 ? { color: "transparent", caretColor: "var(--color-text)" } : {}) }}
+              style={{ ...textareaStyle, ...(findOpen && matches.length > 0 ? { color: "transparent", caretColor: "var(--color-text)", background: "transparent" } : {}) }}
               onSelect={updateCursorPos}
               onClick={updateCursorPos}
               onKeyUp={updateCursorPos}
