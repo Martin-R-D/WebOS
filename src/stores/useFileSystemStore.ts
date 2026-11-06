@@ -2,9 +2,17 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { FsNode, NodeType } from "../types";
 
+export interface DeletedEntry {
+  node: FsNode;
+  originalParentId: string;
+  originalPath: string;
+  deletedAt: number;
+}
+
 interface FsState {
   nodes: Record<string, FsNode>;
   rootId: string;
+  deletedNodes: Record<string, DeletedEntry>;
   getChildren: (parentId: string) => FsNode[];
   getNode: (id: string) => FsNode | undefined;
   searchNodes: (query: string) => FsNode[];
@@ -15,6 +23,9 @@ interface FsState {
   moveNode: (id: string, newParentId: string) => void;
   getPath: (id: string) => string;
   resetFileSystem: () => void;
+  restoreNode: (id: string) => void;
+  permanentlyDelete: (id: string) => void;
+  emptyRecycleBin: () => void;
 }
 
 function makeNode(
@@ -51,7 +62,17 @@ const SYSTEM_APP_FILES: [string, string][] = [
   ["Calendar.app", "calendar"],
 ];
 
-function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
+function getPathFromNodes(nodes: Record<string, FsNode>, rootId: string, id: string): string {
+  const parts: string[] = [];
+  let current = nodes[id];
+  while (current && current.id !== rootId) {
+    parts.unshift(current.name);
+    current = current.parentId ? nodes[current.parentId] : undefined!;
+  }
+  return "/" + parts.join("/");
+}
+
+function buildSeed(): { nodes: Record<string, FsNode>; rootId: string; deletedNodes: Record<string, DeletedEntry> } {
   const root = makeNode("/", "folder", null);
   const desktop = makeNode("Desktop", "folder", root.id);
   const documents = makeNode("Documents", "folder", root.id);
@@ -89,7 +110,7 @@ function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
   for (const node of all) {
     nodes[node.id] = node;
   }
-  return { nodes, rootId: root.id };
+  return { nodes, rootId: root.id, deletedNodes: {} };
 }
 
 function hasSiblingName(nodes: Record<string, FsNode>, parentId: string, name: string, excludeId?: string): boolean {
@@ -169,13 +190,82 @@ export const useFileSystemStore = create<FsState>()(
       deleteNode: (id: string) => {
         set((state) => {
           if (id === state.rootId) return state;
+          const node = state.nodes[id];
+          if (!node) return state;
+          const now = Date.now();
           const idsToRemove = collectDescendants(state.nodes, id);
-          const next = { ...state.nodes };
+          const nextNodes = { ...state.nodes };
+          const nextDeleted = { ...state.deletedNodes };
           for (const removeId of idsToRemove) {
-            delete next[removeId];
+            const n = nextNodes[removeId];
+            if (n) {
+              const originalPath = getPathFromNodes(state.nodes, state.rootId, removeId);
+              nextDeleted[removeId] = {
+                node: n,
+                originalParentId: n.parentId ?? state.rootId,
+                originalPath,
+                deletedAt: now,
+              };
+              delete nextNodes[removeId];
+            }
           }
-          return { nodes: next };
+          return { nodes: nextNodes, deletedNodes: nextDeleted };
         });
+      },
+
+      restoreNode: (id: string) => {
+        set((state) => {
+          const entry = state.deletedNodes[id];
+          if (!entry) return state;
+          // collect the top-level node and all its descendants in deletedNodes
+          const toRestore: string[] = [id];
+          const queue = [id];
+          while (queue.length > 0) {
+            const cur = queue.pop()!;
+            for (const [did, dentry] of Object.entries(state.deletedNodes)) {
+              if (dentry.node.parentId === cur && did !== id) {
+                toRestore.push(did);
+                queue.push(did);
+              }
+            }
+          }
+          const nextNodes = { ...state.nodes };
+          const nextDeleted = { ...state.deletedNodes };
+          for (const rid of toRestore) {
+            const e = nextDeleted[rid];
+            if (!e) continue;
+            const parentId = nextNodes[e.originalParentId] ? e.originalParentId : state.rootId;
+            nextNodes[rid] = { ...e.node, parentId };
+            delete nextDeleted[rid];
+          }
+          return { nodes: nextNodes, deletedNodes: nextDeleted };
+        });
+      },
+
+      permanentlyDelete: (id: string) => {
+        set((state) => {
+          const nextDeleted = { ...state.deletedNodes };
+          // remove node and all descendants in deletedNodes
+          const toRemove: string[] = [id];
+          const queue = [id];
+          while (queue.length > 0) {
+            const cur = queue.pop()!;
+            for (const [did, dentry] of Object.entries(nextDeleted)) {
+              if (dentry.node.parentId === cur && did !== id) {
+                toRemove.push(did);
+                queue.push(did);
+              }
+            }
+          }
+          for (const rid of toRemove) {
+            delete nextDeleted[rid];
+          }
+          return { deletedNodes: nextDeleted };
+        });
+      },
+
+      emptyRecycleBin: () => {
+        set({ deletedNodes: {} });
       },
 
       updateContent: (id: string, content: string) => {
@@ -217,15 +307,16 @@ export const useFileSystemStore = create<FsState>()(
       },
 
       resetFileSystem: () => {
-        set(buildSeed());
+        set({ ...buildSeed(), deletedNodes: {} });
       },
     }),
     {
       name: "webos-filesystem",
       version: 6,
-      partialize: (state) => ({ nodes: state.nodes, rootId: state.rootId }),
+      partialize: (state) => ({ nodes: state.nodes, rootId: state.rootId, deletedNodes: state.deletedNodes }),
       migrate: (persisted: unknown, version: number) => {
-        const state = persisted as { nodes: Record<string, FsNode>; rootId: string };
+        const state = persisted as { nodes: Record<string, FsNode>; rootId: string; deletedNodes?: Record<string, DeletedEntry> };
+        if (!state.deletedNodes) state.deletedNodes = {};
         if (version < 6) {
           // ensure the System Apps folder exists
           let sysFolder = Object.values(state.nodes).find(
