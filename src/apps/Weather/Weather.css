@@ -158,7 +158,6 @@
 }
 
 .weather__current-icon {
-  color: var(--color-accent);
   flex-shrink: 0;
 }
 

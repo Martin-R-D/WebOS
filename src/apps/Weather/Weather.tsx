@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import * as Icons from "lucide-react";
 import { RefreshCw, MapPin, Search, Thermometer, Droplets, Wind, ChevronRight } from "lucide-react";
 import { useWeatherStore } from "../../stores/useWeatherStore";
-import { weatherLabel, weatherIcon, toF } from "./weatherApi";
+import { weatherLabel, weatherIcon, weatherColor, toF } from "./weatherApi";
 import type { AppProps } from "../../types";
 import "./Weather.css";
 
@@ -37,13 +37,13 @@ export function Weather({}: AppProps) {
   const IconComp = (code: number) => {
     const name = weatherIcon(code);
     const I = (Icons as unknown as Record<string, Icons.LucideIcon>)[name] ?? Icons.Cloud;
-    return <I size={48} />;
+    return <I size={48} color={weatherColor(code)} />;
   };
 
   const SmallIcon = (code: number, size = 20) => {
     const name = weatherIcon(code);
     const I = (Icons as unknown as Record<string, Icons.LucideIcon>)[name] ?? Icons.Cloud;
-    return <I size={size} />;
+    return <I size={size} color={weatherColor(code)} />;
   };
 
   return (

@@ -6,7 +6,7 @@ import { useWeatherStore } from "../../stores/useWeatherStore";
 import { appRegistry } from "../../apps/registry";
 import { launchApp } from "../../lib/launch";
 import { formatClock, cx } from "../../lib/helpers";
-import { weatherIcon, toF } from "../../apps/Weather/weatherApi";
+import { weatherIcon, weatherColor, toF } from "../../apps/Weather/weatherApi";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
 import type { AppId, ContextMenuItem } from "../../types";
 import "./Taskbar.css";
@@ -30,7 +30,7 @@ function TaskbarWeather() {
       onClick={() => launchApp("weather")}
       title="Open Weather"
     >
-      <WeatherIcon size={14} />
+      <WeatherIcon size={14} color={weatherColor(weather.current.weatherCode)} />
       <span>{temp}</span>
     </button>
   );

@@ -94,6 +94,20 @@ export function weatherIcon(code: number): string {
   return "Cloud";
 }
 
+export function weatherColor(code: number): string {
+  if (code === 0) return "#f9c74f";           // clear — golden yellow
+  if (code <= 2) return "#f9a825";            // partly cloudy — warm yellow
+  if (code === 3) return "#90a4ae";           // overcast — steel grey
+  if (code <= 49) return "#b0bec5";           // fog — light grey-blue
+  if (code <= 57) return "#64b5f6";           // drizzle — light blue
+  if (code <= 67) return "#1e88e5";           // rain — mid blue
+  if (code <= 77) return "#90caf9";           // snow — icy blue
+  if (code <= 82) return "#1565c0";           // rain showers — deep blue
+  if (code <= 86) return "#b3e5fc";           // snow showers — pale blue
+  if (code <= 99) return "#f4a261";           // thunderstorm — amber orange
+  return "#90a4ae";
+}
+
 export function toF(c: number): number {
   return Math.round(c * 9 / 5 + 32);
 }
