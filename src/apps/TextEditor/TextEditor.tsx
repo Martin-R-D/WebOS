@@ -79,14 +79,6 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
     setMatchIndex((prev) => (found.length ? Math.min(prev, found.length - 1) : 0));
   }, [findText, text]);
 
-  // Highlight current match in textarea
-  useEffect(() => {
-    if (!findOpen || matches.length === 0 || !textareaRef.current) return;
-    const start = matches[matchIndex];
-    const end = start + findText.length;
-    textareaRef.current.focus();
-    textareaRef.current.setSelectionRange(start, end);
-  }, [matchIndex, matches, findOpen]);
 
   function handleSave() {
     if (fileId) {
@@ -163,12 +155,26 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
 
   function goNext() {
     if (!matches.length) return;
-    setMatchIndex((i) => (i + 1) % matches.length);
+    const next = (matchIndex + 1) % matches.length;
+    setMatchIndex(next);
+    setTimeout(() => {
+      if (!textareaRef.current) return;
+      const start = matches[next];
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(start, start + findText.length);
+    }, 0);
   }
 
   function goPrev() {
     if (!matches.length) return;
-    setMatchIndex((i) => (i - 1 + matches.length) % matches.length);
+    const prev = (matchIndex - 1 + matches.length) % matches.length;
+    setMatchIndex(prev);
+    setTimeout(() => {
+      if (!textareaRef.current) return;
+      const start = matches[prev];
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(start, start + findText.length);
+    }, 0);
   }
 
   function replaceCurrent() {
