@@ -1,5 +1,6 @@
 import { Trash2, Trash, RotateCcw, X, FileText, Folder } from "lucide-react";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
+import { notify } from "../../lib/notify";
 import type { AppProps } from "../../types";
 import "./RecycleBin.css";
 
@@ -36,13 +37,24 @@ export function RecycleBin({}: AppProps) {
     }
   }
 
+  function handlePermanentlyDelete(id: string) {
+    permanentlyDelete(id);
+    notify("Recycle Bin", "1 item permanently deleted", "Trash2", "#ef4444");
+  }
+
+  function handleEmptyRecycleBin() {
+    const count = topLevel.length;
+    emptyRecycleBin();
+    notify("Recycle Bin", `${count} item(s) permanently deleted`, "Trash2", "#ef4444");
+  }
+
   return (
     <div className="rb">
       <div className="rb__toolbar">
         <button
           className="rb__btn rb__btn--danger"
           disabled={isEmpty}
-          onClick={emptyRecycleBin}
+          onClick={handleEmptyRecycleBin}
         >
           <Trash size={14} />
           Empty Recycle Bin
@@ -95,7 +107,7 @@ export function RecycleBin({}: AppProps) {
                     <button
                       className="rb__action-btn rb__action-btn--danger"
                       title="Delete Permanently"
-                      onClick={() => permanentlyDelete(id)}
+                      onClick={() => handlePermanentlyDelete(id)}
                     >
                       <X size={14} />
                     </button>

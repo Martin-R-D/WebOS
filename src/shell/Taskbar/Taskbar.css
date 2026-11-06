@@ -130,6 +130,189 @@
   display: block;
 }
 
+/* Bell / notification button */
+.taskbar__bell-wrapper {
+  position: relative;
+}
+
+.taskbar__bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 7px;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.taskbar__bell:hover,
+.taskbar__bell--active {
+  background: var(--color-hover);
+}
+
+.taskbar__bell-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Notification panel */
+.notif-panel {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-height: 420px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.notif-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.notif-panel__title {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.notif-panel__header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.notif-panel__action-btn {
+  font-size: 11px;
+  color: var(--color-accent);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background var(--transition);
+}
+
+.notif-panel__action-btn:hover {
+  background: var(--color-hover);
+}
+
+.notif-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--color-text-dim);
+  font-size: 13px;
+}
+
+.notif-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.notif-panel__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  transition: background var(--transition);
+}
+
+.notif-panel__item:hover {
+  background: var(--color-hover);
+}
+
+.notif-panel__item--unread {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 9px;
+  background: color-mix(in srgb, var(--color-accent) 5%, transparent);
+}
+
+.notif-panel__item-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notif-panel__item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notif-panel__item-title {
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-panel__item-message {
+  font-size: 11px;
+  color: var(--color-text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notif-panel__item-time {
+  font-size: 10px;
+  color: var(--color-text-dim);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notif-panel__item-dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  color: var(--color-text-dim);
+  opacity: 0;
+  transition: background var(--transition), opacity var(--transition), color var(--transition);
+}
+
+.notif-panel__item:hover .notif-panel__item-dismiss {
+  opacity: 1;
+}
+
+.notif-panel__item-dismiss:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
 /* Clock popup */
 .clock-popup {
   position: absolute;
