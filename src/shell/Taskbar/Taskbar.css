@@ -91,6 +91,22 @@
   font-size: 12px;
 }
 
+.taskbar__weather {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  color: var(--color-text-dim);
+  transition: background var(--transition), color var(--transition);
+}
+
+.taskbar__weather:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
 .taskbar__clock {
   text-align: right;
   line-height: 1.2;

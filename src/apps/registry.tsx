@@ -10,6 +10,7 @@ import { Paint } from "./Paint/Paint";
 import { Clock } from "./Clock/Clock";
 import { TaskManager } from "./TaskManager/TaskManager";
 import { StickyNotes } from "./StickyNotes/StickyNotes";
+import { Weather } from "./Weather/Weather";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
   "file-explorer": {
@@ -126,6 +127,17 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     defaultHeight: 480,
     minWidth: 320,
     minHeight: 300,
+  },
+  "weather": {
+    id: "weather",
+    name: "Weather",
+    icon: "CloudSun",
+    component: Weather,
+    defaultWidth: 380,
+    defaultHeight: 480,
+    minWidth: 320,
+    minHeight: 380,
+    singleInstance: true,
   },
 };
 

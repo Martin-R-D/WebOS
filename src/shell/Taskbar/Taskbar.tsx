@@ -2,12 +2,39 @@ import { useState, useEffect } from "react";
 import * as Icons from "lucide-react";
 import { useWindowStore } from "../../stores/useWindowStore";
 import { useSystemStore } from "../../stores/useSystemStore";
+import { useWeatherStore } from "../../stores/useWeatherStore";
 import { appRegistry } from "../../apps/registry";
 import { launchApp } from "../../lib/launch";
 import { formatClock, cx } from "../../lib/helpers";
+import { weatherIcon, weatherColor, toF } from "../../apps/Weather/weatherApi";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
 import type { AppId, ContextMenuItem } from "../../types";
 import "./Taskbar.css";
+
+function TaskbarWeather() {
+  const { weather, unit, refresh } = useWeatherStore();
+
+  useEffect(() => {
+    if (!weather) refresh();
+  }, []);
+
+  if (!weather) return null;
+
+  const iconName = weatherIcon(weather.current.weatherCode);
+  const WeatherIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[iconName] ?? Icons.Cloud;
+  const temp = unit === "C" ? `${weather.current.temp}°` : `${toF(weather.current.temp)}°`;
+
+  return (
+    <button
+      className="taskbar__weather"
+      onClick={() => launchApp("weather")}
+      title="Open Weather"
+    >
+      <WeatherIcon size={14} color={weatherColor(weather.current.weatherCode)} />
+      <span>{temp}</span>
+    </button>
+  );
+}
 
 interface TaskbarProps {
   onToggleStart: () => void;
@@ -117,6 +144,7 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
       <div className="taskbar__tray">
         <Icons.Wifi size={14} />
         <Icons.Volume2 size={14} />
+        <TaskbarWeather />
         <div className="taskbar__clock">
           <span>{time}</span>
           <small>{dateStr}</small>
