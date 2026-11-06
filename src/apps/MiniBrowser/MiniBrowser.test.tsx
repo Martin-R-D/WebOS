@@ -32,9 +32,9 @@ describe("normalize", () => {
     expect(normalize("docs.google.com/something")).toBe("https://docs.google.com/something");
   });
 
-  it("searches DuckDuckGo for plain text queries", () => {
-    expect(normalize("hello world")).toBe("https://duckduckgo.com/?q=hello%20world");
-    expect(normalize("what is javascript")).toBe("https://duckduckgo.com/?q=what%20is%20javascript");
+  it("searches DuckDuckGo Lite for plain text queries", () => {
+    expect(normalize("hello world")).toBe("https://lite.duckduckgo.com/lite/?q=hello%20world");
+    expect(normalize("what is javascript")).toBe("https://lite.duckduckgo.com/lite/?q=what%20is%20javascript");
   });
 
   it("returns the start page for webos://start", () => {
@@ -48,7 +48,6 @@ describe("MiniBrowser", () => {
   it("renders the start page with clock, search box, and speed dial", () => {
     renderBrowser();
     expect(screen.getByPlaceholderText("Search the web…")).toBeInTheDocument();
-    expect(screen.getByText("DuckDuckGo")).toBeInTheDocument();
     expect(screen.getByText("Wikipedia")).toBeInTheDocument();
     expect(screen.getByText("OpenStreetMap")).toBeInTheDocument();
     expect(screen.getByText("MDN Play")).toBeInTheDocument();
@@ -62,7 +61,7 @@ describe("MiniBrowser", () => {
     await userEvent.type(searchBox, "test query{Enter}");
     const iframe = container.querySelector("iframe");
     expect(iframe).toBeInTheDocument();
-    expect(iframe!.src).toBe("https://duckduckgo.com/?q=test%20query");
+    expect(iframe!.src).toBe("https://lite.duckduckgo.com/lite/?q=test%20query");
   });
 
   it("navigates via the URL bar", async () => {
