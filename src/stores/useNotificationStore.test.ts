@@ -57,9 +57,6 @@ describe("useNotificationStore", () => {
   });
 
   it("persists under webos-notifications key", () => {
-    const { name } = (useNotificationStore as unknown as { _persist: { options: { name: string } } })
-      ._persist?.options ?? { name: "" };
-    // Check via store name in persist config — verify storage key indirectly
     expect(useNotificationStore.persist.getOptions().name).toBe("webos-notifications");
   });
 });
