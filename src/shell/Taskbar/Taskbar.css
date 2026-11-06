@@ -107,13 +107,210 @@
   color: var(--color-text);
 }
 
+.taskbar__clock-wrapper {
+  position: relative;
+}
+
 .taskbar__clock {
   text-align: right;
   line-height: 1.2;
+  padding: 4px 7px;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.taskbar__clock:hover,
+.taskbar__clock--active {
+  background: var(--color-hover);
 }
 
 .taskbar__clock small {
   color: var(--color-text-dim);
   font-size: 10px;
   display: block;
+}
+
+/* Clock popup */
+.clock-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.clock-popup__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.clock-popup__month-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.clock-popup__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.clock-popup__nav:hover {
+  background: var(--color-hover);
+}
+
+.clock-popup__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.clock-popup__day-label {
+  text-align: center;
+  font-size: 10px;
+  color: var(--color-text-dim);
+  padding: 2px 0 4px;
+  font-weight: 500;
+}
+
+.clock-popup__day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  font-size: 11px;
+  border-radius: 6px;
+  transition: background var(--transition);
+  gap: 1px;
+}
+
+.clock-popup__day:hover {
+  background: var(--color-hover);
+}
+
+.clock-popup__day--today {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.clock-popup__day--today:hover {
+  opacity: 0.9;
+}
+
+.clock-popup__day--selected:not(.clock-popup__day--today) {
+  background: var(--color-hover);
+  outline: 1px solid var(--color-accent);
+}
+
+.clock-popup__dots {
+  display: flex;
+  gap: 2px;
+}
+
+.clock-popup__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  display: block;
+}
+
+.clock-popup__events {
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.clock-popup__events-title {
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--color-text-dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.clock-popup__no-events {
+  color: var(--color-text-dim);
+  font-size: 11px;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.clock-popup__event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.clock-popup__event-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.clock-popup__event-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.clock-popup__event-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clock-popup__event-time {
+  color: var(--color-text-dim);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.clock-popup__footer {
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.clock-popup__open-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--color-accent);
+  transition: background var(--transition);
+}
+
+.clock-popup__open-btn:hover {
+  background: var(--color-hover);
 }
