@@ -8,6 +8,7 @@ import { LockScreen } from "./shell/BootScreen/LockScreen";
 import { useWindowStore } from "./stores/useWindowStore";
 import { useSystemStore } from "./stores/useSystemStore";
 import { useKeyboardShortcuts } from "./lib/useKeyboardShortcuts";
+import { ToastManager } from "./shell/Toast/ToastManager";
 
 function App() {
   const windows = useWindowStore((s) => s.windows);
@@ -45,6 +46,7 @@ function App() {
       ))}
       <StartMenu open={startOpen} onClose={() => setStartOpen(false)} />
       <Taskbar onToggleStart={() => setStartOpen((v) => !v)} startOpen={startOpen} />
+      <ToastManager />
     </Desktop>
   );
 }
