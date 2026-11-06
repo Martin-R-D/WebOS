@@ -32,9 +32,9 @@ describe("normalize", () => {
     expect(normalize("docs.google.com/something")).toBe("https://docs.google.com/something");
   });
 
-  it("searches DuckDuckGo Lite for plain text queries", () => {
-    expect(normalize("hello world")).toBe("https://lite.duckduckgo.com/lite/?q=hello%20world");
-    expect(normalize("what is javascript")).toBe("https://lite.duckduckgo.com/lite/?q=what%20is%20javascript");
+  it("returns a webos search URL for plain text queries", () => {
+    expect(normalize("hello world")).toBe("webos://search?q=hello%20world");
+    expect(normalize("what is javascript")).toBe("webos://search?q=what%20is%20javascript");
   });
 
   it("returns the start page for webos://start", () => {
@@ -55,13 +55,14 @@ describe("MiniBrowser", () => {
     expect(screen.getByText("OpenLibrary")).toBeInTheDocument();
   });
 
-  it("navigates to DuckDuckGo Lite when typing a search query", async () => {
-    const { container } = renderBrowser();
-    const searchBox = screen.getByPlaceholderText("Search the web…");
-    await userEvent.type(searchBox, "test query{Enter}");
-    const iframe = container.querySelector("iframe");
-    expect(iframe).toBeInTheDocument();
-    expect(iframe!.src).toBe("https://lite.duckduckgo.com/lite/?q=test%20query");
+  it("opens a real tab for search queries instead of loading in iframe", async () => {
+    const opened: string[] = [];
+    const origOpen = window.open;
+    window.open = (url?: string | URL) => { opened.push(String(url)); return null; };
+    renderBrowser();
+    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "test query{Enter}");
+    expect(opened[0]).toBe("https://duckduckgo.com/?q=test%20query");
+    window.open = origOpen;
   });
 
   it("navigates via the URL bar", async () => {
@@ -80,12 +81,11 @@ describe("MiniBrowser", () => {
 
   it("home button returns to start page", async () => {
     renderBrowser();
-    const searchBox = screen.getByPlaceholderText("Search the web…");
-    await userEvent.type(searchBox, "test{Enter}");
+    const urlBar = screen.getByPlaceholderText("Search or enter address");
+    await userEvent.type(urlBar, "example.com{Enter}");
     expect(screen.queryByPlaceholderText("Search the web…")).not.toBeInTheDocument();
 
-    const homeBtn = screen.getByTitle("Home");
-    await userEvent.click(homeBtn);
+    await userEvent.click(screen.getByTitle("Home"));
     expect(screen.getByPlaceholderText("Search the web…")).toBeInTheDocument();
   });
 

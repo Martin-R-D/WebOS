@@ -26,7 +26,7 @@ export function normalize(raw: string): string {
   if (trimmed === START) return START;
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(trimmed)) return "https://" + trimmed;
-  return "https://lite.duckduckgo.com/lite/?q=" + encodeURIComponent(trimmed);
+  return "webos://search?q=" + encodeURIComponent(trimmed);
 }
 
 export function MiniBrowser({}: AppProps) {
@@ -49,6 +49,11 @@ export function MiniBrowser({}: AppProps) {
 
   function navigate(raw: string) {
     const next = normalize(raw);
+    if (next.startsWith("webos://search?q=")) {
+      const q = next.slice("webos://search?q=".length);
+      window.open("https://duckduckgo.com/?q=" + q, "_blank");
+      return;
+    }
     const newHistory = history.slice(0, index + 1);
     newHistory.push(next);
     setHistory(newHistory);
