@@ -18,7 +18,7 @@ describe("useFileSystemStore", () => {
         expect.arrayContaining(["Desktop", "Documents", "Pictures", "System Apps", "About Me.txt"]),
       );
       const apps = fs().getChildren(byName("System Apps").id);
-      expect(apps).toHaveLength(12);
+      expect(apps).toHaveLength(13);
       expect(apps.every((a) => a.name.endsWith(".app") && a.content)).toBe(true);
     });
 
@@ -161,7 +161,7 @@ describe("useFileSystemStore", () => {
       const id = fs().createNode(byName("Desktop").id, "mine.txt", "file", "");
       fs().resetFileSystem();
       expect(fs().getNode(id)).toBeUndefined();
-      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(12);
+      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(13);
     });
   });
 
@@ -169,7 +169,7 @@ describe("useFileSystemStore", () => {
     it("persists nodes under the webos-filesystem key", () => {
       fs().createNode(byName("Desktop").id, "persisted.txt", "file", "");
       const raw = JSON.parse(localStorage.getItem("webos-filesystem")!);
-      expect(raw.version).toBe(5);
+      expect(raw.version).toBe(6);
       const names = Object.values<{ name: string }>(raw.state.nodes).map((n) => n.name);
       expect(names).toContain("persisted.txt");
     });
@@ -192,7 +192,7 @@ describe("useFileSystemStore", () => {
         }),
       );
       await useFileSystemStore.persist.rehydrate();
-      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(12);
+      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(13);
       expect(fs().getNode("mine")!.content).toBe("precious");
     });
   });

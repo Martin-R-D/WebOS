@@ -48,6 +48,7 @@ const SYSTEM_APP_FILES: [string, string][] = [
   ["Task Manager.app", "task-manager"],
   ["Sticky Notes.app", "sticky-notes"],
   ["Weather.app", "weather"],
+  ["Calendar.app", "calendar"],
 ];
 
 function buildSeed(): { nodes: Record<string, FsNode>; rootId: string } {
@@ -221,11 +222,11 @@ export const useFileSystemStore = create<FsState>()(
     }),
     {
       name: "webos-filesystem",
-      version: 5,
+      version: 6,
       partialize: (state) => ({ nodes: state.nodes, rootId: state.rootId }),
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as { nodes: Record<string, FsNode>; rootId: string };
-        if (version < 5) {
+        if (version < 6) {
           // ensure the System Apps folder exists
           let sysFolder = Object.values(state.nodes).find(
             (n) => n.parentId === state.rootId && n.type === "folder" && n.name === "System Apps",
