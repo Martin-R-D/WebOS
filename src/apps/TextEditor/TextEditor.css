@@ -154,9 +154,44 @@
   flex-direction: row;
 }
 
-.editor__area {
+.editor__area-wrap {
   flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.editor__highlight-backdrop {
+  position: absolute;
+  inset: 0;
+  padding: 14px;
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+  color: transparent;
+  pointer-events: none;
+  background: transparent;
+}
+
+.editor__mark {
+  background: rgba(255, 200, 0, 0.35);
+  border-radius: 2px;
+  color: transparent;
+}
+
+.editor__mark--current {
+  background: rgba(255, 140, 0, 0.6);
+  border-radius: 2px;
+  color: transparent;
+}
+
+.editor__area {
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
   resize: none;
   border: none;
   outline: none;

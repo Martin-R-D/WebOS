@@ -10,6 +10,25 @@ import "./TextEditor.css";
 
 marked.setOptions({ async: false });
 
+function buildHighlightedText(text: string, matches: number[], currentIndex: number, matchLen: number): React.ReactNode {
+  if (!matches.length || !matchLen) return text;
+  const nodes: React.ReactNode[] = [];
+  let pos = 0;
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i];
+    const end = start + matchLen;
+    if (start > pos) nodes.push(text.slice(pos, start));
+    nodes.push(
+      <mark key={i} className={i === currentIndex ? "editor__mark--current" : "editor__mark"}>
+        {text.slice(start, end)}
+      </mark>
+    );
+    pos = end;
+  }
+  if (pos < text.length) nodes.push(text.slice(pos));
+  return nodes;
+}
+
 export function TextEditor({ windowId, launchProps }: AppProps) {
   const getNode = useFileSystemStore((s) => s.getNode);
   const updateContent = useFileSystemStore((s) => s.updateContent);
@@ -43,6 +62,7 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
   const [cursorCol, setCursorCol] = useState(1);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
   const findInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -444,17 +464,30 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
 
       <div className={`editor__body${viewMode === "split" ? " editor__body--split" : ""}`}>
         {viewMode !== "preview" && (
-          <textarea
-            ref={textareaRef}
-            className="editor__area"
-            value={text}
-            onChange={handleChange}
-            spellCheck={false}
-            style={textareaStyle}
-            onSelect={updateCursorPos}
-            onClick={updateCursorPos}
-            onKeyUp={updateCursorPos}
-          />
+          <div className="editor__area-wrap">
+            {findOpen && matches.length > 0 && (
+              <div ref={backdropRef} className="editor__highlight-backdrop" style={textareaStyle} aria-hidden="true">
+                {buildHighlightedText(text, matches, matchIndex, findText.length)}
+              </div>
+            )}
+            <textarea
+              ref={textareaRef}
+              className="editor__area"
+              value={text}
+              onChange={handleChange}
+              spellCheck={false}
+              style={{ ...textareaStyle, ...(findOpen && matches.length > 0 ? { color: "transparent", caretColor: "var(--color-text)" } : {}) }}
+              onSelect={updateCursorPos}
+              onClick={updateCursorPos}
+              onKeyUp={updateCursorPos}
+              onScroll={() => {
+                if (backdropRef.current && textareaRef.current) {
+                  backdropRef.current.scrollTop = textareaRef.current.scrollTop;
+                  backdropRef.current.scrollLeft = textareaRef.current.scrollLeft;
+                }
+              }}
+            />
+          </div>
         )}
         {viewMode !== "edit" && (
           <div
