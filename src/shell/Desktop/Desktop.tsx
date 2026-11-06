@@ -4,6 +4,7 @@ import { useSystemStore } from "../../stores/useSystemStore";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { appRegistry } from "../../apps/registry";
 import { launchApp } from "../../lib/launch";
+import { Trash2, Trash } from "lucide-react";
 import { openFsNode, isImageFile } from "../../lib/openNode";
 import {
   startNodeDrag, startIconDrag, isNodeDrag, isIconDrag,
@@ -64,6 +65,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
   const setDesktopIconPos = useSystemStore((s) => s.setDesktopIconPos);
   const nodes = useFileSystemStore((s) => s.nodes);
   const rootId = useFileSystemStore((s) => s.rootId);
+  const deletedNodes = useFileSystemStore((s) => s.deletedNodes);
   const getChildren = useFileSystemStore((s) => s.getChildren);
   const renameNode = useFileSystemStore((s) => s.renameNode);
   const deleteNode = useFileSystemStore((s) => s.deleteNode);
@@ -87,6 +89,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
     const keys = [
       ...APP_SHORTCUTS.map((id) => `app-${id}`),
       ...desktopFiles.map((n) => n.id),
+      "recycle-bin",
     ];
     for (const key of keys) {
       iconPositions[key] = desktopIconPos[key] ?? defaultIconPos(flowIndex++);
@@ -171,7 +174,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
       items.push(
         { label: "Rename", icon: "Pencil", onClick: () => setRenameTarget(node) },
         { label: "Move to…", icon: "FolderInput", onClick: () => setMoveTarget(node) },
-        { label: "Delete", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
+        { label: "Move to Recycle Bin", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
       );
     }
 
@@ -208,6 +211,27 @@ export function Desktop({ children }: { children?: ReactNode }) {
             </button>
           );
         })}
+
+        {/* Permanent Recycle Bin icon */}
+        {(() => {
+          const rbPos = iconPositions["recycle-bin"];
+          const RecycleBinIcon = Object.keys(deletedNodes).length > 0 ? Trash : Trash2;
+          return (
+            <button
+              key="recycle-bin"
+              className={cx("desktop__icon", selectedId === "recycle-bin" && "desktop__icon--selected")}
+              style={{ left: rbPos.x, top: rbPos.y }}
+              onClick={(e) => { e.stopPropagation(); setSelectedId("recycle-bin"); }}
+              onDoubleClick={() => launchApp("recycle-bin")}
+              onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setMenu({ x: e.clientX, y: e.clientY, items: [{ label: "Open", icon: "Trash2", onClick: () => launchApp("recycle-bin") }] }); }}
+              draggable
+              onDragStart={(e) => startIconDrag(e, "recycle-bin")}
+            >
+              <RecycleBinIcon size={30} />
+              <span>Recycle Bin</span>
+            </button>
+          );
+        })()}
 
         {desktopFiles.map((node) => {
           let Icon: Icons.LucideIcon = node.type === "folder" ? Icons.Folder : Icons.FileText;

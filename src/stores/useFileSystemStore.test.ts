@@ -18,7 +18,7 @@ describe("useFileSystemStore", () => {
         expect.arrayContaining(["Desktop", "Documents", "Pictures", "System Apps", "About Me.txt"]),
       );
       const apps = fs().getChildren(byName("System Apps").id);
-      expect(apps).toHaveLength(13);
+      expect(apps).toHaveLength(14);
       expect(apps.every((a) => a.name.endsWith(".app") && a.content)).toBe(true);
     });
 
@@ -130,7 +130,16 @@ describe("useFileSystemStore", () => {
   });
 
   describe("deleteNode", () => {
-    it("deletes a folder together with all of its descendants", () => {
+    it("soft-deletes a node into deletedNodes instead of removing it", () => {
+      const desktop = byName("Desktop").id;
+      const id = fs().createNode(desktop, "gone.txt", "file", "bye");
+      fs().deleteNode(id);
+      expect(fs().getNode(id)).toBeUndefined();
+      expect(fs().deletedNodes[id]).toBeDefined();
+      expect(fs().deletedNodes[id].node.name).toBe("gone.txt");
+    });
+
+    it("soft-deletes a folder together with all descendants", () => {
       const docs = byName("Documents").id;
       const sub = fs().createNode(docs, "sub", "folder");
       const deep = fs().createNode(sub, "deep.txt", "file", "");
@@ -138,6 +147,9 @@ describe("useFileSystemStore", () => {
       expect(fs().getNode(docs)).toBeUndefined();
       expect(fs().getNode(sub)).toBeUndefined();
       expect(fs().getNode(deep)).toBeUndefined();
+      expect(fs().deletedNodes[docs]).toBeDefined();
+      expect(fs().deletedNodes[sub]).toBeDefined();
+      expect(fs().deletedNodes[deep]).toBeDefined();
       expect(byName("Desktop")).toBeDefined();
     });
 
@@ -145,6 +157,68 @@ describe("useFileSystemStore", () => {
       const count = Object.keys(fs().nodes).length;
       fs().deleteNode(fs().rootId);
       expect(Object.keys(fs().nodes)).toHaveLength(count);
+    });
+  });
+
+  describe("recycle bin", () => {
+    it("restoreNode moves node back to nodes", () => {
+      const desktop = byName("Desktop").id;
+      const id = fs().createNode(desktop, "restore.txt", "file", "hi");
+      fs().deleteNode(id);
+      expect(fs().getNode(id)).toBeUndefined();
+      fs().restoreNode(id);
+      expect(fs().getNode(id)).toBeDefined();
+      expect(fs().getNode(id)!.name).toBe("restore.txt");
+      expect(fs().deletedNodes[id]).toBeUndefined();
+    });
+
+    it("restoreNode restores to rootId if original parent no longer exists", () => {
+      const docs = byName("Documents").id;
+      const sub = fs().createNode(docs, "tempfolder", "folder");
+      const child = fs().createNode(sub, "child.txt", "file", "");
+      // delete just the child first (while parent is still in nodes)
+      fs().deleteNode(child);
+      // now delete the parent (this hard-deletes sub from nodes and moves to deleted)
+      fs().deleteNode(sub);
+      // restore child — its parent (sub) is no longer in nodes, should go to rootId
+      fs().restoreNode(child);
+      expect(fs().getNode(child)!.parentId).toBe(fs().rootId);
+    });
+
+    it("permanentlyDelete removes from deletedNodes", () => {
+      const desktop = byName("Desktop").id;
+      const id = fs().createNode(desktop, "perm.txt", "file", "");
+      fs().deleteNode(id);
+      expect(fs().deletedNodes[id]).toBeDefined();
+      fs().permanentlyDelete(id);
+      expect(fs().deletedNodes[id]).toBeUndefined();
+    });
+
+    it("emptyRecycleBin clears all deletedNodes", () => {
+      const desktop = byName("Desktop").id;
+      fs().createNode(desktop, "a.txt", "file", "");
+      fs().createNode(desktop, "b.txt", "file", "");
+      const a = Object.values(fs().nodes).find((n) => n.name === "a.txt")!.id;
+      const b = Object.values(fs().nodes).find((n) => n.name === "b.txt")!.id;
+      fs().deleteNode(a);
+      fs().deleteNode(b);
+      expect(Object.keys(fs().deletedNodes).length).toBe(2);
+      fs().emptyRecycleBin();
+      expect(Object.keys(fs().deletedNodes).length).toBe(0);
+    });
+
+    it("descendants are soft-deleted and restored together", () => {
+      const docs = byName("Documents").id;
+      const folder = fs().createNode(docs, "myfolder", "folder");
+      const child = fs().createNode(folder, "child.txt", "file", "");
+      fs().deleteNode(folder);
+      expect(fs().deletedNodes[folder]).toBeDefined();
+      expect(fs().deletedNodes[child]).toBeDefined();
+      fs().restoreNode(folder);
+      expect(fs().getNode(folder)).toBeDefined();
+      expect(fs().getNode(child)).toBeDefined();
+      expect(fs().deletedNodes[folder]).toBeUndefined();
+      expect(fs().deletedNodes[child]).toBeUndefined();
     });
   });
 
@@ -161,7 +235,7 @@ describe("useFileSystemStore", () => {
       const id = fs().createNode(byName("Desktop").id, "mine.txt", "file", "");
       fs().resetFileSystem();
       expect(fs().getNode(id)).toBeUndefined();
-      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(13);
+      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(14);
     });
   });
 
@@ -169,7 +243,7 @@ describe("useFileSystemStore", () => {
     it("persists nodes under the webos-filesystem key", () => {
       fs().createNode(byName("Desktop").id, "persisted.txt", "file", "");
       const raw = JSON.parse(localStorage.getItem("webos-filesystem")!);
-      expect(raw.version).toBe(6);
+      expect(raw.version).toBe(7);
       const names = Object.values<{ name: string }>(raw.state.nodes).map((n) => n.name);
       expect(names).toContain("persisted.txt");
     });
@@ -192,7 +266,7 @@ describe("useFileSystemStore", () => {
         }),
       );
       await useFileSystemStore.persist.rehydrate();
-      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(13);
+      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(14);
       expect(fs().getNode("mine")!.content).toBe("precious");
     });
   });

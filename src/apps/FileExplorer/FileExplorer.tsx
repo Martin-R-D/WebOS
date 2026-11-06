@@ -150,7 +150,7 @@ export function FileExplorer({}: AppProps) {
       }
 
       items.push(
-        { label: "Delete", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
+        { label: "Move to Recycle Bin", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
       );
     }
 

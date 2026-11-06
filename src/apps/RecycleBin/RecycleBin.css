@@ -1,0 +1,156 @@
+.rb {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+.rb__toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.rb__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rb__btn:hover:not(:disabled) {
+  background: var(--color-hover);
+}
+
+.rb__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rb__btn--danger {
+  color: #e06060;
+  border-color: #c05050;
+}
+
+.rb__btn--danger:hover:not(:disabled) {
+  background: rgba(200, 60, 60, 0.12);
+}
+
+.rb__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex: 1;
+  color: var(--color-text-dim);
+  font-size: 15px;
+}
+
+.rb__empty-icon {
+  color: var(--color-text-dim);
+  opacity: 0.6;
+}
+
+.rb__list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.rb__list-header {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 80px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+}
+
+.rb__row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 80px;
+  padding: 8px 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  transition: background 0.1s;
+}
+
+.rb__row:hover {
+  background: var(--color-hover);
+}
+
+.rb__col-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb__row-icon {
+  flex-shrink: 0;
+  color: var(--color-text-dim);
+}
+
+.rb__col-path {
+  color: var(--color-text-dim);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb__col-time {
+  color: var(--color-text-dim);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.rb__col-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.rb__action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.rb__action-btn:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.rb__action-btn--danger:hover {
+  background: rgba(200, 60, 60, 0.15);
+  color: #e06060;
+}
