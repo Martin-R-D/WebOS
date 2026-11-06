@@ -9,12 +9,12 @@ interface ToastProps {
 }
 
 export function Toast({ notification }: ToastProps) {
-  const dismiss = useNotificationStore((s) => s.dismiss);
+  const markRead = useNotificationStore((s) => s.markRead);
   const [dismissing, setDismissing] = useState(false);
 
   function handleDismiss() {
     setDismissing(true);
-    setTimeout(() => dismiss(notification.id), 280);
+    setTimeout(() => markRead(notification.id), 280);
   }
 
   useEffect(() => {

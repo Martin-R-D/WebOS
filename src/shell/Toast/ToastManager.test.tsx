@@ -35,15 +35,14 @@ describe("ToastManager", () => {
     expect(screen.queryByText("Bye")).not.toBeInTheDocument();
   });
 
-  it("clicking × calls dismiss and removes toast", () => {
+  it("clicking × marks the notification as read", () => {
     render(<ToastManager />);
     act(() => {
       useNotificationStore.getState().push({ title: "Close me", message: "click x" });
     });
     const closeBtn = screen.getByLabelText("Dismiss");
     fireEvent.click(closeBtn);
-    // After animation delay, notification should be dismissed
     act(() => vi.advanceTimersByTime(400));
-    expect(useNotificationStore.getState().notifications).toHaveLength(0);
+    expect(useNotificationStore.getState().notifications[0].read).toBe(true);
   });
 });
