@@ -3,6 +3,7 @@ import { useSystemStore } from "../stores/useSystemStore";
 import { useWindowStore } from "../stores/useWindowStore";
 import { useProfileStore } from "../stores/useProfileStore";
 import { useCalendarStore } from "../stores/useCalendarStore";
+import { useNotificationStore } from "../stores/useNotificationStore";
 
 export function resetAllStores() {
   useFileSystemStore.setState(useFileSystemStore.getInitialState(), true);
@@ -10,4 +11,5 @@ export function resetAllStores() {
   useWindowStore.setState(useWindowStore.getInitialState(), true);
   useProfileStore.setState(useProfileStore.getInitialState(), true);
   useCalendarStore.setState(useCalendarStore.getInitialState(), true);
+  useNotificationStore.setState(useNotificationStore.getInitialState(), true);
 }
