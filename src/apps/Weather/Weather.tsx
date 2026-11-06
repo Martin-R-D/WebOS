@@ -3,6 +3,7 @@ import * as Icons from "lucide-react";
 import { RefreshCw, MapPin, Search, Thermometer, Droplets, Wind, ChevronRight } from "lucide-react";
 import { useWeatherStore } from "../../stores/useWeatherStore";
 import { weatherLabel, weatherIcon, weatherColor, toF } from "./weatherApi";
+import { notify } from "../../lib/notify";
 import type { AppProps } from "../../types";
 import "./Weather.css";
 
@@ -63,7 +64,12 @@ export function Weather({}: AppProps) {
             className={`weather__unit-btn ${unit === "F" ? "weather__unit-btn--active" : ""}`}
             onClick={() => setUnit("F")}
           >°F</button>
-          <button className="weather__icon-btn" onClick={refresh} title="Refresh" disabled={loading}>
+          <button
+            className="weather__icon-btn"
+            onClick={async () => { await refresh(); notify("Weather", `Weather updated for ${city}`, "Cloud", weatherColor(weather?.current.weatherCode ?? 0)); }}
+            title="Refresh"
+            disabled={loading}
+          >
             <RefreshCw size={14} className={loading ? "weather__spin" : undefined} />
           </button>
           <button

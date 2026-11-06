@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, X, Check } from "lucide-react";
 import { useCalendarStore, EVENT_COLORS } from "../../stores/useCalendarStore";
 import type { CalendarEvent } from "../../stores/useCalendarStore";
 import type { AppProps } from "../../types";
+import { notify } from "../../lib/notify";
 import "./Calendar.css";
 
 const MONTH_NAMES = [
@@ -43,6 +44,15 @@ export function Calendar({}: AppProps) {
   const [form, setForm] = useState<EventFormState | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const getEventsForDateOnce = useCalendarStore.getState().getEventsForDate;
+
+  useEffect(() => {
+    const todayEvents = getEventsForDateOnce(todayStr);
+    if (todayEvents.length > 0) {
+      notify("Calendar", `You have ${todayEvents.length} event(s) today`, "CalendarDays", "#3b82f6");
+    }
+  }, []);
 
   const addEvent = useCalendarStore((s) => s.addEvent);
   const updateEvent = useCalendarStore((s) => s.updateEvent);
