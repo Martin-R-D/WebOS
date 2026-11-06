@@ -252,7 +252,7 @@ describe("TextEditor", () => {
       const { area, user } = setup();
       fireEvent.keyDown(area, { key: "f", ctrlKey: true });
       expect(document.querySelector(".editor__find")).not.toBeNull();
-      const findInput = screen.getByPlaceholderText("Find…");
+      screen.getByPlaceholderText("Find…");
       await user.keyboard("{Escape}");
       expect(document.querySelector(".editor__find")).toBeNull();
     });
