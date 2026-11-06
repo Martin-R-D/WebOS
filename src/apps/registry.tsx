@@ -12,6 +12,7 @@ import { TaskManager } from "./TaskManager/TaskManager";
 import { StickyNotes } from "./StickyNotes/StickyNotes";
 import { Weather } from "./Weather/Weather";
 import { Calendar } from "./Calendar/Calendar";
+import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
   "file-explorer": {
@@ -149,6 +150,17 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     defaultHeight: 600,
     minWidth: 700,
     minHeight: 500,
+    singleInstance: true,
+  },
+  "recycle-bin": {
+    id: "recycle-bin",
+    name: "Recycle Bin",
+    icon: "Trash2",
+    component: RecycleBin,
+    defaultWidth: 700,
+    defaultHeight: 480,
+    minWidth: 500,
+    minHeight: 350,
     singleInstance: true,
   },
 };

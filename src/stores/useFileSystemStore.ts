@@ -60,6 +60,7 @@ const SYSTEM_APP_FILES: [string, string][] = [
   ["Sticky Notes.app", "sticky-notes"],
   ["Weather.app", "weather"],
   ["Calendar.app", "calendar"],
+  ["Recycle Bin.app", "recycle-bin"],
 ];
 
 function getPathFromNodes(nodes: Record<string, FsNode>, rootId: string, id: string): string {
@@ -312,12 +313,12 @@ export const useFileSystemStore = create<FsState>()(
     }),
     {
       name: "webos-filesystem",
-      version: 6,
+      version: 7,
       partialize: (state) => ({ nodes: state.nodes, rootId: state.rootId, deletedNodes: state.deletedNodes }),
       migrate: (persisted: unknown, version: number) => {
         const state = persisted as { nodes: Record<string, FsNode>; rootId: string; deletedNodes?: Record<string, DeletedEntry> };
         if (!state.deletedNodes) state.deletedNodes = {};
-        if (version < 6) {
+        if (version < 7) {
           // ensure the System Apps folder exists
           let sysFolder = Object.values(state.nodes).find(
             (n) => n.parentId === state.rootId && n.type === "folder" && n.name === "System Apps",

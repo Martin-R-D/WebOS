@@ -27,7 +27,8 @@ export type AppId =
   | "task-manager"
   | "sticky-notes"
   | "weather"
-  | "calendar";
+  | "calendar"
+  | "recycle-bin";
 
 export interface AppDefinition {
   id: AppId;
