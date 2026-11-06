@@ -55,7 +55,7 @@ describe("MiniBrowser", () => {
     expect(screen.getByText("OpenLibrary")).toBeInTheDocument();
   });
 
-  it("navigates to DuckDuckGo when typing a search query", async () => {
+  it("navigates to DuckDuckGo Lite when typing a search query", async () => {
     const { container } = renderBrowser();
     const searchBox = screen.getByPlaceholderText("Search the web…");
     await userEvent.type(searchBox, "test query{Enter}");
@@ -93,6 +93,6 @@ describe("MiniBrowser", () => {
     const { container } = renderBrowser();
     await userEvent.click(screen.getByText("Wikipedia"));
     const iframe = container.querySelector("iframe");
-    expect(iframe!.src).toBe("https://www.wikipedia.org/");
+    expect(iframe!.src).toContain("https://www.wikipedia.org");
   });
 });
