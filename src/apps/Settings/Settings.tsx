@@ -183,10 +183,10 @@ export function Settings({}: AppProps) {
             <div className="settings__row">
               <p style={{ marginBottom: 8 }}><strong>WebOS</strong> v1.0.0</p>
               <p style={{ marginBottom: 8 }}>Built with React + TypeScript</p>
-              <p style={{ marginBottom: 8 }}>&copy; {new Date().getFullYear()} Your Name</p>
+              <p style={{ marginBottom: 8 }}>&copy; {new Date().getFullYear()} Martin-R-D</p>
               <p>
                 <a
-                  href="https://github.com/yourname"
+                  href="https://github.com/Martin-R-D/WebOS"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "var(--color-accent)" }}
