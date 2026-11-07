@@ -157,6 +157,14 @@
   50%      { opacity: 0.8; }
 }
 
+.lock--unlocking {
+  animation: lock-fadeout 0.35s ease forwards;
+}
+
+@keyframes lock-fadeout {
+  to { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .boot,
   .boot__fadeout,
