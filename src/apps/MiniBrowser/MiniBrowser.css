@@ -172,6 +172,11 @@
   color: var(--color-text-dim);
   padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .browser__results-loading {
@@ -240,4 +245,28 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+
+.browser__rate {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.browser__rate--start {
+  margin-top: 6px;
+}
+
+.browser__rate--ok {
+  color: var(--color-text-dim);
+}
+
+.browser__rate--limited {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #ef4444;
 }

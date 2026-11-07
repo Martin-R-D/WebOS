@@ -1,11 +1,41 @@
 import { useState, useEffect } from "react";
 import {
   ChevronLeft, ChevronRight, RotateCw, ExternalLink, Home, Search,
-  Globe, BookOpen, Map, Code2, Archive, Loader2,
+  Globe, BookOpen, Map, Code2, Archive, Loader2, AlertCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AppProps } from "../../types";
 import "./MiniBrowser.css";
+
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const RATE_LIMIT_KEY = "webos-search-timestamps";
+
+function getRateLimit(): { remaining: number; resetMs: number } {
+  const raw = localStorage.getItem(RATE_LIMIT_KEY);
+  const timestamps: number[] = raw ? JSON.parse(raw) : [];
+  const now = Date.now();
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  const remaining = Math.max(0, RATE_LIMIT_MAX - recent.length);
+  const resetMs = recent.length > 0 ? RATE_LIMIT_WINDOW_MS - (now - recent[0]) : 0;
+  return { remaining, resetMs };
+}
+
+function recordSearch() {
+  const raw = localStorage.getItem(RATE_LIMIT_KEY);
+  const timestamps: number[] = raw ? JSON.parse(raw) : [];
+  const now = Date.now();
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(recent));
+}
+
+function formatMs(ms: number): string {
+  const totalSec = Math.ceil(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return m > 0 ? `${m}m ${s}s` : `${s}s`;
+}
 
 // Internal start page — rendered natively, no iframe cost at all.
 const START = "webos://start";
@@ -58,23 +88,25 @@ async function fetchWikipedia(query: string): Promise<SearchResult[]> {
   }
 }
 
-async function fetchSearchResults(query: string): Promise<SearchResult[]> {
-  try {
-    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-    if (res.ok) {
-      const data = await res.json();
-      const results: SearchResult[] = (data.results ?? []).map(
-        (r: { title: string; url: string; snippet: string; source: string }) => ({
-          ...r,
-          source: r.source as "web" | "duckduckgo",
-        })
-      );
-      if (results.length > 0) return results;
+async function fetchSearchResults(query: string, rateLimited: boolean): Promise<SearchResult[]> {
+  if (!rateLimited) {
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const results: SearchResult[] = (data.results ?? []).map(
+          (r: { title: string; url: string; snippet: string; source: string }) => ({
+            ...r,
+            source: r.source as "web" | "duckduckgo",
+          })
+        );
+        if (results.length > 0) return results;
+      }
+    } catch {
+      // fall through to Wikipedia
     }
-  } catch {
-    // fall through to Wikipedia
   }
-  // Wikipedia fallback
+  // Wikipedia fallback (used when rate limited or API returns nothing)
   return fetchWikipedia(query);
 }
 
@@ -90,6 +122,20 @@ export function MiniBrowser({}: AppProps) {
   const [searching, setSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
+
+  // Rate limit state
+  const [rateRemaining, setRateRemaining] = useState(() => getRateLimit().remaining);
+  const [rateResetMs, setRateResetMs] = useState(() => getRateLimit().resetMs);
+
+  // Tick rate limit countdown every second
+  useEffect(() => {
+    const id = setInterval(() => {
+      const { remaining, resetMs } = getRateLimit();
+      setRateRemaining(remaining);
+      setRateResetMs(resetMs);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const url = history[index];
   const onStartPage = url === START;
@@ -107,12 +153,17 @@ export function MiniBrowser({}: AppProps) {
     const next = normalize(raw);
     if (next.startsWith("webos://search?q=")) {
       const q = decodeURIComponent(next.slice("webos://search?q=".length));
-      // Show inline search results
+      const { remaining } = getRateLimit();
+      const limited = remaining <= 0;
+      if (!limited) recordSearch();
+      const { remaining: newRemaining, resetMs: newResetMs } = getRateLimit();
+      setRateRemaining(newRemaining);
+      setRateResetMs(newResetMs);
       setSearchQuery(q);
       setSearchResults([]);
       setSearchError(null);
       setSearching(true);
-      fetchSearchResults(q).then((results) => {
+      fetchSearchResults(q, limited).then((results) => {
         setSearching(false);
         if (results.length === 0) {
           setSearchError("No results found");
@@ -194,7 +245,20 @@ export function MiniBrowser({}: AppProps) {
       {showResults ? (
         <div className="browser__results">
           <div className="browser__results-header">
-            Results for <strong>{searchQuery}</strong>
+            <span>Results for <strong>{searchQuery}</strong></span>
+            <div className="browser__rate">
+              {rateRemaining <= 0 ? (
+                <span className="browser__rate--limited">
+                  <AlertCircle size={12} />
+                  Rate limited — Wikipedia only · resets in {formatMs(rateResetMs)}
+                </span>
+              ) : (
+                <span className="browser__rate--ok">
+                  {rateRemaining}/{RATE_LIMIT_MAX} searches left
+                  {rateRemaining < RATE_LIMIT_MAX && ` · resets in ${formatMs(rateResetMs)}`}
+                </span>
+              )}
+            </div>
           </div>
           {searching ? (
             <div className="browser__results-loading" aria-label="Searching">
@@ -241,6 +305,18 @@ export function MiniBrowser({}: AppProps) {
               autoFocus
               spellCheck={false}
             />
+          </div>
+          <div className="browser__rate browser__rate--start">
+            {rateRemaining <= 0 ? (
+              <span className="browser__rate--limited">
+                <AlertCircle size={12} />
+                Rate limited — Wikipedia only · resets in {formatMs(rateResetMs)}
+              </span>
+            ) : (
+              <span className="browser__rate--ok">
+                {rateRemaining}/{RATE_LIMIT_MAX} web searches remaining
+              </span>
+            )}
           </div>
           <div className="browser__dial">
             {SPEED_DIAL.map((site) => (
