@@ -4,6 +4,8 @@ const SEARXNG_INSTANCES = [
   "https://searx.be",
   "https://search.mdosch.de",
   "https://searx.tiekoetter.com",
+  "https://searxng.site",
+  "https://priv.au",
 ];
 
 interface SearXResult {
@@ -39,6 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           snippet: r.content ?? "",
           source: "web" as const,
         }));
+        if (results.length === 0) continue; // instance responded but returned nothing — try next
         res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=120");
         return res.json({ results, query: q, source: "searxng" });
       }
