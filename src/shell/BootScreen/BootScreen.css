@@ -58,6 +58,12 @@
   to { width: 100%; }
 }
 
+.boot__version {
+  font-size: 11px;
+  color: var(--color-text-dim);
+  opacity: 0.5;
+}
+
 .boot__fadeout {
   animation: boot-fadeout 0.3s ease forwards;
 }
