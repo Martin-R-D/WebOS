@@ -107,6 +107,21 @@
   color: var(--color-text);
 }
 
+.taskbar__tray-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 7px;
+  border-radius: 6px;
+  color: var(--color-text-dim);
+  transition: background var(--transition), color var(--transition);
+}
+
+.taskbar__tray-btn:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
 .taskbar__clock-wrapper {
   position: relative;
 }
