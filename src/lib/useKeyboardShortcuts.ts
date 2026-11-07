@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { launchApp } from "./launch";
+import { useSystemStore } from "../stores/useSystemStore";
 
 /**
  * Global, OS-style keyboard shortcuts, registered once from <App>.
@@ -50,6 +51,11 @@ export function useKeyboardShortcuts(): void {
         if (e.key === ",") {
           e.preventDefault();
           launchApp("settings");
+          return;
+        }
+        if (e.key.toLowerCase() === "l") {
+          e.preventDefault();
+          useSystemStore.getState().setLocked(true);
           return;
         }
       }
