@@ -102,6 +102,14 @@ describe("Taskbar", () => {
     expect(screen.queryByText("Unpin")).not.toBeInTheDocument();
   });
 
+  it("renders lock button in tray and clicking it calls setLocked(true)", () => {
+    render(<Taskbar onToggleStart={() => {}} startOpen={false} />);
+    const lockBtn = screen.getByTitle("Lock (Ctrl+L)");
+    expect(lockBtn).toBeInTheDocument();
+    fireEvent.click(lockBtn);
+    expect(useSystemStore.getState().locked).toBe(true);
+  });
+
   it("ticks the clock every second", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 5, 1, 9, 59, 30));

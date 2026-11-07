@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as Icons from "lucide-react";
+import { Lock } from "lucide-react";
 import { useWindowStore } from "../../stores/useWindowStore";
 import { useSystemStore } from "../../stores/useSystemStore";
 import { useWeatherStore } from "../../stores/useWeatherStore";
@@ -152,6 +153,13 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
         <Icons.Wifi size={14} />
         <Icons.Volume2 size={14} />
         <TaskbarWeather />
+        <button
+          className="taskbar__tray-btn"
+          onClick={() => useSystemStore.getState().setLocked(true)}
+          title="Lock (Ctrl+L)"
+        >
+          <Lock size={14} />
+        </button>
         <div className="taskbar__bell-wrapper">
           <button
             className={cx("taskbar__bell", notifPanelOpen && "taskbar__bell--active")}

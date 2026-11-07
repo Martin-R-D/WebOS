@@ -8,24 +8,31 @@ export function LockScreen({ onUnlock }: { onUnlock: () => void }) {
   const wallpaper = useSystemStore((s) => s.wallpaper);
 
   const [now, setNow] = useState(new Date());
+  const [unlocking, setUnlocking] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
+  function handleUnlock() {
+    if (unlocking) return;
+    setUnlocking(true);
+    setTimeout(onUnlock, 350);
+  }
+
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Enter") onUnlock();
+      if (e.key === "Enter") handleUnlock();
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [onUnlock]);
+  }, [unlocking]);
 
   const { time, dateStr } = formatClock(now);
 
   return (
-    <div className="lock" onClick={onUnlock}>
+    <div className={`lock${unlocking ? " lock--unlocking" : ""}`} onClick={handleUnlock}>
       <div className="lock__bg" style={{ background: wallpaper }} />
       <div className="lock__overlay" />
       <div className="lock__content">

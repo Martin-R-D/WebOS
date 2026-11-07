@@ -38,23 +38,35 @@ describe("App", () => {
   });
 
   it("shows the lock screen when locked and Enter unlocks to the desktop", async () => {
-    sys().setLocked(true);
-    sys().setUsername("ada");
-    const { container } = render(<App />);
-    expect(screen.getByText("Press Enter or click to unlock")).toBeInTheDocument();
-    expect(screen.getByText("ada")).toBeInTheDocument();
-    expect(container.querySelector(".taskbar")).toBeNull();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      sys().setLocked(true);
+      sys().setUsername("ada");
+      const { container } = render(<App />);
+      expect(screen.getByText("Press Enter or click to unlock")).toBeInTheDocument();
+      expect(screen.getByText("ada")).toBeInTheDocument();
+      expect(container.querySelector(".taskbar")).toBeNull();
 
-    await userEvent.keyboard("{Enter}");
-    expect(sys().locked).toBe(false);
-    expect(container.querySelector(".taskbar")).not.toBeNull();
+      await userEvent.keyboard("{Enter}");
+      act(() => { vi.advanceTimersByTime(400); });
+      expect(sys().locked).toBe(false);
+      expect(container.querySelector(".taskbar")).not.toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("clicking the lock screen also unlocks", async () => {
-    sys().setLocked(true);
-    render(<App />);
-    await userEvent.click(screen.getByText("Press Enter or click to unlock"));
-    expect(sys().locked).toBe(false);
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      sys().setLocked(true);
+      render(<App />);
+      await userEvent.click(screen.getByText("Press Enter or click to unlock"));
+      act(() => { vi.advanceTimersByTime(400); });
+      expect(sys().locked).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("applies the theme and accent colour to the document", () => {

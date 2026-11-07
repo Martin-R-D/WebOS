@@ -58,6 +58,12 @@
   to { width: 100%; }
 }
 
+.boot__version {
+  font-size: 11px;
+  color: var(--color-text-dim);
+  opacity: 0.5;
+}
+
 .boot__fadeout {
   animation: boot-fadeout 0.3s ease forwards;
 }
@@ -155,6 +161,14 @@
 @keyframes lock-hint-pulse {
   0%, 100% { opacity: 0.4; }
   50%      { opacity: 0.8; }
+}
+
+.lock--unlocking {
+  animation: lock-fadeout 0.35s ease forwards;
+}
+
+@keyframes lock-fadeout {
+  to { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
