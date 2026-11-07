@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   ChevronLeft, ChevronRight, RotateCw, ExternalLink, Home, Search,
-  Globe, BookOpen, Map, Code2, Archive,
+  Globe, BookOpen, Map, Code2, Archive, Loader2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AppProps } from "../../types";
@@ -20,6 +20,13 @@ const SPEED_DIAL: { label: string; url: string; icon: LucideIcon }[] = [
   { label: "OpenLibrary", url: "https://openlibrary.org", icon: Globe },
 ];
 
+export interface SearchResult {
+  title: string;
+  url: string;
+  snippet: string;
+  source: "web" | "duckduckgo" | "wikipedia";
+}
+
 export function normalize(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) return START;
@@ -29,6 +36,48 @@ export function normalize(raw: string): string {
   return "webos://search?q=" + encodeURIComponent(trimmed);
 }
 
+async function fetchWikipedia(query: string): Promise<SearchResult[]> {
+  try {
+    const res = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=5&format=json&origin=*`
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    // data: [query, titles[], descriptions[], urls[]]
+    const titles: string[] = data[1] ?? [];
+    const descriptions: string[] = data[2] ?? [];
+    const urls: string[] = data[3] ?? [];
+    return titles.map((title, i) => ({
+      title,
+      url: urls[i] ?? "",
+      snippet: descriptions[i] ?? "",
+      source: "wikipedia" as const,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+async function fetchSearchResults(query: string): Promise<SearchResult[]> {
+  try {
+    const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+    if (res.ok) {
+      const data = await res.json();
+      const results: SearchResult[] = (data.results ?? []).map(
+        (r: { title: string; url: string; snippet: string; source: string }) => ({
+          ...r,
+          source: r.source as "web" | "duckduckgo",
+        })
+      );
+      if (results.length > 0) return results;
+    }
+  } catch {
+    // fall through to Wikipedia
+  }
+  // Wikipedia fallback
+  return fetchWikipedia(query);
+}
+
 export function MiniBrowser({}: AppProps) {
   const [history, setHistory] = useState<string[]>([START]);
   const [index, setIndex] = useState(0);
@@ -36,8 +85,15 @@ export function MiniBrowser({}: AppProps) {
   const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  // Search results state
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchError, setSearchError] = useState<string | null>(null);
+
   const url = history[index];
   const onStartPage = url === START;
+  const showResults = searchQuery !== "";
 
   // clock for the start page
   const [now, setNow] = useState(new Date());
@@ -50,10 +106,26 @@ export function MiniBrowser({}: AppProps) {
   function navigate(raw: string) {
     const next = normalize(raw);
     if (next.startsWith("webos://search?q=")) {
-      const q = next.slice("webos://search?q=".length);
-      window.open("https://duckduckgo.com/?q=" + q, "_blank");
+      const q = decodeURIComponent(next.slice("webos://search?q=".length));
+      // Show inline search results
+      setSearchQuery(q);
+      setSearchResults([]);
+      setSearchError(null);
+      setSearching(true);
+      fetchSearchResults(q).then((results) => {
+        setSearching(false);
+        if (results.length === 0) {
+          setSearchError("No results found");
+        } else {
+          setSearchResults(results);
+        }
+      });
       return;
     }
+    // Clear search when navigating to a URL
+    setSearchQuery("");
+    setSearchResults([]);
+    setSearchError(null);
     const newHistory = history.slice(0, index + 1);
     newHistory.push(next);
     setHistory(newHistory);
@@ -75,6 +147,10 @@ export function MiniBrowser({}: AppProps) {
     setReloadKey((k) => k + 1);
   }
 
+  function handleResultClick(resultUrl: string) {
+    navigate(resultUrl);
+  }
+
   return (
     <div className="browser">
       <div className="browser__bar">
@@ -92,7 +168,7 @@ export function MiniBrowser({}: AppProps) {
         <button className="browser__btn" onClick={reload} disabled={onStartPage} title="Reload">
           <RotateCw size={14} className={loading ? "browser__spin" : undefined} />
         </button>
-        <button className="browser__btn" onClick={() => navigate(START)} disabled={onStartPage} title="Home">
+        <button className="browser__btn" onClick={() => navigate(START)} disabled={onStartPage && !showResults} title="Home">
           <Home size={14} />
         </button>
         <input
@@ -106,7 +182,7 @@ export function MiniBrowser({}: AppProps) {
         <button
           className="browser__btn"
           onClick={() => window.open(url, "_blank")}
-          disabled={onStartPage}
+          disabled={onStartPage && !showResults}
           title="Open in a real tab"
         >
           <ExternalLink size={14} />
@@ -115,7 +191,42 @@ export function MiniBrowser({}: AppProps) {
 
       {loading && !onStartPage && <div className="browser__progress" />}
 
-      {onStartPage ? (
+      {showResults ? (
+        <div className="browser__results">
+          <div className="browser__results-header">
+            Results for <strong>{searchQuery}</strong>
+          </div>
+          {searching ? (
+            <div className="browser__results-loading" aria-label="Searching">
+              <Loader2 size={24} className="browser__spin" />
+              <span>Searching…</span>
+            </div>
+          ) : searchError && searchResults.length === 0 ? (
+            <div className="browser__results-empty">
+              {searchError === "No results found"
+                ? `No results for "${searchQuery}"`
+                : "Search unavailable — try a URL directly"}
+            </div>
+          ) : (
+            <ul className="browser__results-list">
+              {searchResults.map((result, i) => (
+                <li key={i} className="browser__result-item">
+                  <button
+                    className="browser__result-title"
+                    onClick={() => handleResultClick(result.url)}
+                  >
+                    {result.title}
+                  </button>
+                  <div className="browser__result-url">{result.url}</div>
+                  {result.snippet && (
+                    <div className="browser__result-snippet">{result.snippet}</div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : onStartPage ? (
         <div className="browser__start">
           <div className="browser__start-clock">
             {now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
