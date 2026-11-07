@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MiniBrowser, normalize } from "./MiniBrowser";
 import { useWindowStore } from "../../stores/useWindowStore";
@@ -43,7 +43,14 @@ describe("normalize", () => {
 });
 
 describe("MiniBrowser", () => {
-  beforeEach(resetAllStores);
+  beforeEach(() => {
+    resetAllStores();
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   it("renders the start page with clock, search box, and speed dial", () => {
     renderBrowser();
@@ -55,14 +62,136 @@ describe("MiniBrowser", () => {
     expect(screen.getByText("OpenLibrary")).toBeInTheDocument();
   });
 
-  it("opens a real tab for search queries instead of loading in iframe", async () => {
-    const opened: string[] = [];
-    const origOpen = window.open;
-    window.open = (url?: string | URL) => { opened.push(String(url)); return null; };
+  it("typing a search query calls /api/search and renders results", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [
+          { title: "Test Result", url: "https://example.com", snippet: "A test snippet", source: "web" },
+        ],
+        query: "test query",
+        source: "searxng",
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
     renderBrowser();
     await userEvent.type(screen.getByPlaceholderText("Search the web…"), "test query{Enter}");
-    expect(opened[0]).toBe("https://duckduckgo.com/?q=test%20query");
-    window.open = origOpen;
+
+    await waitFor(() => {
+      expect(screen.getByText("Test Result")).toBeInTheDocument();
+    });
+    expect(screen.getByText("A test snippet")).toBeInTheDocument();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/search?q=test%20query"));
+  });
+
+  it("clicking a search result navigates the browser to that URL", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [
+          { title: "Example Site", url: "https://example.com", snippet: "An example", source: "web" },
+        ],
+        query: "example",
+        source: "searxng",
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const { container } = renderBrowser();
+    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "example{Enter}");
+
+    await waitFor(() => {
+      expect(screen.getByText("Example Site")).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByText("Example Site"));
+
+    await waitFor(() => {
+      const iframe = container.querySelector("iframe");
+      expect(iframe).not.toBeNull();
+      expect(iframe!.src).toContain("https://example.com");
+    });
+  });
+
+  it("falls back to Wikipedia when /api/search returns empty results", async () => {
+    const mockFetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/search")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ results: [], query: "quantum", source: "searxng" }),
+        });
+      }
+      // Wikipedia opensearch
+      return Promise.resolve({
+        ok: true,
+        json: async () => [
+          "quantum",
+          ["Quantum mechanics"],
+          ["Study of matter at atomic scales"],
+          ["https://en.wikipedia.org/wiki/Quantum_mechanics"],
+        ],
+      });
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    renderBrowser();
+    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "quantum{Enter}");
+
+    await waitFor(() => {
+      expect(screen.getByText("Quantum mechanics")).toBeInTheDocument();
+    });
+  });
+
+  it("falls back to Wikipedia when /api/search fails", async () => {
+    const mockFetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes("/api/search")) {
+        return Promise.reject(new Error("Network error"));
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => [
+          "cats",
+          ["Cat"],
+          ["A small domesticated carnivore"],
+          ["https://en.wikipedia.org/wiki/Cat"],
+        ],
+      });
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    renderBrowser();
+    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "cats{Enter}");
+
+    await waitFor(() => {
+      expect(screen.getByText("Cat")).toBeInTheDocument();
+    });
+  });
+
+  it("shows speed dial when no search is active", () => {
+    renderBrowser();
+    expect(screen.getByPlaceholderText("Search the web…")).toBeInTheDocument();
+    expect(screen.getByText("Wikipedia")).toBeInTheDocument();
+  });
+
+  it("hides speed dial and shows results header when search is active", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        results: [{ title: "Result", url: "https://r.com", snippet: "s", source: "web" }],
+        query: "foo",
+        source: "searxng",
+      }),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    renderBrowser();
+    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "foo{Enter}");
+
+    await waitFor(() => {
+      expect(screen.getByText(/Results for/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByPlaceholderText("Search the web…")).not.toBeInTheDocument();
   });
 
   it("navigates via the URL bar", async () => {
