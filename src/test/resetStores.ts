@@ -1,3 +1,4 @@
+import { useExplorerSettingsStore } from "../stores/useExplorerSettingsStore";
 import { useTodoStore } from "../stores/useTodoStore";
 import { useConverterStore } from "../stores/useConverterStore";
 import { useRecentFilesStore } from "../stores/useRecentFilesStore";
@@ -12,6 +13,10 @@ import { useNotificationStore } from "../stores/useNotificationStore";
 import { useEditorSettingsStore } from "../stores/useEditorSettingsStore";
 
 export function resetAllStores() {
+  useExplorerSettingsStore.setState(
+    useExplorerSettingsStore.getInitialState(),
+    true,
+  );
   useTodoStore.setState(useTodoStore.getInitialState(), true);
   useConverterStore.setState(useConverterStore.getInitialState(), true);
   useRecentFilesStore.setState(useRecentFilesStore.getInitialState(), true);

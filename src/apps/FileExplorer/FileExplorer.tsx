@@ -1,3 +1,5 @@
+import { sortFiles, type FileSort } from "./sortFiles";
+import { useExplorerSettingsStore } from "../../stores/useExplorerSettingsStore";
 import { RecentFiles } from "./RecentFiles";
 import { PropertiesDialog } from "../../shell/FileDialogs/PropertiesDialog";
 import { useState } from "react";
@@ -48,6 +50,8 @@ function findDesktopFolderId(
 }
 
 export function FileExplorer({ launchProps }: AppProps) {
+  const { sort, descending, setSort, toggleDirection } =
+    useExplorerSettingsStore();
   const compact = useCompact();
   const [locationsOpen, setLocationsOpen] = useState(false);
   const rootId = useFileSystemStore((s) => s.rootId);
@@ -104,7 +108,11 @@ export function FileExplorer({ launchProps }: AppProps) {
 
   const currentFolderId = history[historyIndex];
   const searchResults = searchQuery ? searchNodes(searchQuery) : [];
-  const children = searchQuery ? searchResults : getChildren(currentFolderId);
+  const children = sortFiles(
+    searchQuery ? searchResults : getChildren(currentFolderId),
+    sort,
+    descending,
+  );
   const currentPath = getPath(currentFolderId);
   const currentNode = getNode(currentFolderId);
   const isSearching = searchQuery.length > 0;
@@ -345,6 +353,28 @@ export function FileExplorer({ launchProps }: AppProps) {
         )}
       </div>
 
+      {!recentOpen && (
+        <div className="fx__sort">
+          <label>
+            Sort by
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value as FileSort)}
+            >
+              <option value="name">Name</option>
+              <option value="type">Type</option>
+              <option value="modified">Last modified</option>
+            </select>
+          </label>
+          <button
+            className="fd-btn"
+            onClick={toggleDirection}
+            aria-label={`Sort ${descending ? "ascending" : "descending"}`}
+          >
+            {descending ? "Descending ↓" : "Ascending ↑"}
+          </button>
+        </div>
+      )}
       <div className="fx__body">
         <div className="fx__sidebar" hidden={compact && !locationsOpen}>
           <button

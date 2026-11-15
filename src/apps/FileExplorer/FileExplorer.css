@@ -210,3 +210,25 @@
 .recent-files__open small {
   color: var(--color-text-dim);
 }
+
+.fx__sort {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+.fx__sort label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fx__sort select {
+  min-height: 44px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  padding: 6px;
+}
