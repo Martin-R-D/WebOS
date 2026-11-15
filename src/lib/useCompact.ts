@@ -8,5 +8,9 @@ function subscribe(onChange: () => void) {
   return () => media?.removeEventListener("change", onChange);
 }
 export function useCompact() {
-  return useSyncExternalStore(subscribe, () => window.matchMedia?.(query).matches ?? false, () => false);
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia?.(query).matches ?? false,
+    () => false,
+  );
 }
