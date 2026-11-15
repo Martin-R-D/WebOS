@@ -8,6 +8,8 @@ interface IconPos {
 }
 
 interface SystemStoreState extends SystemSettings {
+  followSystemTheme: boolean;
+  setFollowSystemTheme: (enabled: boolean) => void;
   booted: boolean;
   locked: boolean;
   pinnedApps: AppId[];
@@ -38,6 +40,8 @@ export const useSystemStore = create<SystemStoreState>()(
   persist(
     (set) => ({
       ...defaults,
+      followSystemTheme: false,
+      setFollowSystemTheme: (enabled) => set({ followSystemTheme: enabled }),
       booted: false,
       locked: false,
       pinnedApps: [],
@@ -48,7 +52,7 @@ export const useSystemStore = create<SystemStoreState>()(
           desktopIconPos: { ...s.desktopIconPos, [key]: pos },
         })),
 
-      setTheme: (t) => set({ theme: t }),
+      setTheme: (t) => set({ theme: t, followSystemTheme: false }),
       setWallpaper: (w) => set({ wallpaper: w }),
       setUsername: (n) => set({ username: n }),
       setAccentColor: (c) => set({ accentColor: c }),
@@ -66,13 +70,19 @@ export const useSystemStore = create<SystemStoreState>()(
           pinnedApps: s.pinnedApps.filter((a) => a !== id),
         })),
       resetSettings: () =>
-        set({ ...defaults, pinnedApps: [], desktopIconPos: {} }),
+        set({
+          ...defaults,
+          followSystemTheme: false,
+          pinnedApps: [],
+          desktopIconPos: {},
+        }),
     }),
     {
       name: "webos-system",
       version: 1,
       partialize: (state) => ({
         theme: state.theme,
+        followSystemTheme: state.followSystemTheme,
         wallpaper: state.wallpaper,
         username: state.username,
         accentColor: state.accentColor,

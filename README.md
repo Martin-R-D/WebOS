@@ -28,35 +28,35 @@ WebOS is a fully functional desktop operating system that runs entirely in the b
 
 ### Desktop Environment
 
-| Feature | Description |
-|---------|-------------|
-| **Window Management** | Drag, resize (8-directional), minimize, maximize, and close windows. Edge snapping to left/right halves and top (maximize). Z-index stacking with focus tracking. |
-| **Movable Desktop Icons** | Freely drag icons anywhere on the desktop. Positions are saved and persist across sessions. |
-| **Drag & Drop File Management** | Move files between the desktop and File Explorer by dragging. Drop onto folders to move files inside them. |
-| **Taskbar** | Shows pinned apps and running windows. Click to focus/minimize. Right-click for Close/Unpin options. |
-| **Start Menu** | Grid of all installed apps. Right-click any app to pin/unpin from the taskbar. |
-| **Context Menus** | Right-click on the desktop, files, folders, taskbar items, and Start Menu apps for contextual actions. |
-| **Three Themes** | Dark, Light, and Midnight. Fully token-based with CSS custom properties. |
-| **Boot Animation** | Animated boot sequence with progress bar on first load. |
-| **Lock Screen** | Blurred wallpaper with live clock. Press Enter or click to unlock. |
-| **Sound Effects** | Synthesized UI sounds (Web Audio API, no audio files) for open, close, click, error, and chime events. Togglable in Settings. |
+| Feature                         | Description                                                                                                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Window Management**           | Drag, resize (8-directional), minimize, maximize, and close windows. Edge snapping to left/right halves and top (maximize). Z-index stacking with focus tracking. |
+| **Movable Desktop Icons**       | Freely drag icons anywhere on the desktop. Positions are saved and persist across sessions.                                                                       |
+| **Drag & Drop File Management** | Move files between the desktop and File Explorer by dragging. Drop onto folders to move files inside them.                                                        |
+| **Taskbar**                     | Shows pinned apps and running windows. Click to focus/minimize. Right-click for Close/Unpin options.                                                              |
+| **Start Menu**                  | Grid of all installed apps. Right-click any app to pin/unpin from the taskbar.                                                                                    |
+| **Context Menus**               | Right-click on the desktop, files, folders, taskbar items, and Start Menu apps for contextual actions.                                                            |
+| **Three Themes**                | Dark, Light, and Midnight. Fully token-based with CSS custom properties.                                                                                          |
+| **Boot Animation**              | Animated boot sequence with progress bar on first load.                                                                                                           |
+| **Lock Screen**                 | Blurred wallpaper with live clock. Press Enter or click to unlock.                                                                                                |
+| **Sound Effects**               | Synthesized UI sounds (Web Audio API, no audio files) for open, close, click, error, and chime events. Togglable in Settings.                                     |
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl + `` ` (backtick) | Launch or focus the Terminal |
-| `Ctrl + E` | Launch or focus File Explorer |
-| `Ctrl + ,` | Launch or focus Settings |
-| `Escape` | Close the Start Menu |
+| Shortcut                | Action                        |
+| ----------------------- | ----------------------------- |
+| `Ctrl + `` ` (backtick) | Launch or focus the Terminal  |
+| `Ctrl + E`              | Launch or focus File Explorer |
+| `Ctrl + ,`              | Launch or focus Settings      |
+| `Escape`                | Close the Start Menu          |
 
-These shortcuts work globally and are safe  - they never interfere with typing in the Text Editor or Terminal.
+These shortcuts work globally and are safe - they never interfere with typing in the Text Editor or Terminal.
 
 ### Virtual File System
 
 - Flat-map architecture (`Record<string, FsNode>`) with parent-child relationships
 - Persisted in localStorage with version-based migrations (currently v4)
-- Duplicate name prevention  - creating, renaming, or moving a file/folder with a conflicting name is blocked
+- Duplicate name prevention - creating, renaming, or moving a file/folder with a conflicting name is blocked
 - Protected system nodes (root folders, System Apps, `.app` shortcuts) cannot be renamed, moved, or deleted
 - The **System Apps** folder is fully locked: nothing can be dragged in or out
 - Corruption recovery: if the persisted state fails to load, it auto-resets and reloads
@@ -64,6 +64,7 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 ### Built-in Applications
 
 #### File Explorer
+
 - Sidebar with quick-access folders (Root, Desktop, Documents, Pictures, System Apps)
 - Toolbar with back/forward/up navigation, new folder, and new file buttons
 - Double-click folders to navigate, files to open in the appropriate app
@@ -72,6 +73,7 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 - `.app` files show the app's icon and offer "Add to Taskbar" on right-click
 
 #### Text Editor
+
 - Full text editing with word/character count
 - **Save** (overwrites current file) and **Save As** (pick folder + name via dialog)
 - Overwrite confirmation popup on name collision
@@ -80,15 +82,17 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 - Opens automatically when you double-click a `.txt` file
 
 #### Paint
+
 - Canvas-based drawing with pointer capture for smooth strokes
 - 10 colors, 4 brush sizes, eraser tool
 - 25-step undo stack and clear canvas
 - **Save / Save As** into the virtual file system (stored as PNG data URL)
 - **Download** as a real PNG file to your computer
-- Reopen saved `.png` files for further editing  - full round-trip persistence
+- Reopen saved `.png` files for further editing - full round-trip persistence
 - Opens automatically when you double-click an image file (`.png`, `.jpg`, `.gif`, `.webp`, `.bmp`)
 
 #### Terminal
+
 - Bash-like shell with command history (Arrow Up/Down) and tab completion
 - Commands: `help`, `whoami`, `date`, `echo`, `clear`, `pwd`, `ls`, `cd`, `cat`, `mkdir`, `touch`, `rm`, `open`, `neofetch`
 - `open <app>` launches any system app by name (e.g., `open calculator`, `open paint`)
@@ -96,7 +100,8 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 - Error sound on invalid commands
 
 #### Calculator
-- Full expression engine (not simple A op B)  - type complex expressions like `2^(3+4)*5`
+
+- Full expression engine (not simple A op B) - type complex expressions like `2^(3+4)*5`
 - Supports: `+`, `-`, `*`, `/`, `^` (power), `%` (percent), parentheses `()`
 - Implicit multiplication: `2(3+4)` = 14
 - Unary minus: `-(5+3)` = -8
@@ -105,25 +110,29 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 - Full keyboard support: digits, operators, Enter (=), Backspace, Escape (clear)
 
 #### Browser
+
 - Native start page with live clock, search bar, and speed-dial tiles
-- Searches go to Wikipedia (which allows embedding)  - type a URL for direct navigation
+- Searches go to Wikipedia (which allows embedding) - type a URL for direct navigation
 - Loading progress bar animation
 - Home button to return to the start page
 - "Open in new tab" button for sites that block iframes
-- No iframe loaded until you navigate  - lightweight by default
+- No iframe loaded until you navigate - lightweight by default
 
 #### Clock
+
 - **World Clock** tab: live time in 5 time zones (New York, London, Sofia, Tokyo, Sydney)
 - **Stopwatch** tab: start/stop/reset with lap recording (drift-free via `performance.now()`)
 - **Timer** tab: set minutes/seconds, countdown with chime sound and flash animation on completion
 
 #### Task Manager
+
 - Lists all open windows with their app icons
 - Focus or close any window directly
 - System stats: uptime, window count, current theme, memory usage
 - "End all tasks" button (spares its own window)
 
 #### Settings
+
 - Theme selector (Dark / Light / Midnight)
 - Wallpaper (gradient presets or custom CSS)
 - Username (shown in Terminal prompt and lock screen)
@@ -132,9 +141,11 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 - Factory reset (clears all persisted data and reloads)
 
 #### About Me
+
 - Portfolio information page (editable in the file system as `About Me.txt`)
 
 #### Sticky Notes
+
 - Create, edit, and delete notes
 - Pick note color from 5 preset options (yellow, pink, blue, green, purple)
 - Notes persisted to localStorage with Zustand
@@ -143,7 +154,7 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 ### Persistence & Safety
 
 - **Zustand + persist middleware** for file system and system settings
-- **Window state is never persisted**  - fresh session every reload (intentional)
+- **Window state is never persisted** - fresh session every reload (intentional)
 - **Version migrations** ensure new features (like added apps) appear for existing users without losing their files
 - **Factory reset** available in Settings or via Terminal (`open settings`)
 - **Corruption recovery** in `main.tsx`: if React fails to render due to corrupt state, all `webos-*` keys are cleared and the page reloads (guarded to prevent infinite loops)
@@ -151,7 +162,7 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 ### Design Details
 
 - Fully responsive token system with CSS custom properties
-- `prefers-reduced-motion` support  - all animations disabled for users who prefer it
+- `prefers-reduced-motion` support - all animations disabled for users who prefer it
 - Backdrop blur on taskbar, start menu, and context menus
 - Accent glow on focused windows
 - Desktop icons lift on hover
@@ -162,17 +173,17 @@ These shortcuts work globally and are safe  - they never interfere with typing i
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | React 18 |
-| Language | TypeScript 5 |
-| Build Tool | Vite |
-| State Management | Zustand (with persist middleware) |
-| Icons | Lucide React |
-| Styling | Vanilla CSS with custom properties (no CSS framework) |
-| Audio | Web Audio API (synthesized, no audio files) |
-| Storage | localStorage (no backend) |
-| Deployment | Vercel |
+| Layer            | Technology                                            |
+| ---------------- | ----------------------------------------------------- |
+| Framework        | React 18                                              |
+| Language         | TypeScript 5                                          |
+| Build Tool       | Vite                                                  |
+| State Management | Zustand (with persist middleware)                     |
+| Icons            | Lucide React                                          |
+| Styling          | Vanilla CSS with custom properties (no CSS framework) |
+| Audio            | Web Audio API (synthesized, no audio files)           |
+| Storage          | localStorage (no backend)                             |
+| Deployment       | Vercel                                                |
 
 ---
 
@@ -244,6 +255,21 @@ src/
 
 ---
 
+## Local productivity tools
+
+- **Calculator history:** open History to reuse or copy the latest 20 calculations.
+- **Sticky Notes:** search note text and pin important notes above the rest.
+- **File Explorer:** sort by name, type, or modification date; open Properties from item actions; use Recent to reopen the last ten files.
+- **Unit Converter:** convert length, weight, temperature, and decimal/binary data sizes offline. Swap preserves the quantity; unit choices are remembered.
+- **To-Do List:** add, edit, complete, and filter tasks. Deletion and clearing completed tasks require confirmation.
+- **Browser bookmarks:** use the star button to add, edit, open, and remove saved HTTP/HTTPS sites.
+- **System theme:** enable Follow system theme in Settings to respond to device light/dark changes. Selecting a manual theme turns automatic following off.
+
+App data stays in this browser. Unit Converter and To-Do List are available in the
+Start menu and System Apps folder for both new and existing installations.
+
+---
+
 ## Testing
 
 The project uses [Vitest](https://vitest.dev) with jsdom and Testing Library.
@@ -271,7 +297,6 @@ On compact screens, Home reveals the desktop without closing apps, Apps opens
 the launcher, and Running switches between windows. File Explorer has visible
 per-file action buttons. Desktop window geometry is retained when switching
 between compact and desktop layouts.
-
 
 Tests live next to the code they cover (`*.test.ts` / `*.test.tsx`) and cover the stores, file system rules, drag and drop, app launching, keyboard shortcuts, the window manager, the shell (taskbar, start menu, context menu) and the apps.
 

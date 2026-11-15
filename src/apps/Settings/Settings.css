@@ -182,3 +182,20 @@
 .settings__toggle.on::after {
   transform: translateX(18px);
 }
+
+.settings__system-theme {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.settings__system-theme input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--color-accent);
+}
+.settings__theme-status {
+  color: var(--color-text-dim);
+  font-size: 12px;
+  margin-bottom: 8px;
+}

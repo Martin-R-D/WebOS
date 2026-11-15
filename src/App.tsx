@@ -1,3 +1,4 @@
+import { useResolvedTheme } from "./lib/useResolvedTheme";
 import { useVisualViewport } from "./lib/useVisualViewport";
 import { useState, useEffect } from "react";
 import { Desktop } from "./shell/Desktop/Desktop";
@@ -13,7 +14,7 @@ import { ToastManager } from "./shell/Toast/ToastManager";
 
 function App() {
   const windows = useWindowStore((s) => s.windows);
-  const theme = useSystemStore((s) => s.theme);
+  const theme = useResolvedTheme();
   const accentColor = useSystemStore((s) => s.accentColor);
   const booted = useSystemStore((s) => s.booted);
   const locked = useSystemStore((s) => s.locked);

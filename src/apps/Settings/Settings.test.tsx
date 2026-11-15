@@ -21,25 +21,37 @@ describe("Settings", () => {
     sys().setAccentColor("#ff6a88");
     render(<Settings windowId="s" />);
     expect(document.documentElement.getAttribute("data-theme")).toBe("light");
-    expect(document.documentElement.style.getPropertyValue("--color-accent")).toBe("#ff6a88");
+    expect(
+      document.documentElement.style.getPropertyValue("--color-accent"),
+    ).toBe("#ff6a88");
   });
 
   it("switching theme updates the store and the document", async () => {
     render(<Settings windowId="s" />);
     await userEvent.click(screen.getByRole("button", { name: "Midnight" }));
     expect(sys().theme).toBe("midnight");
-    expect(document.documentElement.getAttribute("data-theme")).toBe("midnight");
-    expect(screen.getByRole("button", { name: "Midnight" })).toHaveClass("active");
-    expect(screen.getByRole("button", { name: "Dark" })).not.toHaveClass("active");
+    expect(document.documentElement.getAttribute("data-theme")).toBe(
+      "midnight",
+    );
+    expect(screen.getByRole("button", { name: "Midnight" })).toHaveClass(
+      "active",
+    );
+    expect(screen.getByRole("button", { name: "Dark" })).not.toHaveClass(
+      "active",
+    );
   });
 
   it("picking a wallpaper swatch stores it and marks it active", async () => {
     const { container } = render(<Settings windowId="s" />);
-    const swatches = container.querySelectorAll<HTMLElement>(".settings__wallpaper");
+    const swatches = container.querySelectorAll<HTMLElement>(
+      ".settings__wallpaper",
+    );
     expect(swatches.length).toBeGreaterThan(1);
     await userEvent.click(swatches[2]);
     expect(sys().wallpaper).toContain("#203a43");
-    expect(container.querySelectorAll(".settings__wallpaper.active")).toHaveLength(1);
+    expect(
+      container.querySelectorAll(".settings__wallpaper.active"),
+    ).toHaveLength(1);
   });
 
   it("the Account section edits the username and shows its initial", async () => {
@@ -56,7 +68,9 @@ describe("Settings", () => {
     render(<Settings windowId="s" />);
     await userEvent.click(screen.getByRole("button", { name: "System" }));
     expect(screen.getByText(/Sound On/)).toBeInTheDocument();
-    await userEvent.click(screen.getByText(/Sound On/).querySelector(".settings__toggle")!);
+    await userEvent.click(
+      screen.getByText(/Sound On/).querySelector(".settings__toggle")!,
+    );
     expect(sys().soundEnabled).toBe(false);
     expect(screen.getByText(/Sound Off/)).toBeInTheDocument();
   });
@@ -68,11 +82,15 @@ describe("Settings", () => {
     await userEvent.click(screen.getByRole("button", { name: "System" }));
 
     vi.spyOn(window, "confirm").mockReturnValue(false);
-    await userEvent.click(screen.getByRole("button", { name: "Reset Settings" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Reset Settings" }),
+    );
     expect(sys().username).toBe("ada");
 
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    await userEvent.click(screen.getByRole("button", { name: "Reset Settings" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Reset Settings" }),
+    );
     expect(sys()).toMatchObject({ username: "Guest", theme: "dark" });
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
   });
@@ -84,7 +102,9 @@ describe("Settings", () => {
     render(<Settings windowId="s" />);
     await userEvent.click(screen.getByRole("button", { name: "System" }));
     vi.spyOn(window, "confirm").mockReturnValue(false);
-    await userEvent.click(screen.getByRole("button", { name: "Reset File System" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Reset File System" }),
+    );
     expect(useFileSystemStore.getState().getNode(created)).toBeDefined();
   });
 
@@ -92,6 +112,9 @@ describe("Settings", () => {
     render(<Settings windowId="s" />);
     await userEvent.click(screen.getByRole("button", { name: "About" }));
     expect(screen.getByText(/v1\.0\.0/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute(
+      "rel",
+      "noopener noreferrer",
+    );
   });
 });
