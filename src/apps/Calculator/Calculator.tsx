@@ -1,3 +1,5 @@
+import { HistoryPanel } from "./HistoryPanel";
+import { useCalculatorHistoryStore } from "../../stores/useCalculatorHistoryStore";
 import { useState, useRef, useEffect } from "react";
 import type { AppProps } from "../../types";
 import { cx } from "../../lib/helpers";
@@ -15,6 +17,7 @@ function formatResult(n: number): string {
 }
 
 export function Calculator({}: AppProps) {
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [expr, setExpr] = useState("");
   const [justEvaluated, setJustEvaluated] = useState(false);
   const [error, setError] = useState(false);
@@ -51,25 +54,43 @@ export function Calculator({}: AppProps) {
   }
 
   function equals() {
+    if (justEvaluated) return;
     const result = evaluateExpression(expr);
     if (result === null) {
       if (expr.trim()) setError(true);
       return;
     }
+    useCalculatorHistoryStore.getState().record(expr, result);
     setExpr(String(result));
     setJustEvaluated(true);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     const k = e.key;
-    if (/^[0-9.]$/.test(k)) { append(k); e.preventDefault(); }
-    else if ("+-*/^%()".includes(k)) { append(k); e.preventDefault(); }
-    else if (k === "Enter" || k === "=") { equals(); e.preventDefault(); }
-    else if (k === "Backspace") { backspace(); e.preventDefault(); }
-    else if (k === "Escape") { clearAll(); e.preventDefault(); }
+    if (/^[0-9.]$/.test(k)) {
+      append(k);
+      e.preventDefault();
+    } else if ("+-*/^%()".includes(k)) {
+      append(k);
+      e.preventDefault();
+    } else if (k === "Enter" || k === "=") {
+      equals();
+      e.preventDefault();
+    } else if (k === "Backspace") {
+      backspace();
+      e.preventDefault();
+    } else if (k === "Escape") {
+      clearAll();
+      e.preventDefault();
+    }
   }
 
-  const KEYS: { label: string; onClick: () => void; cls?: string; span?: boolean }[] = [
+  const KEYS: {
+    label: string;
+    onClick: () => void;
+    cls?: string;
+    span?: boolean;
+  }[] = [
     { label: "C", onClick: clearAll, cls: "calc__key--fn" },
     { label: "(", onClick: () => append("("), cls: "calc__key--fn" },
     { label: ")", onClick: () => append(")"), cls: "calc__key--fn" },
@@ -99,14 +120,38 @@ export function Calculator({}: AppProps) {
     { label: "=", onClick: equals, cls: "calc__key--accent", span: true },
   ];
 
+  if (historyOpen) {
+    return (
+      <HistoryPanel
+        onBack={() => setHistoryOpen(false)}
+        onUse={(value, evaluated) => {
+          setExpr(value);
+          setJustEvaluated(evaluated);
+          setError(false);
+          setHistoryOpen(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="calc" ref={wrapRef} tabIndex={0} onKeyDown={handleKeyDown}>
+      <button
+        className="calc__history-toggle"
+        onClick={() => setHistoryOpen(true)}
+      >
+        History
+      </button>
       <div className="calc__display">
         <div className={cx("calc__expr", error && "calc__expr--error")}>
           {error ? "Invalid expression" : pretty(expr) || "0"}
         </div>
         <div className="calc__preview">
-          {!error && !justEvaluated && preview !== null && expr && !/^-?[0-9.]+$/.test(expr)
+          {!error &&
+          !justEvaluated &&
+          preview !== null &&
+          expr &&
+          !/^-?[0-9.]+$/.test(expr)
             ? `= ${formatResult(preview)}`
             : " "}
         </div>
