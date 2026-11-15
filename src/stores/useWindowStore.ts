@@ -4,6 +4,7 @@ import type { AppId, WindowState } from "../types";
 const TASKBAR_HEIGHT = 48;
 
 interface WindowStoreState {
+  showDesktop: () => void;
   windows: WindowState[];
   focusedId: string | null;
   topZIndex: number;
@@ -27,6 +28,7 @@ interface WindowStoreState {
 }
 
 export const useWindowStore = create<WindowStoreState>()((set, get) => ({
+  showDesktop: () => set({ focusedId: null }),
   windows: [],
   focusedId: null,
   topZIndex: 100,
@@ -62,8 +64,9 @@ export const useWindowStore = create<WindowStoreState>()((set, get) => ({
     set((state) => {
       const remaining = state.windows.filter((w) => w.id !== id);
       let newFocused: string | null = null;
-      if (state.focusedId === id && remaining.length > 0) {
-        newFocused = remaining.reduce((top, w) =>
+      const visible = remaining.filter((w) => !w.isMinimized);
+      if (state.focusedId === id && visible.length > 0) {
+        newFocused = visible.reduce((top, w) =>
           w.zIndex > top.zIndex ? w : top,
         ).id;
       } else if (state.focusedId !== id) {

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as Icons from "lucide-react";
 import type { WindowState } from "../../types";
 import { useWindowStore } from "../../stores/useWindowStore";
@@ -6,11 +6,16 @@ import { getApp } from "../../apps/registry";
 import { cx } from "../../lib/helpers";
 import { playSound } from "../../lib/sound";
 import "./Window.css";
+import { useCompact } from "../../lib/useCompact";
 
 const RESIZE_DIRS = ["n", "s", "e", "w", "ne", "nw", "se", "sw"] as const;
 type ResizeDir = (typeof RESIZE_DIRS)[number];
 
 export function Window({ win }: { win: WindowState }) {
+  const compact = useCompact();
+  const cleanup = useRef<(() => void) | null>(null);
+  useEffect(() => () => cleanup.current?.(), []);
+  useEffect(() => { if (compact) cleanup.current?.(); }, [compact]);
   const focusedId = useWindowStore((s) => s.focusedId);
   const focusWindow = useWindowStore((s) => s.focusWindow);
   const closeWindow = useWindowStore((s) => s.closeWindow);
@@ -23,13 +28,14 @@ export function Window({ win }: { win: WindowState }) {
   const minW = def.minWidth ?? 240;
   const minH = def.minHeight ?? 160;
 
-  const drag = useRef<{ active: boolean; preview?: HTMLDivElement } | null>(null);
 
-  function onTitleMouseDown(e: React.MouseEvent) {
+  function onTitlePointerDown(e: React.PointerEvent) {
     if ((e.target as HTMLElement).closest(".window__btn")) return;
-    if (win.isMaximized) return;
+    if (compact || win.isMaximized || e.button !== 0) return;
+    cleanup.current?.();
     focusWindow(win.id);
 
+    e.currentTarget.setPointerCapture?.(e.pointerId);
     const startX = e.clientX;
     const startY = e.clientY;
     const origX = win.x;
@@ -47,7 +53,7 @@ export function Window({ win }: { win: WindowState }) {
     preview.style.display = "none";
     document.body.appendChild(preview);
 
-    function onMouseMove(ev: MouseEvent) {
+    function onMouseMove(ev: PointerEvent) {
       const dx = ev.clientX - startX;
       const dy = ev.clientY - startY;
       let nextX = origX + dx;
@@ -88,10 +94,8 @@ export function Window({ win }: { win: WindowState }) {
       }
     }
 
-    function onMouseUp(ev: MouseEvent) {
-      document.body.classList.remove("dragging");
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+    function onMouseUp(ev: PointerEvent) {
+      cleanup.current?.();
 
       // Snap to edges
       const vw = window.innerWidth;
@@ -115,23 +119,34 @@ export function Window({ win }: { win: WindowState }) {
         toggleMaximize(win.id);
       }
 
-      preview.remove();
-      drag.current = null;
+
     }
 
-    drag.current = { active: true, preview };
+    cleanup.current = () => {
+      document.body.classList.remove("dragging");
+      window.removeEventListener("pointermove", onMouseMove);
+      window.removeEventListener("pointerup", onMouseUp);
+      window.removeEventListener("pointercancel", cancel);
+      preview.remove();
+      cleanup.current = null;
+    };
+    function cancel() { cleanup.current?.(); }
+    window.addEventListener("pointercancel", cancel);
     document.body.classList.add("dragging");
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("pointermove", onMouseMove);
+    window.addEventListener("pointerup", onMouseUp);
   }
 
-  function onResizeStart(e: React.MouseEvent, dir: ResizeDir) {
+  function onResizeStart(e: React.PointerEvent, dir: ResizeDir) {
+    if (compact || e.button !== 0) return;
+    cleanup.current?.();
+    e.currentTarget.setPointerCapture?.(e.pointerId);
     e.stopPropagation();
     focusWindow(win.id);
 
     const start = { mx: e.clientX, my: e.clientY, x: win.x, y: win.y, w: win.width, h: win.height };
 
-    function onMove(ev: MouseEvent) {
+    function onMove(ev: PointerEvent) {
       const dx = ev.clientX - start.mx;
       const dy = ev.clientY - start.my;
       let { x, y } = start;
@@ -150,36 +165,45 @@ export function Window({ win }: { win: WindowState }) {
     }
 
     function onUp() {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
       document.body.classList.remove("is-resizing");
+      cleanup.current = null;
     }
 
+    cleanup.current = onUp;
+    window.addEventListener("pointercancel", onUp);
     document.body.classList.add("is-resizing");
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
   }
 
-  if (win.isMinimized) return null;
+  const hidden = win.isMinimized || (compact && win.id !== focusedId);
 
   const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
   const AppComponent = def.component;
 
   return (
     <div
-      className={cx("window", win.id === focusedId && "window--focused", win.isMaximized && "window--maximized")}
+      hidden={hidden}
+      inert={hidden}
+      aria-label={win.title}
+      className={cx("window", compact && "window--compact", win.id === focusedId && "window--focused", win.isMaximized && "window--maximized")}
       style={
-        win.isMaximized
-          ? { left: 0, top: 0, width: "100vw", height: "calc(100vh - var(--taskbar-height))", zIndex: win.zIndex }
+        compact
+          ? { zIndex: win.zIndex }
+          : win.isMaximized
+          ? { left: 0, top: 0, width: "100vw", height: "calc(100dvh - var(--taskbar-height))", zIndex: win.zIndex }
           : { left: win.x, top: win.y, width: win.width, height: win.height, zIndex: win.zIndex }
       }
-      onMouseDown={() => focusWindow(win.id)}
+      onPointerDown={() => focusWindow(win.id)}
     >
       <div
         className="window__titlebar"
-        onMouseDown={onTitleMouseDown}
+        onPointerDown={onTitlePointerDown}
         onDoubleClick={(e) => {
-          if (!(e.target as HTMLElement).closest(".window__btn")) toggleMaximize(win.id);
+          if (!compact && !(e.target as HTMLElement).closest(".window__btn")) toggleMaximize(win.id);
         }}
       >
         <div className="window__title-left">
@@ -188,18 +212,21 @@ export function Window({ win }: { win: WindowState }) {
         </div>
         <div className="window__controls">
           <button
+            aria-label="Minimize window"
             className="window__btn"
             onClick={(e) => { e.stopPropagation(); minimizeWindow(win.id); }}
           >
             <Icons.Minus size={14} />
           </button>
-          <button
+          {!compact && <button
+            aria-label="Toggle maximize"
             className="window__btn"
             onClick={(e) => { e.stopPropagation(); toggleMaximize(win.id); }}
           >
             <Icons.Square size={12} />
-          </button>
+          </button>}
           <button
+            aria-label="Close window"
             className="window__btn window__btn--close"
             onClick={(e) => { e.stopPropagation(); playSound("close"); closeWindow(win.id); }}
           >
@@ -210,12 +237,12 @@ export function Window({ win }: { win: WindowState }) {
       <div className="window__body">
         <AppComponent windowId={win.id} launchProps={win.launchProps} />
       </div>
-      {!win.isMaximized &&
+      {!compact && !win.isMaximized &&
         RESIZE_DIRS.map((dir) => (
           <div
             key={dir}
             className={`window__resize window__resize--${dir}`}
-            onMouseDown={(e) => onResizeStart(e, dir)}
+            onPointerDown={(e) => onResizeStart(e, dir)}
           />
         ))}
     </div>

@@ -43,11 +43,11 @@ describe("Window", () => {
     expect(container.querySelector(".window")).toHaveClass("window--focused");
   });
 
-  it("renders nothing while minimized", () => {
+  it("hides content while minimized without unmounting", () => {
     const id = openCalculator();
     ws().minimizeWindow(id);
     const { container } = renderWindow(id);
-    expect(container.querySelector(".window")).toBeNull();
+    expect(container.querySelector(".window")).not.toBeVisible();
   });
 
   it("the minimize, maximize and close buttons drive the store", () => {
@@ -64,7 +64,7 @@ describe("Window", () => {
     fireEvent.click(min);
     expect(current(id).isMinimized).toBe(true);
 
-    expect(container.querySelector(".window")).toBeNull();
+    expect(container.querySelector(".window")).not.toBeVisible();
 
     act(() => ws().restoreWindow(id));
     fireEvent.click(container.querySelector(".window__btn--close")!);
@@ -85,11 +85,11 @@ describe("Window", () => {
       const id = openCalculator();
       const { x, y } = current(id);
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__titlebar")!, { clientX: 200, clientY: 100 });
-      fireEvent.mouseMove(window, { clientX: 260, clientY: 140 });
+      fireEvent.pointerDown(container.querySelector(".window__titlebar")!, { clientX: 200, clientY: 100 });
+      fireEvent.pointerMove(window, { clientX: 260, clientY: 140 });
       expect(current(id)).toMatchObject({ x: x + 60, y: y + 40 });
-      fireEvent.mouseUp(window, { clientX: 260, clientY: 140 });
-      fireEvent.mouseMove(window, { clientX: 900, clientY: 700 });
+      fireEvent.pointerUp(window, { clientX: 260, clientY: 140 });
+      fireEvent.pointerMove(window, { clientX: 900, clientY: 700 });
       expect(current(id)).toMatchObject({ x: x + 60, y: y + 40 });
       expect(document.body).not.toHaveClass("dragging");
     });
@@ -97,22 +97,22 @@ describe("Window", () => {
     it("keeps the window reachable: never above the screen and never fully off-screen", () => {
       const id = openCalculator();
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__titlebar")!, { clientX: 200, clientY: 100 });
-      fireEvent.mouseMove(window, { clientX: -5000, clientY: -5000 });
+      fireEvent.pointerDown(container.querySelector(".window__titlebar")!, { clientX: 200, clientY: 100 });
+      fireEvent.pointerMove(window, { clientX: -5000, clientY: -5000 });
       expect(current(id).y).toBe(0);
       expect(current(id).x).toBe(-current(id).width + 120);
-      fireEvent.mouseMove(window, { clientX: 9000, clientY: 9000 });
+      fireEvent.pointerMove(window, { clientX: 9000, clientY: 9000 });
       expect(current(id).x).toBe(window.innerWidth - 120);
       expect(current(id).y).toBe(window.innerHeight - 48 - 80);
-      fireEvent.mouseUp(window, { clientX: 400, clientY: 300 });
+      fireEvent.pointerUp(window, { clientX: 400, clientY: 300 });
     });
 
     it("cannot be dragged while maximized", () => {
       const id = openCalculator();
       ws().toggleMaximize(id);
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__titlebar")!, { clientX: 10, clientY: 10 });
-      fireEvent.mouseMove(window, { clientX: 300, clientY: 300 });
+      fireEvent.pointerDown(container.querySelector(".window__titlebar")!, { clientX: 10, clientY: 10 });
+      fireEvent.pointerMove(window, { clientX: 300, clientY: 300 });
       expect(current(id)).toMatchObject({ x: 0, y: 0 });
     });
 
@@ -120,8 +120,8 @@ describe("Window", () => {
       const id = openCalculator();
       const { x } = current(id);
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__btn")!, { clientX: 10, clientY: 10 });
-      fireEvent.mouseMove(window, { clientX: 300, clientY: 300 });
+      fireEvent.pointerDown(container.querySelector(".window__btn")!, { clientX: 10, clientY: 10 });
+      fireEvent.pointerMove(window, { clientX: 300, clientY: 300 });
       expect(current(id).x).toBe(x);
     });
   });
@@ -130,9 +130,9 @@ describe("Window", () => {
     it("the east handle widens the window", () => {
       const id = openCalculator();
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__resize--e")!, { clientX: 500, clientY: 300 });
-      fireEvent.mouseMove(window, { clientX: 560, clientY: 300 });
-      fireEvent.mouseUp(window);
+      fireEvent.pointerDown(container.querySelector(".window__resize--e")!, { clientX: 500, clientY: 300 });
+      fireEvent.pointerMove(window, { clientX: 560, clientY: 300 });
+      fireEvent.pointerUp(window);
       expect(current(id).width).toBe(460);
       expect(current(id).height).toBe(500);
     });
@@ -141,9 +141,9 @@ describe("Window", () => {
       const id = openCalculator();
       const { x, y } = current(id);
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__resize--nw")!, { clientX: 100, clientY: 100 });
-      fireEvent.mouseMove(window, { clientX: 70, clientY: 80 });
-      fireEvent.mouseUp(window);
+      fireEvent.pointerDown(container.querySelector(".window__resize--nw")!, { clientX: 100, clientY: 100 });
+      fireEvent.pointerMove(window, { clientX: 70, clientY: 80 });
+      fireEvent.pointerUp(window);
       expect(current(id)).toMatchObject({ x: x - 30, y: y - 20, width: 430, height: 520 });
     });
 
@@ -152,9 +152,9 @@ describe("Window", () => {
       const { x, width } = current(id);
       const min = 280;
       const { container } = renderWindow(id);
-      fireEvent.mouseDown(container.querySelector(".window__resize--w")!, { clientX: 100, clientY: 100 });
-      fireEvent.mouseMove(window, { clientX: 1000, clientY: 100 });
-      fireEvent.mouseUp(window);
+      fireEvent.pointerDown(container.querySelector(".window__resize--w")!, { clientX: 100, clientY: 100 });
+      fireEvent.pointerMove(window, { clientX: 1000, clientY: 100 });
+      fireEvent.pointerUp(window);
       expect(current(id).width).toBe(min);
       expect(current(id).x + current(id).width).toBe(x + width);
     });

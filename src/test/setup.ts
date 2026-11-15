@@ -9,3 +9,6 @@ afterEach(() => {
   cleanup();
   localStorage.clear();
 });
+
+// jsdom has no native PointerEvent; preserve coordinates for pointer interactions.
+if (!window.PointerEvent) window.PointerEvent = MouseEvent as typeof PointerEvent;

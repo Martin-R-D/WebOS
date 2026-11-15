@@ -14,6 +14,8 @@ import { NotificationPanel } from "./NotificationPanel";
 import { useNotificationStore } from "../../stores/useNotificationStore";
 import type { AppId, ContextMenuItem } from "../../types";
 import "./Taskbar.css";
+import { useCompact } from "../../lib/useCompact";
+import { MobileNav } from "../MobileNav/MobileNav";
 
 function TaskbarWeather() {
   const { weather, unit, refresh } = useWeatherStore();
@@ -46,6 +48,7 @@ interface TaskbarProps {
 }
 
 export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
+  const compact = useCompact();
   const windows = useWindowStore((s) => s.windows);
   const focusedId = useWindowStore((s) => s.focusedId);
   const minimizeWindow = useWindowStore((s) => s.minimizeWindow);
@@ -93,6 +96,8 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
   }
 
   const runningAppIds = new Set(windows.map((w) => w.appId));
+
+  if (compact) return <MobileNav onToggleStart={onToggleStart} />;
 
   return (
     <div className="taskbar">

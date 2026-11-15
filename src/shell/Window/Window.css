@@ -155,3 +155,7 @@ body.is-resizing {
 @media (prefers-reduced-motion: reduce) {
   .window { animation: none; }
 }
+
+.window[hidden] { display: none; }
+.window__body { min-width: 0; min-height: 0; }
+.window__titlebar, .window__resize { touch-action: none; }
