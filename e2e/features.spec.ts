@@ -50,3 +50,20 @@ test("sticky notes search, pin and new-note focus", async ({ page }) => {
     page.getByRole("button", { name: "Unpin note" }),
   ).toHaveAttribute("aria-pressed", "true");
 });
+
+test("file properties opens from touch actions on protected folders", async ({
+  page,
+}) => {
+  await launch(page, "File Explorer");
+  await page.getByRole("button", { name: "Actions for Documents" }).tap();
+  await page
+    .locator(".ctx-menu")
+    .getByRole("button", { name: "Properties" })
+    .tap();
+  const dialog = page.getByRole("dialog", { name: "Properties", exact: true });
+  await expect(dialog).toContainText("/Documents");
+  await expect(dialog).toContainText("Content size");
+  await expect(dialog).toContainText("2 files, 0 folders");
+  await dialog.getByRole("button", { name: "Close", exact: true }).tap();
+  await expect(dialog).toHaveCount(0);
+});

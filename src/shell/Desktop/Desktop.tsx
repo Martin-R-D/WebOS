@@ -1,3 +1,4 @@
+import { PropertiesDialog } from "../FileDialogs/PropertiesDialog";
 import { useState, type ReactNode } from "react";
 import * as Icons from "lucide-react";
 import { useSystemStore } from "../../stores/useSystemStore";
@@ -116,6 +117,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
     y: number;
     items: ContextMenuItem[];
   } | null>(null);
+  const [propertiesId, setPropertiesId] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<FsNode | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
   const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
@@ -225,6 +227,12 @@ export function Desktop({ children }: { children?: ReactNode }) {
         onClick: () => openFsNode(node),
       },
     ];
+
+    items.push({
+      label: "Properties",
+      icon: "Info",
+      onClick: () => setPropertiesId(node.id),
+    });
 
     if (!isProtectedNode(node, rootId)) {
       items.push(
@@ -420,6 +428,12 @@ export function Desktop({ children }: { children?: ReactNode }) {
           y={menu.y}
           items={menu.items}
           onClose={() => setMenu(null)}
+        />
+      )}
+      {propertiesId && (
+        <PropertiesDialog
+          nodeId={propertiesId}
+          onClose={() => setPropertiesId(null)}
         />
       )}
       {renameTarget && (

@@ -1,3 +1,4 @@
+import { PropertiesDialog } from "../../shell/FileDialogs/PropertiesDialog";
 import { useState } from "react";
 import * as Icons from "lucide-react";
 import {
@@ -66,6 +67,7 @@ export function FileExplorer({}: AppProps) {
     y: number;
     items: ContextMenuItem[];
   } | null>(null);
+  const [propertiesId, setPropertiesId] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<FsNode | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
   const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
@@ -164,6 +166,11 @@ export function FileExplorer({}: AppProps) {
               onClick: () => pinApp(appId),
             },
       ];
+      items.push({
+        label: "Properties",
+        icon: "Info",
+        onClick: () => setPropertiesId(node.id),
+      });
       setMenu({ x: e.clientX, y: e.clientY, items });
       return;
     }
@@ -175,6 +182,12 @@ export function FileExplorer({}: AppProps) {
         onClick: () => handleDoubleClick(nodeId),
       },
     ];
+
+    items.push({
+      label: "Properties",
+      icon: "Info",
+      onClick: () => setPropertiesId(node.id),
+    });
 
     if (!isProtectedNode(node, rootId)) {
       items.push(
@@ -430,6 +443,12 @@ export function FileExplorer({}: AppProps) {
           y={menu.y}
           items={menu.items}
           onClose={() => setMenu(null)}
+        />
+      )}
+      {propertiesId && (
+        <PropertiesDialog
+          nodeId={propertiesId}
+          onClose={() => setPropertiesId(null)}
         />
       )}
       {renameTarget && (
