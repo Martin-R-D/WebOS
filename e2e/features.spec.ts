@@ -99,3 +99,20 @@ test("recent files reuse saved windows and follow renames", async ({
     .tap();
   await expect(page.getByText(/No recent files yet/)).toBeVisible();
 });
+
+test("unit converter swaps quantities and retains preferences", async ({
+  page,
+}) => {
+  await launch(page, "Unit Converter");
+  await page.getByLabel("From", { exact: true }).selectOption("cm");
+  await page.getByLabel("To", { exact: true }).selectOption("m");
+  await page.getByLabel("Amount", { exact: true }).fill("100");
+  await expect(page.getByLabel("Conversion result")).toHaveText("1");
+  await page.getByRole("button", { name: "Swap", exact: true }).tap();
+  await expect(page.getByLabel("Amount", { exact: true })).toHaveValue("1");
+  await expect(page.getByLabel("Conversion result")).toHaveText("100");
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Unit Converter");
+  await expect(page.getByLabel("From", { exact: true })).toHaveValue("m");
+});
