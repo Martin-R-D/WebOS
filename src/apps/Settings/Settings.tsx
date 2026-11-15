@@ -1,3 +1,4 @@
+import { useResolvedTheme } from "../../lib/useResolvedTheme";
 import { useState, useEffect } from "react";
 import type { AppProps, ThemeName } from "../../types";
 import { useSystemStore } from "../../stores/useSystemStore";
@@ -23,6 +24,9 @@ type Section = (typeof SECTIONS)[number];
 
 export function Settings({}: AppProps) {
   const theme = useSystemStore((s) => s.theme);
+  const resolvedTheme = useResolvedTheme();
+  const followSystem = useSystemStore((s) => s.followSystemTheme);
+  const setFollowSystem = useSystemStore((s) => s.setFollowSystemTheme);
   const wallpaper = useSystemStore((s) => s.wallpaper);
   const username = useSystemStore((s) => s.username);
   const accentColor = useSystemStore((s) => s.accentColor);
@@ -34,11 +38,12 @@ export function Settings({}: AppProps) {
   const toggleSound = useSystemStore((s) => s.toggleSound);
   const resetSettings = useSystemStore((s) => s.resetSettings);
 
-  const [activeSection, setActiveSection] = useState<Section>("Personalization");
+  const [activeSection, setActiveSection] =
+    useState<Section>("Personalization");
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+    document.documentElement.setAttribute("data-theme", resolvedTheme);
+  }, [resolvedTheme]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--color-accent", accentColor);
@@ -60,7 +65,11 @@ export function Settings({}: AppProps) {
   }
 
   function handleFactoryReset() {
-    if (window.confirm("Factory reset WebOS? All settings, files, and profile data will be erased.")) {
+    if (
+      window.confirm(
+        "Factory reset WebOS? All settings, files, and profile data will be erased.",
+      )
+    ) {
       factoryReset();
     }
   }
@@ -90,7 +99,10 @@ export function Settings({}: AppProps) {
                 {WALLPAPERS.map((w) => (
                   <div
                     key={w}
-                    className={cx("settings__wallpaper", wallpaper === w && "active")}
+                    className={cx(
+                      "settings__wallpaper",
+                      wallpaper === w && "active",
+                    )}
                     style={{ background: w }}
                     onClick={() => setWallpaper(w)}
                   />
@@ -100,11 +112,25 @@ export function Settings({}: AppProps) {
 
             <div className="settings__row">
               <div className="settings__label">Theme</div>
+              <label className="settings__system-theme">
+                <input
+                  type="checkbox"
+                  checked={followSystem}
+                  onChange={(event) => setFollowSystem(event.target.checked)}
+                />
+                Follow system theme
+              </label>
+              <p className="settings__theme-status">
+                Current theme: {resolvedTheme}
+              </p>
               <div className="settings__themes">
                 {THEMES.map((t) => (
                   <button
                     key={t}
-                    className={cx("settings__theme-btn", theme === t && "active")}
+                    className={cx(
+                      "settings__theme-btn",
+                      !followSystem && theme === t && "active",
+                    )}
                     onClick={() => setTheme(t)}
                   >
                     {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -119,7 +145,10 @@ export function Settings({}: AppProps) {
                 {ACCENT_COLORS.map((c) => (
                   <div
                     key={c}
-                    className={cx("settings__swatch", accentColor === c && "active")}
+                    className={cx(
+                      "settings__swatch",
+                      accentColor === c && "active",
+                    )}
                     style={{ background: c }}
                     onClick={() => setAccentColor(c)}
                   />
@@ -163,13 +192,19 @@ export function Settings({}: AppProps) {
             <div className="settings__row">
               <div className="settings__label">Danger Zone</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button className="settings__danger" onClick={handleResetSettings}>
+                <button
+                  className="settings__danger"
+                  onClick={handleResetSettings}
+                >
                   Reset Settings
                 </button>
                 <button className="settings__danger" onClick={handleResetFs}>
                   Reset File System
                 </button>
-                <button className="settings__danger" onClick={handleFactoryReset}>
+                <button
+                  className="settings__danger"
+                  onClick={handleFactoryReset}
+                >
                   Factory Reset
                 </button>
               </div>
@@ -181,9 +216,13 @@ export function Settings({}: AppProps) {
           <>
             <div className="settings__section-title">About</div>
             <div className="settings__row">
-              <p style={{ marginBottom: 8 }}><strong>WebOS</strong> v1.0.0</p>
+              <p style={{ marginBottom: 8 }}>
+                <strong>WebOS</strong> v1.0.0
+              </p>
               <p style={{ marginBottom: 8 }}>Built with React + TypeScript</p>
-              <p style={{ marginBottom: 8 }}>&copy; {new Date().getFullYear()} Martin-R-D</p>
+              <p style={{ marginBottom: 8 }}>
+                &copy; {new Date().getFullYear()} Martin-R-D
+              </p>
               <p>
                 <a
                   href="https://github.com/Martin-R-D/WebOS"

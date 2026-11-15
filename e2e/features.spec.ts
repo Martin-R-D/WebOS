@@ -178,3 +178,26 @@ test("browser bookmarks add, rename and persist", async ({ page }) => {
   await page.getByRole("button", { name: "Confirm remove", exact: true }).tap();
   await expect(page.getByText("No bookmarks yet.")).toBeVisible();
 });
+
+test("system theme follows live device changes and permits manual override", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await launch(page, "Settings");
+  await page.getByRole("checkbox", { name: "Follow system theme" }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Settings");
+  await expect(
+    page.getByRole("checkbox", { name: "Follow system theme" }),
+  ).toBeChecked();
+  await page.getByRole("button", { name: "Midnight", exact: true }).tap();
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "midnight");
+  await expect(
+    page.getByRole("checkbox", { name: "Follow system theme" }),
+  ).not.toBeChecked();
+});

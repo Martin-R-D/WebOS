@@ -3,7 +3,7 @@ import * as Icons from "lucide-react";
 import { X, Square } from "lucide-react";
 import type { AppProps } from "../../types";
 import { useWindowStore } from "../../stores/useWindowStore";
-import { useSystemStore } from "../../stores/useSystemStore";
+import { useResolvedTheme } from "../../lib/useResolvedTheme";
 import { getApp } from "../registry";
 import "./TaskManager.css";
 
@@ -19,7 +19,7 @@ export function TaskManager({ windowId }: AppProps) {
   const focusedId = useWindowStore((s) => s.focusedId);
   const focusWindow = useWindowStore((s) => s.focusWindow);
   const closeWindow = useWindowStore((s) => s.closeWindow);
-  const theme = useSystemStore((s) => s.theme);
+  const theme = useResolvedTheme();
 
   const [uptime, setUptime] = useState(performance.now());
 
@@ -58,14 +58,20 @@ export function TaskManager({ windowId }: AppProps) {
 
       <div className="tm__header">
         <span>Running tasks</span>
-        <button className="tm__endall" onClick={closeAll} disabled={windows.length <= 1}>
+        <button
+          className="tm__endall"
+          onClick={closeAll}
+          disabled={windows.length <= 1}
+        >
           End all tasks
         </button>
       </div>
 
       <div className="tm__list">
         {windows.map((win) => {
-          const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Square;
+          const AppIcon =
+            (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ??
+            Square;
           const isSelf = win.id === windowId;
           return (
             <div
@@ -76,10 +82,15 @@ export function TaskManager({ windowId }: AppProps) {
               <div className="tm__row-info">
                 <div className="tm__row-title">{win.title}</div>
                 <div className="tm__row-sub">
-                  {getApp(win.appId).name} · {win.isMinimized ? "Minimized" : "Running"}
+                  {getApp(win.appId).name} ·{" "}
+                  {win.isMinimized ? "Minimized" : "Running"}
                 </div>
               </div>
-              <button className="tm__row-btn" onClick={() => focusWindow(win.id)} title="Focus">
+              <button
+                className="tm__row-btn"
+                onClick={() => focusWindow(win.id)}
+                title="Focus"
+              >
                 <Icons.Eye size={14} />
               </button>
               <button
