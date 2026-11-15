@@ -24,6 +24,16 @@ export default defineConfig({
       },
     },
     {
+      name: "webkit-phone",
+      grepInvert: /desktop drag/,
+      use: {
+        browserName: "webkit",
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    {
       name: "desktop",
       grep: /desktop drag/,
       use: {

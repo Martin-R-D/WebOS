@@ -253,11 +253,11 @@ npm test            # run the whole suite once
 npm run test:watch  # re-run on change
 ```
 
-Browser regression tests cover compact layouts, touch file actions, dialog focus,
-workspace persistence, and desktop window dragging/resizing:
+Chromium and WebKit browser regression tests cover compact layouts, touch file
+actions, dialog focus, workspace persistence, and desktop window dragging/resizing:
 
 ```bash
-npx playwright install chromium
+npx playwright install --with-deps chromium webkit
 npm run test:e2e
 ```
 

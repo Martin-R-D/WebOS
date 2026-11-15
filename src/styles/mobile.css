@@ -448,3 +448,24 @@ dialog.save-confirm-overlay {
 .editor__btn[hidden] {
   display: none;
 }
+
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+  .tm__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tm__stat {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tm__header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tm__row-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

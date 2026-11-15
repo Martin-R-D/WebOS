@@ -19,5 +19,5 @@ jobs:
       - run: npm test -- --maxWorkers=4
       - run: npm run build
       - run: npm run lint
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:e2e
