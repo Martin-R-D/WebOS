@@ -1,3 +1,4 @@
+import { RecentFiles } from "./RecentFiles";
 import { PropertiesDialog } from "../../shell/FileDialogs/PropertiesDialog";
 import { useState } from "react";
 import * as Icons from "lucide-react";
@@ -46,7 +47,7 @@ function findDesktopFolderId(
   return null;
 }
 
-export function FileExplorer({}: AppProps) {
+export function FileExplorer({ launchProps }: AppProps) {
   const compact = useCompact();
   const [locationsOpen, setLocationsOpen] = useState(false);
   const rootId = useFileSystemStore((s) => s.rootId);
@@ -60,7 +61,13 @@ export function FileExplorer({}: AppProps) {
   const deleteNode = useFileSystemStore((s) => s.deleteNode);
   const moveNode = useFileSystemStore((s) => s.moveNode);
 
-  const [history, setHistory] = useState<string[]>([rootId]);
+  const [recentOpen, setRecentOpen] = useState(false);
+  const [history, setHistory] = useState<string[]>([
+    typeof launchProps?.folderId === "string" &&
+    nodes[launchProps.folderId]?.type === "folder"
+      ? launchProps.folderId
+      : rootId,
+  ]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [menu, setMenu] = useState<{
     x: number;
@@ -105,6 +112,7 @@ export function FileExplorer({}: AppProps) {
   const topFolders = getChildren(rootId).filter((n) => n.type === "folder");
 
   function navigateTo(folderId: string) {
+    setRecentOpen(false);
     setLocationsOpen(false);
     setSearchQuery("");
     setSearchOpen(false);
@@ -244,6 +252,16 @@ export function FileExplorer({}: AppProps) {
   return (
     <div className="fx">
       <div className="fx__toolbar">
+        <button
+          className="fd-btn"
+          aria-pressed={recentOpen}
+          onClick={() => {
+            setRecentOpen(!recentOpen);
+            setLocationsOpen(false);
+          }}
+        >
+          Recent
+        </button>
         {compact && (
           <button
             className="fx__btn"
@@ -356,85 +374,89 @@ export function FileExplorer({}: AppProps) {
           ))}
         </div>
 
-        <div
-          className={cx(
-            "fx__grid",
-            dragOverId === currentFolderId && "fx__grid--dragover",
-          )}
-          onContextMenu={handleEmptyContext}
-          {...dropTargetProps(currentFolderId)}
-        >
-          {children.length === 0 && (
-            <div className="fx__empty">
-              {isSearching
-                ? `No results for "${searchQuery}"`
-                : "This folder is empty"}
-            </div>
-          )}
-          {children.map((node) => {
-            let NodeIcon: Icons.LucideIcon =
-              node.type === "folder" ? Folder : FileText;
-            let displayName = node.name;
-
-            if (
-              node.name.endsWith(".app") &&
-              node.content &&
-              node.content in appRegistry
-            ) {
-              const appDef = appRegistry[node.content as AppId];
-              NodeIcon =
-                (Icons as unknown as Record<string, Icons.LucideIcon>)[
-                  appDef.icon
-                ] ?? FileText;
-              displayName = node.name.replace(/\.app$/, "");
-            } else if (isImageFile(node.name)) {
-              NodeIcon = Icons.Image;
-            }
-
-            const isFolder = node.type === "folder";
-            return (
-              <div className="fx__entry" key={node.id}>
-                <button
-                  className={cx(
-                    "fx__item",
-                    dragOverId === node.id && "fx__item--dragover",
-                  )}
-                  onClick={() => {
-                    if (compact) handleDoubleClick(node.id);
-                  }}
-                  onDoubleClick={() => {
-                    if (!compact) handleDoubleClick(node.id);
-                  }}
-                  onContextMenu={(e) => handleItemContext(e, node.id)}
-                  draggable={
-                    !compact &&
-                    !isProtectedNode(node, rootId) &&
-                    !isSystemAppsFolder(currentNode, rootId)
-                  }
-                  onDragStart={(e) => startNodeDrag(e, node.id)}
-                  {...(isFolder ? dropTargetProps(node.id) : {})}
-                >
-                  <NodeIcon size={28} />
-                  <span>{displayName}</span>
-                  {isSearching && node.parentId && (
-                    <span className="fx__item-path">
-                      {getPath(node.parentId)}
-                    </span>
-                  )}
-                </button>
-                {compact && (
-                  <button
-                    className="fx__more"
-                    aria-label={`Actions for ${displayName}`}
-                    onClick={(e) => handleItemContext(e, node.id)}
-                  >
-                    •••
-                  </button>
-                )}
+        {recentOpen ? (
+          <RecentFiles />
+        ) : (
+          <div
+            className={cx(
+              "fx__grid",
+              dragOverId === currentFolderId && "fx__grid--dragover",
+            )}
+            onContextMenu={handleEmptyContext}
+            {...dropTargetProps(currentFolderId)}
+          >
+            {children.length === 0 && (
+              <div className="fx__empty">
+                {isSearching
+                  ? `No results for "${searchQuery}"`
+                  : "This folder is empty"}
               </div>
-            );
-          })}
-        </div>
+            )}
+            {children.map((node) => {
+              let NodeIcon: Icons.LucideIcon =
+                node.type === "folder" ? Folder : FileText;
+              let displayName = node.name;
+
+              if (
+                node.name.endsWith(".app") &&
+                node.content &&
+                node.content in appRegistry
+              ) {
+                const appDef = appRegistry[node.content as AppId];
+                NodeIcon =
+                  (Icons as unknown as Record<string, Icons.LucideIcon>)[
+                    appDef.icon
+                  ] ?? FileText;
+                displayName = node.name.replace(/\.app$/, "");
+              } else if (isImageFile(node.name)) {
+                NodeIcon = Icons.Image;
+              }
+
+              const isFolder = node.type === "folder";
+              return (
+                <div className="fx__entry" key={node.id}>
+                  <button
+                    className={cx(
+                      "fx__item",
+                      dragOverId === node.id && "fx__item--dragover",
+                    )}
+                    onClick={() => {
+                      if (compact) handleDoubleClick(node.id);
+                    }}
+                    onDoubleClick={() => {
+                      if (!compact) handleDoubleClick(node.id);
+                    }}
+                    onContextMenu={(e) => handleItemContext(e, node.id)}
+                    draggable={
+                      !compact &&
+                      !isProtectedNode(node, rootId) &&
+                      !isSystemAppsFolder(currentNode, rootId)
+                    }
+                    onDragStart={(e) => startNodeDrag(e, node.id)}
+                    {...(isFolder ? dropTargetProps(node.id) : {})}
+                  >
+                    <NodeIcon size={28} />
+                    <span>{displayName}</span>
+                    {isSearching && node.parentId && (
+                      <span className="fx__item-path">
+                        {getPath(node.parentId)}
+                      </span>
+                    )}
+                  </button>
+                  {compact && (
+                    <button
+                      className="fx__more"
+                      aria-label={`Actions for ${displayName}`}
+                      onClick={(e) => handleItemContext(e, node.id)}
+                    >
+                      •••
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {menu && (

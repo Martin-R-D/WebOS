@@ -67,3 +67,35 @@ test("file properties opens from touch actions on protected folders", async ({
   await dialog.getByRole("button", { name: "Close", exact: true }).tap();
   await expect(dialog).toHaveCount(0);
 });
+
+test("recent files reuse saved windows and follow renames", async ({
+  page,
+}) => {
+  await launch(page, "Text Editor");
+  await page.locator(".editor__area").fill("Recent draft");
+  await page.getByRole("button", { name: "Save As", exact: true }).tap();
+  await page.getByLabel("File name").fill("recent.txt");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Save", exact: true })
+    .tap();
+  await launch(page, "File Explorer");
+  await page.getByRole("button", { name: "Recent", exact: true }).tap();
+  await page
+    .locator(".recent-files__open")
+    .filter({ hasText: "recent.txt" })
+    .tap();
+  await expect(page.locator(".editor")).toHaveCount(1);
+  await expect(page.locator(".window:not([hidden]) .editor__area")).toHaveValue(
+    "Recent draft",
+  );
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "File Explorer");
+  await page.getByRole("button", { name: "Recent", exact: true }).tap();
+  await expect(page.locator(".recent-files__open")).toContainText("recent.txt");
+  await page
+    .getByRole("button", { name: "Remove recent.txt from recent" })
+    .tap();
+  await expect(page.getByText(/No recent files yet/)).toBeVisible();
+});

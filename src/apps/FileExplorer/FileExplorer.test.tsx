@@ -43,22 +43,31 @@ describe("FileExplorer search", () => {
   it("shows 'No results' when nothing matches", async () => {
     renderExplorer();
     await userEvent.click(screen.getByLabelText("Search"));
-    await userEvent.type(screen.getByPlaceholderText("Search files…"), "zzzznotfound");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search files…"),
+      "zzzznotfound",
+    );
     expect(screen.getByText(/No results for/)).toBeInTheDocument();
   });
 
   it("clears search and returns to folder view when X is clicked", async () => {
     renderExplorer();
     await userEvent.click(screen.getByLabelText("Search"));
-    await userEvent.type(screen.getByPlaceholderText("Search files…"), "readme");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search files…"),
+      "readme",
+    );
     expect(screen.getByText("readme.txt")).toBeInTheDocument();
 
-    const clearBtn = screen.getByPlaceholderText("Search files…")
+    const clearBtn = screen
+      .getByPlaceholderText("Search files…")
       .closest(".fx__search")!
       .querySelector(".fx__search-clear")! as HTMLElement;
     await userEvent.click(clearBtn);
 
-    expect(screen.queryByPlaceholderText("Search files…")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Search files…"),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("About Me.txt")).toBeInTheDocument();
   });
 
@@ -67,18 +76,23 @@ describe("FileExplorer search", () => {
     await userEvent.click(screen.getByLabelText("Search"));
     await userEvent.type(screen.getByPlaceholderText("Search files…"), "todo");
 
-    const sidebarDocuments = screen.getAllByText("Documents").find(
-      (el) => el.closest(".fx__side-item"),
-    )!;
+    const sidebarDocuments = screen
+      .getAllByText("Documents")
+      .find((el) => el.closest(".fx__side-item"))!;
     await userEvent.click(sidebarDocuments);
 
-    expect(screen.queryByPlaceholderText("Search files…")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Search files…"),
+    ).not.toBeInTheDocument();
   });
 
   it("search is case-insensitive", async () => {
     renderExplorer();
     await userEvent.click(screen.getByLabelText("Search"));
-    await userEvent.type(screen.getByPlaceholderText("Search files…"), "README");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search files…"),
+      "README",
+    );
     expect(screen.getByText("readme.txt")).toBeInTheDocument();
   });
 
@@ -92,13 +106,18 @@ describe("FileExplorer search", () => {
   it("double-clicking a folder result navigates to it and clears search", async () => {
     renderExplorer();
     await userEvent.click(screen.getByLabelText("Search"));
-    await userEvent.type(screen.getByPlaceholderText("Search files…"), "Pictures");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search files…"),
+      "Pictures",
+    );
 
     const results = screen.getAllByText("Pictures");
     const gridResult = results.find((el) => el.closest(".fx__item"))!;
     fireEvent.doubleClick(gridResult.closest("button")!);
 
-    expect(screen.queryByPlaceholderText("Search files…")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Search files…"),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("This folder is empty")).toBeInTheDocument();
   });
 });
@@ -131,7 +150,15 @@ describe("searchNodes store method", () => {
 
   it("is case-insensitive", () => {
     fs().createNode(byName("Desktop").id, "MyNote.TXT", "file", "hello");
-    expect(fs().searchNodes("mynote").some((n) => n.name === "MyNote.TXT")).toBe(true);
-    expect(fs().searchNodes("MYNOTE").some((n) => n.name === "MyNote.TXT")).toBe(true);
+    expect(
+      fs()
+        .searchNodes("mynote")
+        .some((n) => n.name === "MyNote.TXT"),
+    ).toBe(true);
+    expect(
+      fs()
+        .searchNodes("MYNOTE")
+        .some((n) => n.name === "MyNote.TXT"),
+    ).toBe(true);
   });
 });

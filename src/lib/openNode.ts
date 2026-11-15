@@ -1,3 +1,4 @@
+import { useRecentFilesStore } from "../stores/useRecentFilesStore";
 import type { AppId, FsNode } from "../types";
 import { appRegistry } from "../apps/registry";
 import { useWindowStore } from "../stores/useWindowStore";
@@ -26,7 +27,10 @@ export function openFsNode(node: FsNode) {
     const existing = windows.find(
       (w) => w.appId === "file-explorer" && w.launchProps?.folderId === node.id,
     );
-    if (existing) { focusWindow(existing.id); return; }
+    if (existing) {
+      focusWindow(existing.id);
+      return;
+    }
     openWindow({
       appId: "file-explorer",
       title: node.name,
@@ -39,16 +43,26 @@ export function openFsNode(node: FsNode) {
     return;
   }
 
-  if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
+  if (
+    node.name.endsWith(".app") &&
+    node.content &&
+    node.content in appRegistry
+  ) {
     launchApp(node.content as AppId);
     return;
   }
+
+  if (!node.name.endsWith(".app"))
+    useRecentFilesStore.getState().record(node.id);
 
   const appId: AppId = isImageFile(node.name) ? "paint" : "text-editor";
   const existing = windows.find(
     (w) => w.appId === appId && w.launchProps?.fileId === node.id,
   );
-  if (existing) { focusWindow(existing.id); return; }
+  if (existing) {
+    focusWindow(existing.id);
+    return;
+  }
 
   const def = appRegistry[appId];
   openWindow({

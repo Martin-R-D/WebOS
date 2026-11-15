@@ -1,5 +1,14 @@
+import { useRecentFilesStore } from "../../stores/useRecentFilesStore";
 import { useRef, useState, useEffect } from "react";
-import { Paintbrush, Eraser, Undo2, Trash2, Download, Save, SaveAll } from "lucide-react";
+import {
+  Paintbrush,
+  Eraser,
+  Undo2,
+  Trash2,
+  Download,
+  Save,
+  SaveAll,
+} from "lucide-react";
 import type { AppProps } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useWindowStore } from "../../stores/useWindowStore";
@@ -8,8 +17,16 @@ import { cx } from "../../lib/helpers";
 import "./Paint.css";
 
 const COLORS = [
-  "#1a1a2e", "#e74c3c", "#e67e22", "#f1c40f", "#2ecc71",
-  "#1abc9c", "#3498db", "#6c5ce7", "#e84393", "#ffffff",
+  "#1a1a2e",
+  "#e74c3c",
+  "#e67e22",
+  "#f1c40f",
+  "#2ecc71",
+  "#1abc9c",
+  "#3498db",
+  "#6c5ce7",
+  "#e84393",
+  "#ffffff",
 ];
 
 const SIZES = [2, 5, 10, 18];
@@ -150,12 +167,18 @@ export function Paint({ windowId, launchProps }: AppProps) {
     }
   }
 
-  function handleSaveDialogConfirm(folderId: string, name: string, overwriteId?: string) {
+  function handleSaveDialogConfirm(
+    folderId: string,
+    name: string,
+    overwriteId?: string,
+  ) {
     const data = toDataUrl();
 
     if (overwriteId) {
       updateContent(overwriteId, data);
       setFileId(overwriteId);
+      useWindowStore.getState().bindFile(windowId, overwriteId);
+      useRecentFilesStore.getState().record(overwriteId);
       setFileName(name);
       setDirty(false);
       setShowSaveAs(false);
@@ -165,6 +188,8 @@ export function Paint({ windowId, launchProps }: AppProps) {
     const newId = createNode(folderId, name, "file", data);
     if (!newId) return; // name collision with a folder — keep dialog open
     setFileId(newId);
+    useWindowStore.getState().bindFile(windowId, newId);
+    useRecentFilesStore.getState().record(newId);
     setFileName(name);
     setDirty(false);
     setShowSaveAs(false);
@@ -192,7 +217,11 @@ export function Paint({ windowId, launchProps }: AppProps) {
           <button className="paint__tool" onClick={handleSave} title="Save">
             <Save size={15} />
           </button>
-          <button className="paint__tool" onClick={() => setShowSaveAs(true)} title="Save As…">
+          <button
+            className="paint__tool"
+            onClick={() => setShowSaveAs(true)}
+            title="Save As…"
+          >
             <SaveAll size={15} />
           </button>
         </div>
@@ -222,7 +251,12 @@ export function Paint({ windowId, launchProps }: AppProps) {
               onClick={() => setSize(s)}
               title={`${s}px`}
             >
-              <span style={{ width: Math.min(s + 3, 18), height: Math.min(s + 3, 18) }} />
+              <span
+                style={{
+                  width: Math.min(s + 3, 18),
+                  height: Math.min(s + 3, 18),
+                }}
+              />
             </button>
           ))}
         </div>
@@ -231,22 +265,37 @@ export function Paint({ windowId, launchProps }: AppProps) {
           {COLORS.map((c) => (
             <button
               key={c}
-              className={cx("paint__color", color === c && !eraser && "paint__color--active")}
+              className={cx(
+                "paint__color",
+                color === c && !eraser && "paint__color--active",
+              )}
               style={{ background: c }}
-              onClick={() => { setColor(c); setEraser(false); }}
+              onClick={() => {
+                setColor(c);
+                setEraser(false);
+              }}
               title={c}
             />
           ))}
         </div>
 
         <div className="paint__actions">
-          <button className="paint__tool" onClick={undo} disabled={!canUndo} title="Undo">
+          <button
+            className="paint__tool"
+            onClick={undo}
+            disabled={!canUndo}
+            title="Undo"
+          >
             <Undo2 size={15} />
           </button>
           <button className="paint__tool" onClick={clearCanvas} title="Clear">
             <Trash2 size={15} />
           </button>
-          <button className="paint__tool" onClick={download} title="Download as PNG">
+          <button
+            className="paint__tool"
+            onClick={download}
+            title="Download as PNG"
+          >
             <Download size={15} />
           </button>
         </div>

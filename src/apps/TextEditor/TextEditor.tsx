@@ -1,3 +1,4 @@
+import { useRecentFilesStore } from "../../stores/useRecentFilesStore";
 import { useCompact } from "../../lib/useCompact";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
@@ -160,6 +161,8 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
     if (overwriteId) {
       updateContent(overwriteId, text);
       setFileId(overwriteId);
+      useWindowStore.getState().bindFile(windowId, overwriteId);
+      useRecentFilesStore.getState().record(overwriteId);
       setFileName(name);
       setDirty(false);
       setShowSaveAs(false);
@@ -179,6 +182,8 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
     const newId = createNode(folderId, name, "file", text);
     if (!newId) return;
     setFileId(newId);
+    useWindowStore.getState().bindFile(windowId, newId);
+    useRecentFilesStore.getState().record(newId);
     setFileName(name);
     setDirty(false);
     setShowSaveAs(false);
