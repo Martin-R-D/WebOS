@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface ProfileSocial {
+interface ProfileSocial {
   label: string;
   url: string;
 }

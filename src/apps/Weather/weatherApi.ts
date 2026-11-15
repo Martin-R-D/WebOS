@@ -5,7 +5,7 @@ export interface GeoResult {
   longitude: number;
 }
 
-export interface CurrentWeather {
+interface CurrentWeather {
   temp: number;
   feelsLike: number;
   humidity: number;
@@ -13,7 +13,7 @@ export interface CurrentWeather {
   weatherCode: number;
 }
 
-export interface DailyWeather {
+interface DailyWeather {
   date: string;
   tempMin: number;
   tempMax: number;

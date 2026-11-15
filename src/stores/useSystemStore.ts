@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { AppId, SystemSettings, ThemeName } from "../types";
 
-export interface IconPos {
+interface IconPos {
   x: number;
   y: number;
 }
