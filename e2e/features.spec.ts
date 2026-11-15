@@ -139,3 +139,21 @@ test("to-do tasks edit, complete, filter and persist", async ({ page }) => {
   await page.getByRole("button", { name: "Confirm delete", exact: true }).tap();
   await expect(page.getByText(/No tasks yet/)).toBeVisible();
 });
+
+test("file sorting reverses order and persists", async ({ page }) => {
+  await launch(page, "File Explorer");
+  const first = page.locator(".fx__item").first();
+  await expect(first).toContainText("Desktop");
+  await page
+    .getByRole("button", { name: "Sort descending", exact: true })
+    .tap();
+  await expect(first).toContainText("System Apps");
+  await page.getByLabel("Sort by").selectOption("modified");
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "File Explorer");
+  await expect(page.getByLabel("Sort by")).toHaveValue("modified");
+  await expect(
+    page.getByRole("button", { name: "Sort ascending", exact: true }),
+  ).toBeVisible();
+});

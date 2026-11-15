@@ -25,6 +25,7 @@ export function cx(...classes: (string | false | undefined | null)[]): string {
 }
 
 export function factoryReset() {
+  localStorage.removeItem("webos-explorer-settings");
   localStorage.removeItem("webos-todos");
   localStorage.removeItem("webos-converter");
   localStorage.removeItem("webos-recent-files");
