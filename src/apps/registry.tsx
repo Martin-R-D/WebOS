@@ -1,3 +1,4 @@
+import { UnitConverter } from "./UnitConverter/UnitConverter";
 import type { AppDefinition, AppId } from "../types";
 import { Calculator } from "./Calculator/Calculator";
 import { TextEditor } from "./TextEditor/TextEditor";
@@ -15,6 +16,17 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  "unit-converter": {
+    id: "unit-converter",
+    name: "Unit Converter",
+    icon: "ArrowLeftRight",
+    component: UnitConverter,
+    defaultWidth: 440,
+    defaultHeight: 560,
+    minWidth: 300,
+    minHeight: 320,
+    singleInstance: true,
+  },
   "file-explorer": {
     id: "file-explorer",
     name: "File Explorer",
@@ -35,7 +47,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minWidth: 380,
     minHeight: 260,
   },
-  "terminal": {
+  terminal: {
     id: "terminal",
     name: "Terminal",
     icon: "TerminalSquare",
@@ -45,7 +57,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minWidth: 380,
     minHeight: 240,
   },
-  "calculator": {
+  calculator: {
     id: "calculator",
     name: "Calculator",
     icon: "Calculator",
@@ -56,7 +68,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minHeight: 440,
     singleInstance: true,
   },
-  "settings": {
+  settings: {
     id: "settings",
     name: "Settings",
     icon: "Settings",
@@ -67,7 +79,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minHeight: 360,
     singleInstance: true,
   },
-  "browser": {
+  browser: {
     id: "browser",
     name: "Browser",
     icon: "Globe",
@@ -88,7 +100,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minHeight: 320,
     singleInstance: true,
   },
-  "paint": {
+  paint: {
     id: "paint",
     name: "Paint",
     icon: "Paintbrush",
@@ -98,7 +110,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minWidth: 520,
     minHeight: 400,
   },
-  "clock": {
+  clock: {
     id: "clock",
     name: "Clock",
     icon: "Clock",
@@ -130,7 +142,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minWidth: 320,
     minHeight: 300,
   },
-  "weather": {
+  weather: {
     id: "weather",
     name: "Weather",
     icon: "CloudSun",
@@ -141,7 +153,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     minHeight: 380,
     singleInstance: true,
   },
-  "calendar": {
+  calendar: {
     id: "calendar",
     name: "Calendar",
     icon: "CalendarDays",

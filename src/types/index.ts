@@ -18,6 +18,7 @@ export type AppId =
   | "file-explorer"
   | "text-editor"
   | "terminal"
+  | "unit-converter"
   | "calculator"
   | "settings"
   | "browser"

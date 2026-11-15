@@ -5,7 +5,8 @@ import { resetAllStores } from "../test/resetStores";
 const fs = () => useFileSystemStore.getState();
 const byName = (name: string, parentId?: string) =>
   Object.values(fs().nodes).find(
-    (n) => n.name === name && (parentId === undefined || n.parentId === parentId),
+    (n) =>
+      n.name === name && (parentId === undefined || n.parentId === parentId),
   )!;
 
 describe("useFileSystemStore", () => {
@@ -13,18 +14,30 @@ describe("useFileSystemStore", () => {
 
   describe("seed", () => {
     it("builds a root with the core folders and one shortcut per system app", () => {
-      const children = fs().getChildren(fs().rootId).map((n) => n.name);
+      const children = fs()
+        .getChildren(fs().rootId)
+        .map((n) => n.name);
       expect(children).toEqual(
-        expect.arrayContaining(["Desktop", "Documents", "Pictures", "System Apps", "About Me.txt"]),
+        expect.arrayContaining([
+          "Desktop",
+          "Documents",
+          "Pictures",
+          "System Apps",
+          "About Me.txt",
+        ]),
       );
       const apps = fs().getChildren(byName("System Apps").id);
-      expect(apps).toHaveLength(14);
-      expect(apps.every((a) => a.name.endsWith(".app") && a.content)).toBe(true);
+      expect(apps).toHaveLength(15);
+      expect(apps.every((a) => a.name.endsWith(".app") && a.content)).toBe(
+        true,
+      );
     });
 
     it("has a parentless root and every other node pointing at an existing parent", () => {
       expect(fs().nodes[fs().rootId].parentId).toBeNull();
-      for (const n of Object.values(fs().nodes).filter((n) => n.id !== fs().rootId)) {
+      for (const n of Object.values(fs().nodes).filter(
+        (n) => n.id !== fs().rootId,
+      )) {
         expect(fs().nodes[n.parentId!], n.name).toBeDefined();
       }
     });
@@ -36,8 +49,16 @@ describe("useFileSystemStore", () => {
       fs().createNode(docs, "Zeta", "folder");
       fs().createNode(docs, "alpha", "folder");
       fs().createNode(docs, "Beta.txt", "file", "");
-      const names = fs().getChildren(docs).map((n) => n.name);
-      expect(names).toEqual(["alpha", "Zeta", "Beta.txt", "readme.txt", "todo.txt"]);
+      const names = fs()
+        .getChildren(docs)
+        .map((n) => n.name);
+      expect(names).toEqual([
+        "alpha",
+        "Zeta",
+        "Beta.txt",
+        "readme.txt",
+        "todo.txt",
+      ]);
     });
 
     it("returns an empty list for an empty folder", () => {
@@ -47,8 +68,17 @@ describe("useFileSystemStore", () => {
 
   describe("createNode", () => {
     it("creates a node with content and returns its id", () => {
-      const id = fs().createNode(byName("Desktop").id, "note.txt", "file", "hello");
-      expect(fs().getNode(id)).toMatchObject({ name: "note.txt", type: "file", content: "hello" });
+      const id = fs().createNode(
+        byName("Desktop").id,
+        "note.txt",
+        "file",
+        "hello",
+      );
+      expect(fs().getNode(id)).toMatchObject({
+        name: "note.txt",
+        type: "file",
+        content: "hello",
+      });
     });
 
     it("refuses a duplicate name in the same folder and returns an empty id", () => {
@@ -235,7 +265,7 @@ describe("useFileSystemStore", () => {
       const id = fs().createNode(byName("Desktop").id, "mine.txt", "file", "");
       fs().resetFileSystem();
       expect(fs().getNode(id)).toBeUndefined();
-      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(14);
+      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(15);
     });
   });
 
@@ -243,14 +273,28 @@ describe("useFileSystemStore", () => {
     it("persists nodes under the webos-filesystem key", () => {
       fs().createNode(byName("Desktop").id, "persisted.txt", "file", "");
       const raw = JSON.parse(localStorage.getItem("webos-filesystem")!);
-      expect(raw.version).toBe(7);
-      const names = Object.values<{ name: string }>(raw.state.nodes).map((n) => n.name);
+      expect(raw.version).toBe(8);
+      const names = Object.values<{ name: string }>(raw.state.nodes).map(
+        (n) => n.name,
+      );
       expect(names).toContain("persisted.txt");
     });
 
     it("migrating an old state recreates System Apps and adds shortcuts without touching user files", async () => {
-      const mk = (id: string, name: string, type: "file" | "folder", parentId: string | null, content?: string) => ({
-        id, name, type, parentId, content, createdAt: 1, updatedAt: 1,
+      const mk = (
+        id: string,
+        name: string,
+        type: "file" | "folder",
+        parentId: string | null,
+        content?: string,
+      ) => ({
+        id,
+        name,
+        type,
+        parentId,
+        content,
+        createdAt: 1,
+        updatedAt: 1,
       });
       localStorage.setItem(
         "webos-filesystem",
@@ -266,7 +310,7 @@ describe("useFileSystemStore", () => {
         }),
       );
       await useFileSystemStore.persist.rehydrate();
-      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(14);
+      expect(fs().getChildren(byName("System Apps").id)).toHaveLength(15);
       expect(fs().getNode("mine")!.content).toBe("precious");
     });
   });
