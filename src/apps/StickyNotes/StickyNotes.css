@@ -61,7 +61,9 @@
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .sticky-notes__item:hover {
@@ -124,4 +126,27 @@
 
 .sticky-notes__text::placeholder {
   color: rgba(0, 0, 0, 0.4);
+}
+
+.sticky-notes__toolbar {
+  flex-wrap: wrap;
+}
+.sticky-notes__toolbar input {
+  flex: 1;
+  min-width: 120px;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.sticky-notes__pin {
+  min-width: 44px;
+  min-height: 44px;
+  color: #333;
+  border-radius: 6px;
+}
+.sticky-notes__pin[aria-pressed="true"] {
+  background: rgba(0, 0, 0, 0.15);
 }

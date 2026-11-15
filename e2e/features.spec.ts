@@ -32,3 +32,21 @@ test("calculator history survives reload and reuses results", async ({
   await page.getByRole("button", { name: "=", exact: true }).tap();
   await expect(page.locator(".calc__expr")).toHaveText("7");
 });
+
+test("sticky notes search, pin and new-note focus", async ({ page }) => {
+  await launch(page, "Sticky Notes");
+  await page.getByRole("button", { name: "Add Note" }).tap();
+  await page.getByLabel("Note text").fill("Shopping list");
+  await page.getByRole("button", { name: "Pin note", exact: true }).tap();
+  await page.getByLabel("Search notes").fill("missing");
+  await expect(page.getByText("No matching notes.")).toBeVisible();
+  await page.getByRole("button", { name: "Add Note" }).tap();
+  await expect(page.getByLabel("Search notes")).toHaveValue("");
+  await expect(page.getByLabel("Note text").last()).toBeFocused();
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Sticky Notes");
+  await expect(
+    page.getByRole("button", { name: "Unpin note" }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
