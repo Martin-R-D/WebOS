@@ -116,3 +116,26 @@ test("unit converter swaps quantities and retains preferences", async ({
   await launch(page, "Unit Converter");
   await expect(page.getByLabel("From", { exact: true })).toHaveValue("m");
 });
+
+test("to-do tasks edit, complete, filter and persist", async ({ page }) => {
+  await launch(page, "To-Do List");
+  await page.getByLabel("New task", { exact: true }).fill("Buy milk");
+  await page.getByRole("button", { name: "Add task", exact: true }).tap();
+  await page.getByRole("button", { name: "Edit Buy milk", exact: true }).tap();
+  await page.getByLabel("Edit task", { exact: true }).fill("Buy bread");
+  await page.getByRole("button", { name: "Save", exact: true }).tap();
+  await page.getByRole("checkbox", { name: "Complete Buy bread" }).check();
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "To-Do List");
+  await expect(
+    page.getByRole("checkbox", { name: "Complete Buy bread" }),
+  ).toBeChecked();
+  await page.getByRole("button", { name: "Active (0)", exact: true }).tap();
+  await expect(page.getByText("No active tasks.")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Clear completed", exact: true })
+    .tap();
+  await page.getByRole("button", { name: "Confirm delete", exact: true }).tap();
+  await expect(page.getByText(/No tasks yet/)).toBeVisible();
+});

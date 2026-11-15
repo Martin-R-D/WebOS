@@ -1,3 +1,4 @@
+import { useTodoStore } from "../stores/useTodoStore";
 import { useConverterStore } from "../stores/useConverterStore";
 import { useRecentFilesStore } from "../stores/useRecentFilesStore";
 import { useNotesStore } from "../stores/useNotesStore";
@@ -11,6 +12,7 @@ import { useNotificationStore } from "../stores/useNotificationStore";
 import { useEditorSettingsStore } from "../stores/useEditorSettingsStore";
 
 export function resetAllStores() {
+  useTodoStore.setState(useTodoStore.getInitialState(), true);
   useConverterStore.setState(useConverterStore.getInitialState(), true);
   useRecentFilesStore.setState(useRecentFilesStore.getInitialState(), true);
   useNotesStore.setState(useNotesStore.getInitialState(), true);

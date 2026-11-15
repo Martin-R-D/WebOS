@@ -1,0 +1,66 @@
+.todos {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+.todos label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.todos button,
+.todos input:not([type="checkbox"]) {
+  min-height: 44px;
+  padding: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font: inherit;
+}
+.todos input:not([type="checkbox"]) {
+  width: 100%;
+}
+.todos__add,
+.todos__filters,
+.todos__edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+.todos__filters [aria-pressed="true"] {
+  border-color: var(--color-accent);
+}
+.todos__list {
+  list-style: none;
+}
+.todos__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.todos__row > span,
+.todos__edit {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.todos__row input[type="checkbox"] {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  accent-color: var(--color-accent);
+}
+.todos__done {
+  text-decoration: line-through;
+  color: var(--color-text-dim);
+}
