@@ -1,0 +1,13 @@
+.properties {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px 16px;
+  user-select: text;
+}
+.properties dt {
+  color: var(--color-text-dim);
+}
+.properties dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
