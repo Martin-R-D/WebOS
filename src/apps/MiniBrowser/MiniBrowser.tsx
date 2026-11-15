@@ -1,7 +1,19 @@
+import { BookmarksPanel } from "./BookmarksPanel";
 import { useState, useEffect } from "react";
 import {
-  ChevronLeft, ChevronRight, RotateCw, ExternalLink, Home, Search,
-  Globe, BookOpen, Map, Code2, Archive, Loader2, AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  RotateCw,
+  ExternalLink,
+  Home,
+  Search,
+  Globe,
+  BookOpen,
+  Map,
+  Code2,
+  Archive,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { AppProps } from "../../types";
@@ -17,7 +29,8 @@ function getRateLimit(): { remaining: number; resetMs: number } {
   const now = Date.now();
   const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
   const remaining = Math.max(0, RATE_LIMIT_MAX - recent.length);
-  const resetMs = recent.length > 0 ? RATE_LIMIT_WINDOW_MS - (now - recent[0]) : 0;
+  const resetMs =
+    recent.length > 0 ? RATE_LIMIT_WINDOW_MS - (now - recent[0]) : 0;
   return { remaining, resetMs };
 }
 
@@ -45,7 +58,11 @@ const START = "webos://start";
 const SPEED_DIAL: { label: string; url: string; icon: LucideIcon }[] = [
   { label: "Wikipedia", url: "https://www.wikipedia.org", icon: BookOpen },
   { label: "OpenStreetMap", url: "https://www.openstreetmap.org", icon: Map },
-  { label: "MDN Play", url: "https://developer.mozilla.org/en-US/play", icon: Code2 },
+  {
+    label: "MDN Play",
+    url: "https://developer.mozilla.org/en-US/play",
+    icon: Code2,
+  },
   { label: "Archive.org", url: "https://archive.org", icon: Archive },
   { label: "OpenLibrary", url: "https://openlibrary.org", icon: Globe },
 ];
@@ -69,7 +86,7 @@ export function normalize(raw: string): string {
 async function fetchWikipedia(query: string): Promise<SearchResult[]> {
   try {
     const res = await fetch(
-      `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=5&format=json&origin=*`
+      `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=5&format=json&origin=*`,
     );
     if (!res.ok) return [];
     const data = await res.json();
@@ -88,17 +105,25 @@ async function fetchWikipedia(query: string): Promise<SearchResult[]> {
   }
 }
 
-async function fetchSearchResults(query: string, rateLimited: boolean): Promise<SearchResult[]> {
+async function fetchSearchResults(
+  query: string,
+  rateLimited: boolean,
+): Promise<SearchResult[]> {
   if (!rateLimited) {
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
         const data = await res.json();
         const results: SearchResult[] = (data.results ?? []).map(
-          (r: { title: string; url: string; snippet: string; source: string }) => ({
+          (r: {
+            title: string;
+            url: string;
+            snippet: string;
+            source: string;
+          }) => ({
             ...r,
             source: r.source as "web" | "duckduckgo",
-          })
+          }),
         );
         if (results.length > 0) return results;
       }
@@ -111,6 +136,7 @@ async function fetchSearchResults(query: string, rateLimited: boolean): Promise<
 }
 
 export function MiniBrowser({}: AppProps) {
+  const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [history, setHistory] = useState<string[]>([START]);
   const [index, setIndex] = useState(0);
   const [inputUrl, setInputUrl] = useState("");
@@ -124,7 +150,9 @@ export function MiniBrowser({}: AppProps) {
   const [searchError, setSearchError] = useState<string | null>(null);
 
   // Rate limit state
-  const [rateRemaining, setRateRemaining] = useState(() => getRateLimit().remaining);
+  const [rateRemaining, setRateRemaining] = useState(
+    () => getRateLimit().remaining,
+  );
   const [rateResetMs, setRateResetMs] = useState(() => getRateLimit().resetMs);
 
   // Tick rate limit countdown every second
@@ -205,7 +233,21 @@ export function MiniBrowser({}: AppProps) {
   return (
     <div className="browser">
       <div className="browser__bar">
-        <button className="browser__btn" disabled={index <= 0} onClick={() => jumpTo(index - 1)} title="Back">
+        <button
+          className="browser__btn"
+          title="Bookmarks"
+          aria-label="Bookmarks"
+          aria-expanded={bookmarksOpen}
+          onClick={() => setBookmarksOpen(!bookmarksOpen)}
+        >
+          ★
+        </button>
+        <button
+          className="browser__btn"
+          disabled={index <= 0}
+          onClick={() => jumpTo(index - 1)}
+          title="Back"
+        >
           <ChevronLeft size={16} />
         </button>
         <button
@@ -216,10 +258,23 @@ export function MiniBrowser({}: AppProps) {
         >
           <ChevronRight size={16} />
         </button>
-        <button className="browser__btn" onClick={reload} disabled={onStartPage} title="Reload">
-          <RotateCw size={14} className={loading ? "browser__spin" : undefined} />
+        <button
+          className="browser__btn"
+          onClick={reload}
+          disabled={onStartPage}
+          title="Reload"
+        >
+          <RotateCw
+            size={14}
+            className={loading ? "browser__spin" : undefined}
+          />
         </button>
-        <button className="browser__btn" onClick={() => navigate(START)} disabled={onStartPage && !showResults} title="Home">
+        <button
+          className="browser__btn"
+          onClick={() => navigate(START)}
+          disabled={onStartPage && !showResults}
+          title="Home"
+        >
           <Home size={14} />
         </button>
         <input
@@ -227,7 +282,9 @@ export function MiniBrowser({}: AppProps) {
           value={inputUrl}
           placeholder="Search or enter address"
           onChange={(e) => setInputUrl(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") navigate(inputUrl); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") navigate(inputUrl);
+          }}
           spellCheck={false}
         />
         <button
@@ -242,20 +299,30 @@ export function MiniBrowser({}: AppProps) {
 
       {loading && !onStartPage && <div className="browser__progress" />}
 
-      {showResults ? (
+      {bookmarksOpen ? (
+        <BookmarksPanel
+          currentUrl={url}
+          onNavigate={navigate}
+          onClose={() => setBookmarksOpen(false)}
+        />
+      ) : showResults ? (
         <div className="browser__results">
           <div className="browser__results-header">
-            <span>Results for <strong>{searchQuery}</strong></span>
+            <span>
+              Results for <strong>{searchQuery}</strong>
+            </span>
             <div className="browser__rate">
               {rateRemaining <= 0 ? (
                 <span className="browser__rate--limited">
                   <AlertCircle size={12} />
-                  Rate limited — Wikipedia only · resets in {formatMs(rateResetMs)}
+                  Rate limited — Wikipedia only · resets in{" "}
+                  {formatMs(rateResetMs)}
                 </span>
               ) : (
                 <span className="browser__rate--ok">
                   {rateRemaining}/{RATE_LIMIT_MAX} searches left
-                  {rateRemaining < RATE_LIMIT_MAX && ` · resets in ${formatMs(rateResetMs)}`}
+                  {rateRemaining < RATE_LIMIT_MAX &&
+                    ` · resets in ${formatMs(rateResetMs)}`}
                 </span>
               )}
             </div>
@@ -283,7 +350,9 @@ export function MiniBrowser({}: AppProps) {
                   </button>
                   <div className="browser__result-url">{result.url}</div>
                   {result.snippet && (
-                    <div className="browser__result-snippet">{result.snippet}</div>
+                    <div className="browser__result-snippet">
+                      {result.snippet}
+                    </div>
                   )}
                 </li>
               ))}
@@ -293,14 +362,18 @@ export function MiniBrowser({}: AppProps) {
       ) : onStartPage ? (
         <div className="browser__start">
           <div className="browser__start-clock">
-            {now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+            {now.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            })}
           </div>
           <div className="browser__search">
             <Search size={16} />
             <input
               placeholder="Search the web…"
               onKeyDown={(e) => {
-                if (e.key === "Enter") navigate((e.target as HTMLInputElement).value);
+                if (e.key === "Enter")
+                  navigate((e.target as HTMLInputElement).value);
               }}
               autoFocus
               spellCheck={false}
@@ -310,7 +383,8 @@ export function MiniBrowser({}: AppProps) {
             {rateRemaining <= 0 ? (
               <span className="browser__rate--limited">
                 <AlertCircle size={12} />
-                Rate limited — Wikipedia only · resets in {formatMs(rateResetMs)}
+                Rate limited — Wikipedia only · resets in{" "}
+                {formatMs(rateResetMs)}
               </span>
             ) : (
               <span className="browser__rate--ok">
@@ -320,15 +394,20 @@ export function MiniBrowser({}: AppProps) {
           </div>
           <div className="browser__dial">
             {SPEED_DIAL.map((site) => (
-              <button key={site.url} className="browser__tile" onClick={() => navigate(site.url)}>
+              <button
+                key={site.url}
+                className="browser__tile"
+                onClick={() => navigate(site.url)}
+              >
                 <site.icon size={22} />
                 <span>{site.label}</span>
               </button>
             ))}
           </div>
           <div className="browser__start-note">
-            Tiles above are iframe-friendly. Sites that block embedding can be opened
-            in a real tab with the <ExternalLink size={11} style={{ verticalAlign: "-1px" }} /> button.
+            Tiles above are iframe-friendly. Sites that block embedding can be
+            opened in a real tab with the{" "}
+            <ExternalLink size={11} style={{ verticalAlign: "-1px" }} /> button.
           </div>
         </div>
       ) : (
