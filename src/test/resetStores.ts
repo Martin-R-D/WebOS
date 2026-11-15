@@ -1,3 +1,4 @@
+import { useBookmarksStore } from "../stores/useBookmarksStore";
 import { useExplorerSettingsStore } from "../stores/useExplorerSettingsStore";
 import { useTodoStore } from "../stores/useTodoStore";
 import { useConverterStore } from "../stores/useConverterStore";
@@ -13,6 +14,7 @@ import { useNotificationStore } from "../stores/useNotificationStore";
 import { useEditorSettingsStore } from "../stores/useEditorSettingsStore";
 
 export function resetAllStores() {
+  useBookmarksStore.setState(useBookmarksStore.getInitialState(), true);
   useExplorerSettingsStore.setState(
     useExplorerSettingsStore.getInitialState(),
     true,

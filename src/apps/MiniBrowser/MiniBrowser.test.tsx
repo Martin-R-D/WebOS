@@ -24,17 +24,23 @@ describe("normalize", () => {
 
   it("passes through full URLs unchanged", () => {
     expect(normalize("https://example.com")).toBe("https://example.com");
-    expect(normalize("http://example.com/path")).toBe("http://example.com/path");
+    expect(normalize("http://example.com/path")).toBe(
+      "http://example.com/path",
+    );
   });
 
   it("prepends https:// to domain-like input", () => {
     expect(normalize("example.com")).toBe("https://example.com");
-    expect(normalize("docs.google.com/something")).toBe("https://docs.google.com/something");
+    expect(normalize("docs.google.com/something")).toBe(
+      "https://docs.google.com/something",
+    );
   });
 
   it("returns a webos search URL for plain text queries", () => {
     expect(normalize("hello world")).toBe("webos://search?q=hello%20world");
-    expect(normalize("what is javascript")).toBe("webos://search?q=what%20is%20javascript");
+    expect(normalize("what is javascript")).toBe(
+      "webos://search?q=what%20is%20javascript",
+    );
   });
 
   it("returns the start page for webos://start", () => {
@@ -67,7 +73,12 @@ describe("MiniBrowser", () => {
       ok: true,
       json: async () => ({
         results: [
-          { title: "Test Result", url: "https://example.com", snippet: "A test snippet", source: "web" },
+          {
+            title: "Test Result",
+            url: "https://example.com",
+            snippet: "A test snippet",
+            source: "web",
+          },
         ],
         query: "test query",
         source: "searxng",
@@ -76,13 +87,18 @@ describe("MiniBrowser", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     renderBrowser();
-    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "test query{Enter}");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search the web…"),
+      "test query{Enter}",
+    );
 
     await waitFor(() => {
       expect(screen.getByText("Test Result")).toBeInTheDocument();
     });
     expect(screen.getByText("A test snippet")).toBeInTheDocument();
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/search?q=test%20query"));
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/search?q=test%20query"),
+    );
   });
 
   it("clicking a search result navigates the browser to that URL", async () => {
@@ -90,7 +106,12 @@ describe("MiniBrowser", () => {
       ok: true,
       json: async () => ({
         results: [
-          { title: "Example Site", url: "https://example.com", snippet: "An example", source: "web" },
+          {
+            title: "Example Site",
+            url: "https://example.com",
+            snippet: "An example",
+            source: "web",
+          },
         ],
         query: "example",
         source: "searxng",
@@ -99,7 +120,10 @@ describe("MiniBrowser", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     const { container } = renderBrowser();
-    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "example{Enter}");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search the web…"),
+      "example{Enter}",
+    );
 
     await waitFor(() => {
       expect(screen.getByText("Example Site")).toBeInTheDocument();
@@ -119,7 +143,11 @@ describe("MiniBrowser", () => {
       if (url.includes("/api/search")) {
         return Promise.resolve({
           ok: true,
-          json: async () => ({ results: [], query: "quantum", source: "searxng" }),
+          json: async () => ({
+            results: [],
+            query: "quantum",
+            source: "searxng",
+          }),
         });
       }
       // Wikipedia opensearch
@@ -136,7 +164,10 @@ describe("MiniBrowser", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     renderBrowser();
-    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "quantum{Enter}");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search the web…"),
+      "quantum{Enter}",
+    );
 
     await waitFor(() => {
       expect(screen.getByText("Quantum mechanics")).toBeInTheDocument();
@@ -161,7 +192,10 @@ describe("MiniBrowser", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     renderBrowser();
-    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "cats{Enter}");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search the web…"),
+      "cats{Enter}",
+    );
 
     await waitFor(() => {
       expect(screen.getByText("Cat")).toBeInTheDocument();
@@ -178,7 +212,14 @@ describe("MiniBrowser", () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        results: [{ title: "Result", url: "https://r.com", snippet: "s", source: "web" }],
+        results: [
+          {
+            title: "Result",
+            url: "https://r.com",
+            snippet: "s",
+            source: "web",
+          },
+        ],
         query: "foo",
         source: "searxng",
       }),
@@ -186,12 +227,17 @@ describe("MiniBrowser", () => {
     vi.stubGlobal("fetch", mockFetch);
 
     renderBrowser();
-    await userEvent.type(screen.getByPlaceholderText("Search the web…"), "foo{Enter}");
+    await userEvent.type(
+      screen.getByPlaceholderText("Search the web…"),
+      "foo{Enter}",
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/Results for/i)).toBeInTheDocument();
     });
-    expect(screen.queryByPlaceholderText("Search the web…")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Search the web…"),
+    ).not.toBeInTheDocument();
   });
 
   it("navigates via the URL bar", async () => {
@@ -212,7 +258,9 @@ describe("MiniBrowser", () => {
     renderBrowser();
     const urlBar = screen.getByPlaceholderText("Search or enter address");
     await userEvent.type(urlBar, "example.com{Enter}");
-    expect(screen.queryByPlaceholderText("Search the web…")).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText("Search the web…"),
+    ).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByTitle("Home"));
     expect(screen.getByPlaceholderText("Search the web…")).toBeInTheDocument();

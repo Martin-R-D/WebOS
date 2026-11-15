@@ -157,3 +157,24 @@ test("file sorting reverses order and persists", async ({ page }) => {
     page.getByRole("button", { name: "Sort ascending", exact: true }),
   ).toBeVisible();
 });
+
+test("browser bookmarks add, rename and persist", async ({ page }) => {
+  await launch(page, "Browser");
+  await page.getByRole("button", { name: "Bookmarks", exact: true }).tap();
+  await page.getByLabel("Bookmark name", { exact: true }).fill("Example");
+  await page
+    .getByLabel("Website address", { exact: true })
+    .fill("https://example.com");
+  await page.getByRole("button", { name: "Add bookmark", exact: true }).tap();
+  await page.getByRole("button", { name: "Edit Example", exact: true }).tap();
+  await page.getByLabel("Bookmark name", { exact: true }).fill("My site");
+  await page.getByRole("button", { name: "Save bookmark", exact: true }).tap();
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Browser");
+  await page.getByRole("button", { name: "Bookmarks", exact: true }).tap();
+  await expect(page.locator(".bookmarks__open")).toContainText("My site");
+  await page.getByRole("button", { name: "Remove My site", exact: true }).tap();
+  await page.getByRole("button", { name: "Confirm remove", exact: true }).tap();
+  await expect(page.getByText("No bookmarks yet.")).toBeVisible();
+});
