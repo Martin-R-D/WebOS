@@ -4,6 +4,7 @@ import type { AppId, WindowState } from "../types";
 const TASKBAR_HEIGHT = 48;
 
 interface WindowStoreState {
+  bindFile: (windowId: string, fileId: string) => void;
   showDesktop: () => void;
   windows: WindowState[];
   focusedId: string | null;
@@ -31,6 +32,14 @@ interface WindowStoreState {
 }
 
 export const useWindowStore = create<WindowStoreState>()((set, get) => ({
+  bindFile: (windowId, fileId) =>
+    set((state) => ({
+      windows: state.windows.map((win) =>
+        win.id === windowId
+          ? { ...win, launchProps: { ...win.launchProps, fileId } }
+          : win,
+      ),
+    })),
   showDesktop: () => set({ focusedId: null }),
   windows: [],
   focusedId: null,
