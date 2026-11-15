@@ -4,6 +4,7 @@ import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { isSelfOrDescendant } from "../../lib/fsGuards";
 import type { FsNode } from "../../types";
 import "./FileDialogs.css";
+import { Modal } from "../Modal/Modal";
 
 /* ---------------- Rename ---------------- */
 
@@ -38,17 +39,17 @@ export function RenameDialog({ node, onRename, onCancel }: RenameDialogProps) {
   }
 
   return (
-    <div className="fd-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+    <Modal className="fd-overlay" label="Rename file" onClose={onCancel}>
       <div className="fd-dialog" onMouseDown={(e) => e.stopPropagation()}>
         <div className="fd-header">
           Rename
-          <button className="fd-close" onClick={onCancel}><X size={14} /></button>
+          <button aria-label="Close dialog" className="fd-close" onClick={onCancel}><X size={14} /></button>
         </div>
         <div className="fd-content">
           <span className="fd-label">New name</span>
           <input
             ref={inputRef}
-            className="fd-input"
+            aria-label="New name" className="fd-input"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
@@ -69,7 +70,7 @@ export function RenameDialog({ node, onRename, onCancel }: RenameDialogProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -83,11 +84,11 @@ interface ConfirmDeleteDialogProps {
 
 export function ConfirmDeleteDialog({ node, onConfirm, onCancel }: ConfirmDeleteDialogProps) {
   return (
-    <div className="fd-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+    <Modal className="fd-overlay" label="Delete file" onClose={onCancel}>
       <div className="fd-dialog" onMouseDown={(e) => e.stopPropagation()}>
         <div className="fd-header">
           Delete
-          <button className="fd-close" onClick={onCancel}><X size={14} /></button>
+          <button aria-label="Close dialog" className="fd-close" onClick={onCancel}><X size={14} /></button>
         </div>
         <div className="fd-content fd-content--center">
           <AlertTriangle size={28} className="fd-icon-danger" />
@@ -104,7 +105,7 @@ export function ConfirmDeleteDialog({ node, onConfirm, onCancel }: ConfirmDelete
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -157,20 +158,20 @@ export function MoveDialog({ node, onMove, onCancel }: MoveDialogProps) {
   }
 
   return (
-    <div className="fd-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+    <Modal className="fd-overlay" label="Move file" onClose={onCancel}>
       <div className="fd-dialog" onMouseDown={(e) => e.stopPropagation()}>
         <div className="fd-header">
           Move "{node.name}"
-          <button className="fd-close" onClick={onCancel}><X size={14} /></button>
+          <button aria-label="Close dialog" className="fd-close" onClick={onCancel}><X size={14} /></button>
         </div>
 
         <div className="fd-path">
           {buildBreadcrumbs().map((c, i) => (
             <span key={c.id} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}>
               {i > 0 && <ChevronRight size={12} className="fd-path-sep" />}
-              <span className="fd-path-seg" onClick={() => { setFolderId(c.id); setError(""); }}>
+              <button className="fd-path-seg" onClick={() => { setFolderId(c.id); setError(""); }}>
                 {c.name}
-              </span>
+              </button>
             </span>
           ))}
         </div>
@@ -221,6 +222,6 @@ export function MoveDialog({ node, onMove, onCancel }: MoveDialogProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

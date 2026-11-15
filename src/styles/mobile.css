@@ -1,26 +1,102 @@
 .mobile-nav { display: none; }
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
   :root { --taskbar-height: calc(64px + env(safe-area-inset-bottom, 0px)); --titlebar-height: 48px; }
-  .desktop { height: 100dvh; }
+  .desktop { top: var(--viewport-top, 0px); height: var(--viewport-height, 100dvh); }
   .desktop__icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); align-content: start; gap: 8px; padding: calc(16px + env(safe-area-inset-top, 0px)) 12px var(--taskbar-height); overflow-y: auto; pointer-events: auto; }
   .desktop__icon { position: static; width: 100%; min-height: 88px; }
   .window--compact { inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) var(--taskbar-height) env(safe-area-inset-left, 0px); min-width: 0; min-height: 0; border-radius: 0; animation: none; }
   .window--compact .window__titlebar { cursor: default; }
   .window__btn { width: 44px; height: 44px; }
   .window__body { overscroll-behavior: contain; }
-  .mobile-nav { position: fixed; inset: auto 0 0; z-index: var(--z-taskbar); height: var(--taskbar-height); display: flex; justify-content: space-around; background: var(--color-taskbar); border-top: 1px solid var(--color-border); padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+  .mobile-nav { position: fixed; inset: auto 0 auto; top: calc(var(--viewport-top, 0px) + var(--viewport-height, 100dvh) - var(--taskbar-height)); z-index: var(--z-taskbar); height: var(--taskbar-height); display: flex; justify-content: space-around; background: var(--color-taskbar); border-top: 1px solid var(--color-border); padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
   .mobile-nav > button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 44px; min-height: 44px; font-size: 12px; }
-  .mobile-running, .mobile-nav .notif-panel { position: fixed; left: 8px; right: 8px; bottom: calc(var(--taskbar-height) + 8px); width: auto; max-height: calc(100dvh - var(--taskbar-height) - 32px - env(safe-area-inset-top, 0px)); overflow: auto; padding: 12px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: var(--shadow-panel); }
+  .mobile-running, .mobile-nav .notif-panel { position: fixed; left: 8px; right: 8px; top: auto; bottom: calc(100dvh - var(--viewport-top, 0px) - var(--viewport-height, 100dvh) + var(--taskbar-height) + 8px); width: auto; max-height: calc(var(--viewport-height, 100dvh) - var(--taskbar-height) - 32px - env(safe-area-inset-top, 0px)); overflow: auto; padding: 12px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: var(--shadow-panel); }
   .mobile-running header, .mobile-running__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .mobile-running button { min-height: 44px; min-width: 44px; }
   .mobile-running__row > button:first-child { flex: 1; text-align: left; overflow-wrap: anywhere; }
   .mobile-running [aria-current="true"] { color: var(--color-accent); }
   .notif-panel__item-dismiss { opacity: 1; min-width: 44px; min-height: 44px; }
-  .startmenu { left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); width: auto; max-height: calc(100dvh - var(--taskbar-height) - 32px - env(safe-area-inset-top, 0px)); overflow-y: auto; }
+  .startmenu { left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); width: auto; max-height: calc(var(--viewport-height, 100dvh) - var(--taskbar-height) - 32px - env(safe-area-inset-top, 0px)); overflow-y: auto; }
   .startmenu__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (pointer: coarse) {
   button { min-height: 44px; }
   input, textarea, select { font-size: max(16px, 1em); }
 }
+/* Dialogs use the browser's top layer for focus and background isolation. */
+dialog.fd-overlay, dialog.save-dialog-overlay, dialog.save-confirm-overlay { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; color: var(--color-text); }
+.fd-dialog, .save-dialog, .save-confirm { max-width: calc(100vw - 24px); max-height: calc(var(--viewport-height, 100dvh) - 24px); overflow-y: auto; }
+.save-dialog__item, .ctx-item { width: 100%; text-align: left; }
+.fx__entry { min-width: 0; }
+.fx__entry > .fx__item { width: 100%; height: 100%; }
+.fx__sidebar[hidden] { display: none; }
+.ctx-menu { max-width: calc(100vw - 8px); max-height: calc(var(--viewport-height, 100dvh) - 8px); overflow-y: auto; }
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+  .fd-overlay, .save-dialog-overlay, .save-confirm-overlay { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+  .fd-dialog, .save-dialog, .save-confirm { width: calc(100% - 24px); }
+  .fd-close, .save-dialog__close, .ctx-item, .fd-item, .save-dialog__item, .fd-path-seg, .save-dialog__path-seg { min-height: 44px; }
+  .fd-close, .save-dialog__close { min-width: 44px; }
+  .fd-actions, .save-dialog__actions { flex-wrap: wrap; }
+  .fd-input, .save-dialog__input { width: 100%; min-width: 0; font-size: 16px; }
+  .fx__toolbar { flex-wrap: wrap; gap: 2px; }
+  .fx__btn { width: 44px; height: 44px; }
+  .fx__path { flex-basis: 100%; order: 1; }
+  .fx__body { min-height: 0; position: relative; }
+  .fx__sidebar { position: absolute; inset: 0 auto 0 0; z-index: 10; background: var(--color-surface); overflow-y: auto; width: min(240px, 85%); }
+  .fx__side-item { min-height: 44px; }
+  .fx__grid { grid-template-columns: 1fr; padding: 8px; }
+  .fx__entry { display: flex; align-items: center; }
+  .fx__entry > .fx__item { flex: 1; flex-direction: row; min-width: 0; text-align: left; min-height: 48px; }
+  .fx__item > svg { flex-shrink: 0; }
+  .fx__more { min-width: 44px; min-height: 44px; }
+  .fx__search { max-width: 100%; }
+}
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+  .window__body > * { min-width: 0; }
+  .settings { flex-direction: column; }
+  .settings__nav { width: 100%; flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--color-border); padding: 4px; }
+  .settings__nav button { min-height: 44px; flex: 1; }
+  .settings__content { min-height: 0; padding: 12px; }
+  .calendar { flex-direction: column; overflow-y: auto; }
+  .calendar__main { flex: none; border-right: 0; }
+  .calendar__detail { width: 100%; flex: none; overflow: visible; }
+  .calendar__nav { padding: 8px; gap: 4px; }
+  .calendar__nav-btn { width: 44px; height: 44px; }
+  .calendar__cell { min-height: 44px; }
+  .calendar__form-row { flex-wrap: wrap; }
+  .editor__toolbar { flex-wrap: wrap; padding: 4px; }
+  .editor__btn { min-height: 44px; }
+  .editor__btn--icon { min-width: 44px; }
+  .editor__find-row { flex-wrap: wrap; }
+  .editor__find-input { min-width: 0; width: 100%; font-size: 16px; }
+  .editor__area-wrap, .editor__preview { min-width: 0; min-height: 120px; }
+  .editor__statusbar { flex-wrap: wrap; gap: 4px; }
+  .editor__settings-panel { position: fixed; top: auto; bottom: calc(var(--taskbar-height) + 8px); left: 8px; right: 8px; max-height: 60dvh; overflow-y: auto; }
+  .editor__settings-row, .editor__settings-group { flex-wrap: wrap; }
+  .browser__bar { flex-wrap: wrap; }
+  .browser__btn { min-width: 44px; min-height: 44px; }
+  .paint { overflow-y: auto; }
+  .paint__toolbar { gap: 6px; padding: 6px; }
+  .paint__tools, .paint__actions, .paint__sizes { flex-wrap: wrap; }
+  .paint__tool, .paint__size, .paint__color { width: 44px; height: 44px; }
+  .paint__stage { min-height: 220px; flex-shrink: 0; }
+  .term { min-height: 200px; }
+  .term__input { min-width: 0; font-size: 16px; }
+  .calc { min-height: 380px; }
+  .clock { overflow-y: auto; }
+  .weather { overflow-y: auto; }
+}
+
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+  .browser__url { flex-basis: 100%; order: 1; font-size: 16px; }
+  .rb__toolbar { flex-wrap: wrap; }
+  .rb__list-header { display: none; }
+  .rb__row { grid-template-columns: minmax(0, 1fr) 88px; }
+  .rb__row > :nth-child(2), .rb__row > :nth-child(3) { display: none; }
+  .sticky-notes__grid { grid-template-columns: 1fr; }
+  .sticky-notes__item button { min-width: 44px; min-height: 44px; }
+  dialog.fd-overlay, dialog.save-dialog-overlay, dialog.save-confirm-overlay { top: var(--viewport-top, 0px); bottom: auto; height: var(--viewport-height, 100dvh); }
+}
+
+.editor__btn[hidden] { display: none; }

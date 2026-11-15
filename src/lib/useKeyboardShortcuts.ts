@@ -27,6 +27,7 @@ export function useKeyboardShortcuts(): void {
     }
 
     function handleKeyDown(e: KeyboardEvent) {
+      if (document.querySelector("dialog[open]")) return;
       const mod = e.ctrlKey || e.metaKey;
 
       // --- Escape (alone): close the Start menu / open menus ---

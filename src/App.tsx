@@ -1,3 +1,4 @@
+import { useVisualViewport } from "./lib/useVisualViewport";
 import { useState, useEffect } from "react";
 import { Desktop } from "./shell/Desktop/Desktop";
 import { Window } from "./shell/Window/Window";
@@ -21,6 +22,7 @@ function App() {
   const [startOpen, setStartOpen] = useState(false);
 
   useKeyboardShortcuts();
+  useVisualViewport();
 
   useEffect(() => {
     const close = () => setStartOpen(false);

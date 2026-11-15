@@ -180,12 +180,24 @@ export function Window({ win }: { win: WindowState }) {
   }
 
   const hidden = win.isMinimized || (compact && win.id !== focusedId);
+  const windowRef = useRef<HTMLDivElement>(null);
+  const lastFocused = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (hidden || win.id !== focusedId) return;
+    const element = windowRef.current;
+    if (!element || element.contains(document.activeElement)) return;
+    const target = lastFocused.current?.isConnected ? lastFocused.current : element;
+    target.focus({ preventScroll: true });
+  }, [hidden, focusedId, win.id]);
 
   const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
   const AppComponent = def.component;
 
   return (
     <div
+      ref={windowRef}
+      tabIndex={-1}
+      onFocusCapture={(event) => { if (event.target !== event.currentTarget) lastFocused.current = event.target; }}
       hidden={hidden}
       inert={hidden}
       aria-label={win.title}

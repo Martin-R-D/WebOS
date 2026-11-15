@@ -24,7 +24,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
     let top = y;
     if (left + rect.width > window.innerWidth) left = window.innerWidth - rect.width - 4;
     if (top + rect.height > window.innerHeight) top = window.innerHeight - rect.height - 4;
-    setPos({ left, top });
+    setPos({ left: Math.max(4, left), top: Math.max(4, top) });
   }, [x, y]);
 
   return createPortal(
@@ -46,13 +46,13 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
           return (
             <li key={i}>
               {item.separatorBefore && <div className="ctx-sep" />}
-              <div
+              <button
                 className={cx("ctx-item", item.danger && "ctx-item--danger")}
-                onClick={() => { item.onClick(); onClose(); }}
+                onClick={() => { onClose(); item.onClick(); }}
               >
                 {ItemIcon && <ItemIcon size={15} />}
                 {item.label}
-              </div>
+              </button>
             </li>
           );
         })}

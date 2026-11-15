@@ -1,3 +1,4 @@
+import { useCompact } from "../../lib/useCompact";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Save, SaveAll, Eye, EyeOff, Columns2, Bold, Italic, Strikethrough, Code, Heading, List, Settings2, ChevronUp, ChevronDown } from "lucide-react";
 import { marked } from "marked";
@@ -44,7 +45,9 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
   const [showSaveAs, setShowSaveAs] = useState(false);
 
   // Preview mode: "edit" | "preview" | "split"
-  const [viewMode, setViewMode] = useState<"edit" | "preview" | "split">("edit");
+  const compact = useCompact();
+  const [preferredViewMode, setViewMode] = useState<"edit" | "preview" | "split">("edit");
+  const viewMode = compact && preferredViewMode === "split" ? "edit" : preferredViewMode;
 
   // Find & Replace state
   const [findOpen, setFindOpen] = useState(false);
@@ -364,6 +367,7 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
         </button>
         <button
           className={`editor__btn editor__btn--icon${viewMode === "split" ? " editor__btn--active" : ""}`}
+          hidden={compact}
           onClick={() => setViewMode(viewMode === "split" ? "edit" : "split")}
           title="Split view"
         >

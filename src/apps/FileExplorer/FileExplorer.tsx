@@ -13,6 +13,7 @@ import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../../shell/FileD
 import { isProtectedNode, isSystemAppsFolder } from "../../lib/fsGuards";
 import { cx } from "../../lib/helpers";
 import "./FileExplorer.css";
+import { useCompact } from "../../lib/useCompact";
 
 function findDesktopFolderId(nodes: Record<string, import("../../types").FsNode>, rootId: string): string | null {
   for (const node of Object.values(nodes)) {
@@ -24,6 +25,8 @@ function findDesktopFolderId(nodes: Record<string, import("../../types").FsNode>
 }
 
 export function FileExplorer({}: AppProps) {
+  const compact = useCompact();
+  const [locationsOpen, setLocationsOpen] = useState(false);
   const rootId = useFileSystemStore((s) => s.rootId);
   const nodes = useFileSystemStore((s) => s.nodes);
   const getChildren = useFileSystemStore((s) => s.getChildren);
@@ -74,6 +77,7 @@ export function FileExplorer({}: AppProps) {
   const topFolders = getChildren(rootId).filter((n) => n.type === "folder");
 
   function navigateTo(folderId: string) {
+    setLocationsOpen(false);
     setSearchQuery("");
     setSearchOpen(false);
     const next = history.slice(0, historyIndex + 1);
@@ -177,20 +181,21 @@ export function FileExplorer({}: AppProps) {
   return (
     <div className="fx">
       <div className="fx__toolbar">
-        <button className="fx__btn" disabled={historyIndex <= 0} onClick={goBack}>
+        {compact && <button className="fx__btn" aria-label="Locations" aria-expanded={locationsOpen} onClick={() => setLocationsOpen(!locationsOpen)}><Folder size={16} /></button>}
+        <button aria-label="Back" className="fx__btn" disabled={historyIndex <= 0} onClick={goBack}>
           <ChevronLeft size={16} />
         </button>
-        <button className="fx__btn" disabled={historyIndex >= history.length - 1} onClick={goForward}>
+        <button aria-label="Forward" className="fx__btn" disabled={historyIndex >= history.length - 1} onClick={goForward}>
           <ChevronRight size={16} />
         </button>
-        <button className="fx__btn" disabled={!currentNode?.parentId} onClick={goUp}>
+        <button aria-label="Up" className="fx__btn" disabled={!currentNode?.parentId} onClick={goUp}>
           <ArrowUp size={16} />
         </button>
         <div className="fx__path">{currentPath}</div>
-        <button className="fx__btn" onClick={() => createNode(currentFolderId, "New Folder", "folder")}>
+        <button aria-label="New folder" className="fx__btn" onClick={() => createNode(currentFolderId, "New Folder", "folder")}>
           <FolderPlus size={16} />
         </button>
-        <button className="fx__btn" onClick={() => createNode(currentFolderId, "untitled.txt", "file", "")}>
+        <button aria-label="New file" className="fx__btn" onClick={() => createNode(currentFolderId, "untitled.txt", "file", "")}>
           <FilePlus size={16} />
         </button>
         {searchOpen ? (
@@ -219,7 +224,7 @@ export function FileExplorer({}: AppProps) {
       </div>
 
       <div className="fx__body">
-        <div className="fx__sidebar">
+        <div className="fx__sidebar" hidden={compact && !locationsOpen}>
           <button
             className={cx(
               "fx__side-item",
@@ -271,12 +276,13 @@ export function FileExplorer({}: AppProps) {
 
             const isFolder = node.type === "folder";
             return (
+              <div className="fx__entry" key={node.id}>
               <button
-                key={node.id}
                 className={cx("fx__item", dragOverId === node.id && "fx__item--dragover")}
-                onDoubleClick={() => handleDoubleClick(node.id)}
+                onClick={() => { if (compact) handleDoubleClick(node.id); }}
+                onDoubleClick={() => { if (!compact) handleDoubleClick(node.id); }}
                 onContextMenu={(e) => handleItemContext(e, node.id)}
-                draggable={!isProtectedNode(node, rootId) && !isSystemAppsFolder(currentNode, rootId)}
+                draggable={!compact && !isProtectedNode(node, rootId) && !isSystemAppsFolder(currentNode, rootId)}
                 onDragStart={(e) => startNodeDrag(e, node.id)}
                 {...(isFolder ? dropTargetProps(node.id) : {})}
               >
@@ -286,6 +292,8 @@ export function FileExplorer({}: AppProps) {
                   <span className="fx__item-path">{getPath(node.parentId)}</span>
                 )}
               </button>
+              {compact && <button className="fx__more" aria-label={`Actions for ${displayName}`} onClick={(e) => handleItemContext(e, node.id)}>•••</button>}
+              </div>
             );
           })}
         </div>
