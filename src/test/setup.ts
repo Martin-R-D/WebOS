@@ -9,3 +9,14 @@ afterEach(() => {
   cleanup();
   localStorage.clear();
 });
+
+// jsdom has no native PointerEvent; preserve coordinates for pointer interactions.
+if (!window.PointerEvent)
+  window.PointerEvent = MouseEvent as typeof PointerEvent;
+// jsdom does not implement native dialog lifecycle.
+HTMLDialogElement.prototype.showModal = function () {
+  this.open = true;
+};
+HTMLDialogElement.prototype.close = function () {
+  this.open = false;
+};

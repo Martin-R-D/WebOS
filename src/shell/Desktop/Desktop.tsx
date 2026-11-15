@@ -7,22 +7,52 @@ import { launchApp } from "../../lib/launch";
 import { Trash2, Trash } from "lucide-react";
 import { openFsNode, isImageFile } from "../../lib/openNode";
 import {
-  startNodeDrag, startIconDrag, isNodeDrag, isIconDrag,
-  getDraggedNodeId, getIconDrag, allowNodeDrop, dropNodeInto,
+  startNodeDrag,
+  startIconDrag,
+  isNodeDrag,
+  isIconDrag,
+  getDraggedNodeId,
+  getIconDrag,
+  allowNodeDrop,
+  dropNodeInto,
 } from "../../lib/dragDrop";
 import { cx, clamp } from "../../lib/helpers";
 import { isProtectedNode } from "../../lib/fsGuards";
 import { ContextMenu } from "../ContextMenu/ContextMenu";
-import { RenameDialog, ConfirmDeleteDialog, MoveDialog } from "../FileDialogs/FileDialogs";
+import {
+  RenameDialog,
+  ConfirmDeleteDialog,
+  MoveDialog,
+} from "../FileDialogs/FileDialogs";
 import type { AppId, ContextMenuItem, FsNode } from "../../types";
 import "./Desktop.css";
+import { useCompact } from "../../lib/useCompact";
 
-const APP_SHORTCUTS: AppId[] = ["about-me", "file-explorer", "terminal", "browser", "settings"];
+const APP_SHORTCUTS: AppId[] = [
+  "about-me",
+  "file-explorer",
+  "terminal",
+  "browser",
+  "settings",
+];
 
 const desktopMenuItems: ContextMenuItem[] = [
-  { label: "Change Wallpaper", icon: "Image", onClick: () => launchApp("settings") },
-  { label: "Open Terminal", icon: "TerminalSquare", onClick: () => launchApp("terminal") },
-  { label: "Refresh", icon: "RefreshCw", separatorBefore: true, onClick: () => location.reload() },
+  {
+    label: "Change Wallpaper",
+    icon: "Image",
+    onClick: () => launchApp("settings"),
+  },
+  {
+    label: "Open Terminal",
+    icon: "TerminalSquare",
+    onClick: () => launchApp("terminal"),
+  },
+  {
+    label: "Refresh",
+    icon: "RefreshCw",
+    separatorBefore: true,
+    onClick: () => location.reload(),
+  },
 ];
 
 // Icon grid geometry for default (auto-flow) positions
@@ -47,9 +77,16 @@ function clampIconPos(x: number, y: number): { x: number; y: number } {
   };
 }
 
-function findDesktopFolderId(nodes: Record<string, FsNode>, rootId: string): string | null {
+function findDesktopFolderId(
+  nodes: Record<string, FsNode>,
+  rootId: string,
+): string | null {
   for (const node of Object.values(nodes)) {
-    if (node.parentId === rootId && node.type === "folder" && node.name === "Desktop") {
+    if (
+      node.parentId === rootId &&
+      node.type === "folder" &&
+      node.name === "Desktop"
+    ) {
       return node.id;
     }
   }
@@ -57,6 +94,7 @@ function findDesktopFolderId(nodes: Record<string, FsNode>, rootId: string): str
 }
 
 export function Desktop({ children }: { children?: ReactNode }) {
+  const compact = useCompact();
   const wallpaper = useSystemStore((s) => s.wallpaper);
   const pinnedApps = useSystemStore((s) => s.pinnedApps);
   const pinApp = useSystemStore((s) => s.pinApp);
@@ -73,7 +111,11 @@ export function Desktop({ children }: { children?: ReactNode }) {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
-  const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
+  const [menu, setMenu] = useState<{
+    x: number;
+    y: number;
+    items: ContextMenuItem[];
+  } | null>(null);
   const [renameTarget, setRenameTarget] = useState<FsNode | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<FsNode | null>(null);
   const [moveTarget, setMoveTarget] = useState<FsNode | null>(null);
@@ -124,7 +166,10 @@ export function Desktop({ children }: { children?: ReactNode }) {
     // Repositioning an icon that already lives on the desktop
     const icon = getIconDrag(e);
     if (icon) {
-      setDesktopIconPos(icon.key, clampIconPos(e.clientX - icon.dx, e.clientY - icon.dy));
+      setDesktopIconPos(
+        icon.key,
+        clampIconPos(e.clientX - icon.dx, e.clientY - icon.dy),
+      );
       return;
     }
 
@@ -133,7 +178,10 @@ export function Desktop({ children }: { children?: ReactNode }) {
     if (desktopFolderId) {
       const nodeId = getDraggedNodeId(e);
       if (dropNodeInto(e, desktopFolderId) && nodeId) {
-        setDesktopIconPos(nodeId, clampIconPos(e.clientX - ICON_W / 2, e.clientY - 40));
+        setDesktopIconPos(
+          nodeId,
+          clampIconPos(e.clientX - ICON_W / 2, e.clientY - 40),
+        );
       }
     }
   }
@@ -151,8 +199,16 @@ export function Desktop({ children }: { children?: ReactNode }) {
     const items: ContextMenuItem[] = [
       { label: "Open", icon: app.icon, onClick: () => launchApp(appId) },
       isPinned
-        ? { label: "Unpin from Taskbar", icon: "PinOff", onClick: () => unpinApp(appId) }
-        : { label: "Add to Taskbar", icon: "Pin", onClick: () => pinApp(appId) },
+        ? {
+            label: "Unpin from Taskbar",
+            icon: "PinOff",
+            onClick: () => unpinApp(appId),
+          }
+        : {
+            label: "Add to Taskbar",
+            icon: "Pin",
+            onClick: () => pinApp(appId),
+          },
     ];
     setMenu({ x: e.clientX, y: e.clientY, items });
   }
@@ -172,9 +228,23 @@ export function Desktop({ children }: { children?: ReactNode }) {
 
     if (!isProtectedNode(node, rootId)) {
       items.push(
-        { label: "Rename", icon: "Pencil", onClick: () => setRenameTarget(node) },
-        { label: "Move to…", icon: "FolderInput", onClick: () => setMoveTarget(node) },
-        { label: "Move to Recycle Bin", icon: "Trash2", danger: true, separatorBefore: true, onClick: () => setDeleteTarget(node) },
+        {
+          label: "Rename",
+          icon: "Pencil",
+          onClick: () => setRenameTarget(node),
+        },
+        {
+          label: "Move to…",
+          icon: "FolderInput",
+          onClick: () => setMoveTarget(node),
+        },
+        {
+          label: "Move to Recycle Bin",
+          icon: "Trash2",
+          danger: true,
+          separatorBefore: true,
+          onClick: () => setDeleteTarget(node),
+        },
       );
     }
 
@@ -193,17 +263,28 @@ export function Desktop({ children }: { children?: ReactNode }) {
       <div className="desktop__icons">
         {APP_SHORTCUTS.map((appId) => {
           const app = appRegistry[appId];
-          const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
+          const AppIcon =
+            (Icons as unknown as Record<string, Icons.LucideIcon>)[app.icon] ??
+            Icons.Square;
           const pos = iconPositions[`app-${app.id}`];
           return (
             <button
               key={`app-${app.id}`}
-              className={cx("desktop__icon", selectedId === `app-${app.id}` && "desktop__icon--selected")}
+              className={cx(
+                "desktop__icon",
+                selectedId === `app-${app.id}` && "desktop__icon--selected",
+              )}
               style={{ left: pos.x, top: pos.y }}
-              onClick={(e) => { e.stopPropagation(); setSelectedId(`app-${app.id}`); }}
-              onDoubleClick={() => launchApp(app.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedId(`app-${app.id}`);
+                if (compact) launchApp(app.id);
+              }}
+              onDoubleClick={() => {
+                if (!compact) launchApp(app.id);
+              }}
               onContextMenu={(e) => handleAppContext(e, appId)}
-              draggable
+              draggable={!compact}
               onDragStart={(e) => startIconDrag(e, `app-${app.id}`)}
             >
               <AppIcon size={30} />
@@ -215,16 +296,40 @@ export function Desktop({ children }: { children?: ReactNode }) {
         {/* Permanent Recycle Bin icon */}
         {(() => {
           const rbPos = iconPositions["recycle-bin"];
-          const RecycleBinIcon = Object.keys(deletedNodes).length > 0 ? Trash : Trash2;
+          const RecycleBinIcon =
+            Object.keys(deletedNodes).length > 0 ? Trash : Trash2;
           return (
             <button
               key="recycle-bin"
-              className={cx("desktop__icon", selectedId === "recycle-bin" && "desktop__icon--selected")}
+              className={cx(
+                "desktop__icon",
+                selectedId === "recycle-bin" && "desktop__icon--selected",
+              )}
               style={{ left: rbPos.x, top: rbPos.y }}
-              onClick={(e) => { e.stopPropagation(); setSelectedId("recycle-bin"); }}
-              onDoubleClick={() => launchApp("recycle-bin")}
-              onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setMenu({ x: e.clientX, y: e.clientY, items: [{ label: "Open", icon: "Trash2", onClick: () => launchApp("recycle-bin") }] }); }}
-              draggable
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedId("recycle-bin");
+                if (compact) launchApp("recycle-bin");
+              }}
+              onDoubleClick={() => {
+                if (!compact) launchApp("recycle-bin");
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMenu({
+                  x: e.clientX,
+                  y: e.clientY,
+                  items: [
+                    {
+                      label: "Open",
+                      icon: "Trash2",
+                      onClick: () => launchApp("recycle-bin"),
+                    },
+                  ],
+                });
+              }}
+              draggable={!compact}
               onDragStart={(e) => startIconDrag(e, "recycle-bin")}
             >
               <RecycleBinIcon size={30} />
@@ -234,11 +339,19 @@ export function Desktop({ children }: { children?: ReactNode }) {
         })()}
 
         {desktopFiles.map((node) => {
-          let Icon: Icons.LucideIcon = node.type === "folder" ? Icons.Folder : Icons.FileText;
+          let Icon: Icons.LucideIcon =
+            node.type === "folder" ? Icons.Folder : Icons.FileText;
           let label = node.name;
-          if (node.name.endsWith(".app") && node.content && node.content in appRegistry) {
+          if (
+            node.name.endsWith(".app") &&
+            node.content &&
+            node.content in appRegistry
+          ) {
             const appDef = appRegistry[node.content as AppId];
-            Icon = (Icons as unknown as Record<string, Icons.LucideIcon>)[appDef.icon] ?? Icons.FileText;
+            Icon =
+              (Icons as unknown as Record<string, Icons.LucideIcon>)[
+                appDef.icon
+              ] ?? Icons.FileText;
             label = node.name.replace(/\.app$/, "");
           } else if (isImageFile(node.name)) {
             Icon = Icons.Image;
@@ -254,19 +367,45 @@ export function Desktop({ children }: { children?: ReactNode }) {
                 dragOverId === node.id && "desktop__icon--dragover",
               )}
               style={{ left: pos.x, top: pos.y }}
-              onClick={(e) => { e.stopPropagation(); setSelectedId(`fs-${node.id}`); }}
-              onDoubleClick={() => openFsNode(node)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedId(`fs-${node.id}`);
+                if (compact) openFsNode(node);
+              }}
+              onDoubleClick={() => {
+                if (!compact) openFsNode(node);
+              }}
               onContextMenu={(e) => handleNodeContext(e, node)}
-              draggable
+              draggable={!compact}
               onDragStart={(e) => {
                 // icon payload → repositioning on the desktop;
                 // node payload → moving the file somewhere else
                 startIconDrag(e, node.id);
                 if (!isProtectedNode(node, rootId)) startNodeDrag(e, node.id);
               }}
-              onDragOver={isFolder ? (e) => { e.stopPropagation(); if (allowNodeDrop(e)) setDragOverId(node.id); } : undefined}
-              onDragLeave={isFolder ? () => setDragOverId((cur) => (cur === node.id ? null : cur)) : undefined}
-              onDrop={isFolder ? (e) => { e.preventDefault(); e.stopPropagation(); setDragOverId(null); dropNodeInto(e, node.id); } : undefined}
+              onDragOver={
+                isFolder
+                  ? (e) => {
+                      e.stopPropagation();
+                      if (allowNodeDrop(e)) setDragOverId(node.id);
+                    }
+                  : undefined
+              }
+              onDragLeave={
+                isFolder
+                  ? () => setDragOverId((cur) => (cur === node.id ? null : cur))
+                  : undefined
+              }
+              onDrop={
+                isFolder
+                  ? (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDragOverId(null);
+                      dropNodeInto(e, node.id);
+                    }
+                  : undefined
+              }
             >
               <Icon size={30} />
               <span>{label}</span>
@@ -286,21 +425,30 @@ export function Desktop({ children }: { children?: ReactNode }) {
       {renameTarget && (
         <RenameDialog
           node={renameTarget}
-          onRename={(name) => { renameNode(renameTarget.id, name); setRenameTarget(null); }}
+          onRename={(name) => {
+            renameNode(renameTarget.id, name);
+            setRenameTarget(null);
+          }}
           onCancel={() => setRenameTarget(null)}
         />
       )}
       {deleteTarget && (
         <ConfirmDeleteDialog
           node={deleteTarget}
-          onConfirm={() => { deleteNode(deleteTarget.id); setDeleteTarget(null); }}
+          onConfirm={() => {
+            deleteNode(deleteTarget.id);
+            setDeleteTarget(null);
+          }}
           onCancel={() => setDeleteTarget(null)}
         />
       )}
       {moveTarget && (
         <MoveDialog
           node={moveTarget}
-          onMove={(destId) => { moveNode(moveTarget.id, destId); setMoveTarget(null); }}
+          onMove={(destId) => {
+            moveNode(moveTarget.id, destId);
+            setMoveTarget(null);
+          }}
           onCancel={() => setMoveTarget(null)}
         />
       )}

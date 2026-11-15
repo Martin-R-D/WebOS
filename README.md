@@ -253,6 +253,26 @@ npm test            # run the whole suite once
 npm run test:watch  # re-run on change
 ```
 
+Chromium and WebKit browser regression tests cover compact layouts, touch file
+actions, dialog focus, workspace persistence, and desktop window dragging/resizing:
+
+```bash
+npx playwright install --with-deps chromium webkit
+npm run test:e2e
+```
+
+To use an existing Chromium installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE`
+to its executable path. The tests start an isolated Vite server on port 5174.
+Weather requests are blocked in these tests so local UI checks do not depend on
+external providers. Real-device checks are still needed for iOS/Android software
+keyboards and device safe areas.
+
+On compact screens, Home reveals the desktop without closing apps, Apps opens
+the launcher, and Running switches between windows. File Explorer has visible
+per-file action buttons. Desktop window geometry is retained when switching
+between compact and desktop layouts.
+
+
 Tests live next to the code they cover (`*.test.ts` / `*.test.tsx`) and cover the stores, file system rules, drag and drop, app launching, keyboard shortcuts, the window manager, the shell (taskbar, start menu, context menu) and the apps.
 
 A pre-commit hook in `.githooks/` runs the suite before every commit and aborts the commit if a test fails. `npm install` enables it automatically (the `prepare` script points `core.hooksPath` at `.githooks`).

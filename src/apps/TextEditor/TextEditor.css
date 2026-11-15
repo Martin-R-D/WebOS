@@ -85,7 +85,7 @@
   gap: 8px;
   z-index: 100;
   min-width: 200px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .editor__settings-row {
@@ -225,9 +225,15 @@
   color: var(--color-text);
 }
 
-.editor__preview h1 { font-size: 1.8em; }
-.editor__preview h2 { font-size: 1.4em; }
-.editor__preview h3 { font-size: 1.2em; }
+.editor__preview h1 {
+  font-size: 1.8em;
+}
+.editor__preview h2 {
+  font-size: 1.4em;
+}
+.editor__preview h3 {
+  font-size: 1.2em;
+}
 
 .editor__preview p {
   margin: 0.5em 0;
@@ -285,6 +291,3 @@
   flex-shrink: 0;
   background: var(--color-bg);
 }
-
-.editor__status-left {}
-.editor__status-right {}

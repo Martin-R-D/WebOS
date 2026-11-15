@@ -14,6 +14,8 @@ import { NotificationPanel } from "./NotificationPanel";
 import { useNotificationStore } from "../../stores/useNotificationStore";
 import type { AppId, ContextMenuItem } from "../../types";
 import "./Taskbar.css";
+import { useCompact } from "../../lib/useCompact";
+import { MobileNav } from "../MobileNav/MobileNav";
 
 function TaskbarWeather() {
   const { weather, unit, refresh } = useWeatherStore();
@@ -25,8 +27,11 @@ function TaskbarWeather() {
   if (!weather) return null;
 
   const iconName = weatherIcon(weather.current.weatherCode);
-  const WeatherIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[iconName] ?? Icons.Cloud;
-  const temp = unit === "C" ? `${weather.current.temp}°` : `${toF(weather.current.temp)}°`;
+  const WeatherIcon =
+    (Icons as unknown as Record<string, Icons.LucideIcon>)[iconName] ??
+    Icons.Cloud;
+  const temp =
+    unit === "C" ? `${weather.current.temp}°` : `${toF(weather.current.temp)}°`;
 
   return (
     <button
@@ -34,7 +39,10 @@ function TaskbarWeather() {
       onClick={() => launchApp("weather")}
       title="Open Weather"
     >
-      <WeatherIcon size={14} color={weatherColor(weather.current.weatherCode)} />
+      <WeatherIcon
+        size={14}
+        color={weatherColor(weather.current.weatherCode)}
+      />
       <span>{temp}</span>
     </button>
   );
@@ -46,6 +54,7 @@ interface TaskbarProps {
 }
 
 export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
+  const compact = useCompact();
   const windows = useWindowStore((s) => s.windows);
   const focusedId = useWindowStore((s) => s.focusedId);
   const minimizeWindow = useWindowStore((s) => s.minimizeWindow);
@@ -55,7 +64,11 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
   const unpinApp = useSystemStore((s) => s.unpinApp);
 
   const [now, setNow] = useState(new Date());
-  const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
+  const [menu, setMenu] = useState<{
+    x: number;
+    y: number;
+    items: ContextMenuItem[];
+  } | null>(null);
   const [clockPopupOpen, setClockPopupOpen] = useState(false);
   const [notifPanelOpen, setNotifPanelOpen] = useState(false);
   const notifications = useNotificationStore((s) => s.notifications);
@@ -82,17 +95,28 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
     const items: ContextMenuItem[] = [];
     // "Close" only when the app is actually open (has a window)
     if (winId) {
-      items.push({ label: "Close", icon: "X", danger: true, onClick: () => closeWindow(winId) });
+      items.push({
+        label: "Close",
+        icon: "X",
+        danger: true,
+        onClick: () => closeWindow(winId),
+      });
     }
     // "Unpin" only when the app is pinned to the taskbar
     if (pinnedApps.includes(appId)) {
-      items.push({ label: "Unpin", icon: "PinOff", onClick: () => unpinApp(appId) });
+      items.push({
+        label: "Unpin",
+        icon: "PinOff",
+        onClick: () => unpinApp(appId),
+      });
     }
     if (items.length === 0) return;
     setMenu({ x: e.clientX, y: e.clientY, items });
   }
 
   const runningAppIds = new Set(windows.map((w) => w.appId));
+
+  if (compact) return <MobileNav onToggleStart={onToggleStart} />;
 
   return (
     <div className="taskbar">
@@ -111,7 +135,10 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
           .map((appId) => {
             const app = appRegistry[appId];
             if (!app) return null;
-            const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[app.icon] ?? Icons.Square;
+            const AppIcon =
+              (Icons as unknown as Record<string, Icons.LucideIcon>)[
+                app.icon
+              ] ?? Icons.Square;
             return (
               <button
                 key={`pin-${appId}`}
@@ -128,7 +155,9 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
 
         {/* Running windows */}
         {windows.map((win) => {
-          const AppIcon = (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ?? Icons.Square;
+          const AppIcon =
+            (Icons as unknown as Record<string, Icons.LucideIcon>)[win.icon] ??
+            Icons.Square;
           const isPinned = pinnedApps.includes(win.appId);
           return (
             <button
@@ -162,13 +191,18 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
         </button>
         <div className="taskbar__bell-wrapper">
           <button
-            className={cx("taskbar__bell", notifPanelOpen && "taskbar__bell--active")}
+            className={cx(
+              "taskbar__bell",
+              notifPanelOpen && "taskbar__bell--active",
+            )}
             onClick={() => setNotifPanelOpen((v) => !v)}
             aria-label="Toggle notifications"
           >
             <Icons.Bell size={14} />
             {unreadCount > 0 && (
-              <span className="taskbar__bell-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
+              <span className="taskbar__bell-badge">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
             )}
           </button>
           {notifPanelOpen && (
@@ -177,7 +211,10 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
         </div>
         <div className="taskbar__clock-wrapper">
           <button
-            className={cx("taskbar__clock", clockPopupOpen && "taskbar__clock--active")}
+            className={cx(
+              "taskbar__clock",
+              clockPopupOpen && "taskbar__clock--active",
+            )}
             onClick={() => setClockPopupOpen((v) => !v)}
             aria-label="Toggle calendar popup"
           >

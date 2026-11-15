@@ -1,5 +1,21 @@
+import { useCompact } from "../../lib/useCompact";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, SaveAll, Eye, EyeOff, Columns2, Bold, Italic, Strikethrough, Code, Heading, List, Settings2, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  Save,
+  SaveAll,
+  Eye,
+  EyeOff,
+  Columns2,
+  Bold,
+  Italic,
+  Strikethrough,
+  Code,
+  Heading,
+  List,
+  Settings2,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { marked } from "marked";
 import type { AppProps } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
@@ -10,7 +26,12 @@ import "./TextEditor.css";
 
 marked.setOptions({ async: false });
 
-function buildHighlightedText(text: string, matches: number[], currentIndex: number, matchLen: number): React.ReactNode {
+function buildHighlightedText(
+  text: string,
+  matches: number[],
+  currentIndex: number,
+  matchLen: number,
+): React.ReactNode {
   if (!matches.length || !matchLen) return text;
   const nodes: React.ReactNode[] = [];
   let pos = 0;
@@ -19,9 +40,14 @@ function buildHighlightedText(text: string, matches: number[], currentIndex: num
     const end = start + matchLen;
     if (start > pos) nodes.push(text.slice(pos, start));
     nodes.push(
-      <mark key={i} className={i === currentIndex ? "editor__mark--current" : "editor__mark"}>
+      <mark
+        key={i}
+        className={
+          i === currentIndex ? "editor__mark--current" : "editor__mark"
+        }
+      >
         {text.slice(start, end)}
-      </mark>
+      </mark>,
     );
     pos = end;
   }
@@ -34,7 +60,14 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
   const updateContent = useFileSystemStore((s) => s.updateContent);
   const createNode = useFileSystemStore((s) => s.createNode);
   const setTitle = useWindowStore((s) => s.setTitle);
-  const { fontSize, fontFamily, lineWrap, setFontSize, setFontFamily, setLineWrap } = useEditorSettingsStore();
+  const {
+    fontSize,
+    fontFamily,
+    lineWrap,
+    setFontSize,
+    setFontFamily,
+    setLineWrap,
+  } = useEditorSettingsStore();
 
   const initialFileId = (launchProps?.fileId as string) ?? null;
   const [fileId, setFileId] = useState<string | null>(initialFileId);
@@ -44,7 +77,12 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
   const [showSaveAs, setShowSaveAs] = useState(false);
 
   // Preview mode: "edit" | "preview" | "split"
-  const [viewMode, setViewMode] = useState<"edit" | "preview" | "split">("edit");
+  const compact = useCompact();
+  const [preferredViewMode, setViewMode] = useState<
+    "edit" | "preview" | "split"
+  >("edit");
+  const viewMode =
+    compact && preferredViewMode === "split" ? "edit" : preferredViewMode;
 
   // Find & Replace state
   const [findOpen, setFindOpen] = useState(false);
@@ -96,9 +134,10 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
       idx += needle.length;
     }
     setMatches(found);
-    setMatchIndex((prev) => (found.length ? Math.min(prev, found.length - 1) : 0));
+    setMatchIndex((prev) =>
+      found.length ? Math.min(prev, found.length - 1) : 0,
+    );
   }, [findText, text]);
-
 
   function handleSave() {
     if (fileId) {
@@ -113,7 +152,11 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
     setShowSaveAs(true);
   }
 
-  function handleSaveDialogConfirm(folderId: string, name: string, overwriteId?: string) {
+  function handleSaveDialogConfirm(
+    folderId: string,
+    name: string,
+    overwriteId?: string,
+  ) {
     if (overwriteId) {
       updateContent(overwriteId, text);
       setFileId(overwriteId);
@@ -201,51 +244,67 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
     if (!matches.length) return;
     const start = matches[matchIndex];
     const end = start + findText.length;
-    const newText = text.substring(0, start) + replaceText + text.substring(end);
+    const newText =
+      text.substring(0, start) + replaceText + text.substring(end);
     setText(newText);
     setDirty(true);
   }
 
   function replaceAll() {
     if (!findText) return;
-    const regex = new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    const regex = new RegExp(
+      findText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "gi",
+    );
     const newText = text.replace(regex, replaceText);
     setText(newText);
     setDirty(true);
   }
 
   // Formatting helpers
-  const wrapSelection = useCallback((before: string, after: string, placeholder = "text") => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = text.substring(start, end);
-    const insert = selected || placeholder;
-    const newText = text.substring(0, start) + before + insert + after + text.substring(end);
-    setText(newText);
-    setDirty(true);
-    setTimeout(() => {
-      ta.focus();
-      const newStart = start + before.length;
-      const newEnd = newStart + insert.length;
-      ta.setSelectionRange(newStart, newEnd);
-    }, 0);
-  }, [text]);
+  const wrapSelection = useCallback(
+    (before: string, after: string, placeholder = "text") => {
+      const ta = textareaRef.current;
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = text.substring(start, end);
+      const insert = selected || placeholder;
+      const newText =
+        text.substring(0, start) +
+        before +
+        insert +
+        after +
+        text.substring(end);
+      setText(newText);
+      setDirty(true);
+      setTimeout(() => {
+        ta.focus();
+        const newStart = start + before.length;
+        const newEnd = newStart + insert.length;
+        ta.setSelectionRange(newStart, newEnd);
+      }, 0);
+    },
+    [text],
+  );
 
-  const prependLine = useCallback((prefix: string) => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const lineStart = text.lastIndexOf("\n", start - 1) + 1;
-    const newText = text.substring(0, lineStart) + prefix + text.substring(lineStart);
-    setText(newText);
-    setDirty(true);
-    setTimeout(() => {
-      ta.focus();
-      ta.setSelectionRange(start + prefix.length, start + prefix.length);
-    }, 0);
-  }, [text]);
+  const prependLine = useCallback(
+    (prefix: string) => {
+      const ta = textareaRef.current;
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const lineStart = text.lastIndexOf("\n", start - 1) + 1;
+      const newText =
+        text.substring(0, lineStart) + prefix + text.substring(lineStart);
+      setText(newText);
+      setDirty(true);
+      setTimeout(() => {
+        ta.focus();
+        ta.setSelectionRange(start + prefix.length, start + prefix.length);
+      }, 0);
+    },
+    [text],
+  );
 
   function handleBold() {
     wrapSelection("**", "**", "bold text");
@@ -313,14 +372,16 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
   const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
   const chars = text.length;
 
-  const matchLabel =
-    !findText ? "" :
-    matches.length === 0 ? "No matches" :
-    `${matchIndex + 1} of ${matches.length}`;
+  const matchLabel = !findText
+    ? ""
+    : matches.length === 0
+      ? "No matches"
+      : `${matchIndex + 1} of ${matches.length}`;
 
   const textareaStyle: React.CSSProperties = {
     fontSize: `${fontSize}px`,
-    fontFamily: fontFamily === "monospace" ? "var(--font-mono, monospace)" : "sans-serif",
+    fontFamily:
+      fontFamily === "monospace" ? "var(--font-mono, monospace)" : "sans-serif",
     whiteSpace: lineWrap ? "pre-wrap" : "pre",
   };
 
@@ -336,34 +397,61 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
           Save As
         </button>
         <div className="editor__sep" />
-        <button className="editor__btn editor__btn--icon" onClick={handleBold} title="Bold (Ctrl+B)">
+        <button
+          className="editor__btn editor__btn--icon"
+          onClick={handleBold}
+          title="Bold (Ctrl+B)"
+        >
           <Bold size={14} />
         </button>
-        <button className="editor__btn editor__btn--icon" onClick={handleItalic} title="Italic (Ctrl+I)">
+        <button
+          className="editor__btn editor__btn--icon"
+          onClick={handleItalic}
+          title="Italic (Ctrl+I)"
+        >
           <Italic size={14} />
         </button>
-        <button className="editor__btn editor__btn--icon" onClick={handleStrikethrough} title="Strikethrough">
+        <button
+          className="editor__btn editor__btn--icon"
+          onClick={handleStrikethrough}
+          title="Strikethrough"
+        >
           <Strikethrough size={14} />
         </button>
-        <button className="editor__btn editor__btn--icon" onClick={handleCode} title="Code">
+        <button
+          className="editor__btn editor__btn--icon"
+          onClick={handleCode}
+          title="Code"
+        >
           <Code size={14} />
         </button>
-        <button className="editor__btn editor__btn--icon" onClick={handleHeading} title="Heading">
+        <button
+          className="editor__btn editor__btn--icon"
+          onClick={handleHeading}
+          title="Heading"
+        >
           <Heading size={14} />
         </button>
-        <button className="editor__btn editor__btn--icon" onClick={handleList} title="List">
+        <button
+          className="editor__btn editor__btn--icon"
+          onClick={handleList}
+          title="List"
+        >
           <List size={14} />
         </button>
         <div className="editor__sep" />
         <button
           className={`editor__btn editor__btn--icon${viewMode === "preview" ? " editor__btn--active" : ""}`}
-          onClick={() => setViewMode(viewMode === "preview" ? "edit" : "preview")}
+          onClick={() =>
+            setViewMode(viewMode === "preview" ? "edit" : "preview")
+          }
           title={viewMode === "preview" ? "Edit mode" : "Preview mode"}
         >
           {viewMode === "preview" ? <EyeOff size={14} /> : <Eye size={14} />}
         </button>
         <button
           className={`editor__btn editor__btn--icon${viewMode === "split" ? " editor__btn--active" : ""}`}
+          hidden={compact}
           onClick={() => setViewMode(viewMode === "split" ? "edit" : "split")}
           title="Split view"
         >
@@ -442,9 +530,23 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
               }}
             />
             <span className="editor__find-count">{matchLabel}</span>
-            <button className="editor__btn editor__btn--icon" onClick={goPrev} title="Previous"><ChevronUp size={14} /></button>
-            <button className="editor__btn editor__btn--icon" onClick={goNext} title="Next"><ChevronDown size={14} /></button>
-            <button className="editor__btn editor__btn--sm" onClick={closeFind}>✕</button>
+            <button
+              className="editor__btn editor__btn--icon"
+              onClick={goPrev}
+              title="Previous"
+            >
+              <ChevronUp size={14} />
+            </button>
+            <button
+              className="editor__btn editor__btn--icon"
+              onClick={goNext}
+              title="Next"
+            >
+              <ChevronDown size={14} />
+            </button>
+            <button className="editor__btn editor__btn--sm" onClick={closeFind}>
+              ✕
+            </button>
           </div>
           {replaceOpen && (
             <div className="editor__find-row">
@@ -453,21 +555,45 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
                 placeholder="Replace…"
                 value={replaceText}
                 onChange={(e) => setReplaceText(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Escape") closeFind(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") closeFind();
+                }}
               />
-              <button className="editor__btn editor__btn--sm" onClick={replaceCurrent}>Replace</button>
-              <button className="editor__btn editor__btn--sm" onClick={replaceAll}>Replace All</button>
+              <button
+                className="editor__btn editor__btn--sm"
+                onClick={replaceCurrent}
+              >
+                Replace
+              </button>
+              <button
+                className="editor__btn editor__btn--sm"
+                onClick={replaceAll}
+              >
+                Replace All
+              </button>
             </div>
           )}
         </div>
       )}
 
-      <div className={`editor__body${viewMode === "split" ? " editor__body--split" : ""}`}>
+      <div
+        className={`editor__body${viewMode === "split" ? " editor__body--split" : ""}`}
+      >
         {viewMode !== "preview" && (
           <div className="editor__area-wrap">
             {findOpen && matches.length > 0 && (
-              <div ref={backdropRef} className="editor__highlight-backdrop" style={textareaStyle} aria-hidden="true">
-                {buildHighlightedText(text, matches, matchIndex, findText.length)}
+              <div
+                ref={backdropRef}
+                className="editor__highlight-backdrop"
+                style={textareaStyle}
+                aria-hidden="true"
+              >
+                {buildHighlightedText(
+                  text,
+                  matches,
+                  matchIndex,
+                  findText.length,
+                )}
               </div>
             )}
             <textarea
@@ -476,14 +602,24 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
               value={text}
               onChange={handleChange}
               spellCheck={false}
-              style={{ ...textareaStyle, ...(findOpen && matches.length > 0 ? { color: "transparent", caretColor: "var(--color-text)", background: "transparent" } : {}) }}
+              style={{
+                ...textareaStyle,
+                ...(findOpen && matches.length > 0
+                  ? {
+                      color: "transparent",
+                      caretColor: "var(--color-text)",
+                      background: "transparent",
+                    }
+                  : {}),
+              }}
               onSelect={updateCursorPos}
               onClick={updateCursorPos}
               onKeyUp={updateCursorPos}
               onScroll={() => {
                 if (backdropRef.current && textareaRef.current) {
                   backdropRef.current.scrollTop = textareaRef.current.scrollTop;
-                  backdropRef.current.scrollLeft = textareaRef.current.scrollLeft;
+                  backdropRef.current.scrollLeft =
+                    textareaRef.current.scrollLeft;
                 }
               }}
             />
@@ -498,8 +634,12 @@ export function TextEditor({ windowId, launchProps }: AppProps) {
       </div>
 
       <div className="editor__statusbar">
-        <span className="editor__status-left">Ln {cursorLine}, Col {cursorCol}</span>
-        <span className="editor__status-right">{words} words · {chars} chars</span>
+        <span className="editor__status-left">
+          Ln {cursorLine}, Col {cursorCol}
+        </span>
+        <span className="editor__status-right">
+          {words} words · {chars} chars
+        </span>
       </div>
 
       {showSaveAs && (
