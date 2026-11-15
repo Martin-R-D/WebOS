@@ -43,9 +43,10 @@ export const useSystemStore = create<SystemStoreState>()(
       pinnedApps: [],
       desktopIconPos: {},
 
-      setDesktopIconPos: (key, pos) => set((s) => ({
-        desktopIconPos: { ...s.desktopIconPos, [key]: pos },
-      })),
+      setDesktopIconPos: (key, pos) =>
+        set((s) => ({
+          desktopIconPos: { ...s.desktopIconPos, [key]: pos },
+        })),
 
       setTheme: (t) => set({ theme: t }),
       setWallpaper: (w) => set({ wallpaper: w }),
@@ -54,13 +55,18 @@ export const useSystemStore = create<SystemStoreState>()(
       toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
       setBooted: (v) => set({ booted: v }),
       setLocked: (v) => set({ locked: v }),
-      pinApp: (id) => set((s) => ({
-        pinnedApps: s.pinnedApps.includes(id) ? s.pinnedApps : [...s.pinnedApps, id],
-      })),
-      unpinApp: (id) => set((s) => ({
-        pinnedApps: s.pinnedApps.filter((a) => a !== id),
-      })),
-      resetSettings: () => set({ ...defaults, pinnedApps: [], desktopIconPos: {} }),
+      pinApp: (id) =>
+        set((s) => ({
+          pinnedApps: s.pinnedApps.includes(id)
+            ? s.pinnedApps
+            : [...s.pinnedApps, id],
+        })),
+      unpinApp: (id) =>
+        set((s) => ({
+          pinnedApps: s.pinnedApps.filter((a) => a !== id),
+        })),
+      resetSettings: () =>
+        set({ ...defaults, pinnedApps: [], desktopIconPos: {} }),
     }),
     {
       name: "webos-system",

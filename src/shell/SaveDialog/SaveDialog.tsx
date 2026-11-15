@@ -12,7 +12,12 @@ interface SaveDialogProps {
   onCancel: () => void;
 }
 
-export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: SaveDialogProps) {
+export function SaveDialog({
+  initialName,
+  initialFolderId,
+  onSave,
+  onCancel,
+}: SaveDialogProps) {
   const compact = useCompact();
   const rootId = useFileSystemStore((s) => s.rootId);
   const getChildren = useFileSystemStore((s) => s.getChildren);
@@ -35,7 +40,10 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
     const crumbs: { id: string; name: string }[] = [];
     let current = getNode(folderId);
     while (current) {
-      crumbs.unshift({ id: current.id, name: current.id === rootId ? "/" : current.name });
+      crumbs.unshift({
+        id: current.id,
+        name: current.id === rootId ? "/" : current.name,
+      });
       current = current.parentId ? getNode(current.parentId) : undefined;
     }
     return crumbs;
@@ -89,16 +97,28 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
       <div className="save-dialog" onMouseDown={(e) => e.stopPropagation()}>
         <div className="save-dialog__header">
           Save As
-          <button aria-label="Close dialog" className="save-dialog__close" onClick={onCancel}>
+          <button
+            aria-label="Close dialog"
+            className="save-dialog__close"
+            onClick={onCancel}
+          >
             <X size={14} />
           </button>
         </div>
 
         <div className="save-dialog__path">
           {crumbs.map((c, i) => (
-            <span key={c.id} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}>
-              {i > 0 && <ChevronRight size={12} className="save-dialog__path-sep" />}
-              <button className="save-dialog__path-seg" onClick={() => setFolderId(c.id)}>
+            <span
+              key={c.id}
+              style={{ display: "inline-flex", alignItems: "center", gap: 2 }}
+            >
+              {i > 0 && (
+                <ChevronRight size={12} className="save-dialog__path-sep" />
+              )}
+              <button
+                className="save-dialog__path-seg"
+                onClick={() => setFolderId(c.id)}
+              >
                 {c.name}
               </button>
             </span>
@@ -121,10 +141,19 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
             <button
               key={node.id}
               className={`save-dialog__item save-dialog__item--${node.type}`}
-              onDoubleClick={() => { if (!compact) handleItemDoubleClick(node.id); }}
-              onClick={() => { if (compact) handleItemDoubleClick(node.id); else if (node.type === "file") setFileName(node.name); }}
+              onDoubleClick={() => {
+                if (!compact) handleItemDoubleClick(node.id);
+              }}
+              onClick={() => {
+                if (compact) handleItemDoubleClick(node.id);
+                else if (node.type === "file") setFileName(node.name);
+              }}
             >
-              {node.type === "folder" ? <Folder size={16} /> : <FileText size={16} />}
+              {node.type === "folder" ? (
+                <Folder size={16} />
+              ) : (
+                <FileText size={16} />
+              )}
               {node.name}
             </button>
           ))}
@@ -137,19 +166,31 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
           <span className="save-dialog__label">Name:</span>
           <input
             ref={inputRef}
-            aria-label="File name" className="save-dialog__input"
+            aria-label="File name"
+            className="save-dialog__input"
             value={fileName}
-            onChange={(e) => { setFileName(e.target.value); setFolderConflict(false); }}
+            onChange={(e) => {
+              setFileName(e.target.value);
+              setFolderConflict(false);
+            }}
             onKeyDown={handleKeyDown}
           />
           {folderConflict && (
-            <span className="save-dialog__folder-error">A folder with this name exists here</span>
+            <span className="save-dialog__folder-error">
+              A folder with this name exists here
+            </span>
           )}
           <div className="save-dialog__actions">
-            <button className="save-dialog__btn save-dialog__btn--cancel" onClick={onCancel}>
+            <button
+              className="save-dialog__btn save-dialog__btn--cancel"
+              onClick={onCancel}
+            >
               Cancel
             </button>
-            <button className="save-dialog__btn save-dialog__btn--save" onClick={handleSave}>
+            <button
+              className="save-dialog__btn save-dialog__btn--save"
+              onClick={handleSave}
+            >
               Save
             </button>
           </div>
@@ -157,12 +198,17 @@ export function SaveDialog({ initialName, initialFolderId, onSave, onCancel }: S
       </div>
 
       {conflictId && (
-        <Modal className="save-confirm-overlay" label="Overwrite file" onClose={() => setConflictId(null)}>
+        <Modal
+          className="save-confirm-overlay"
+          label="Overwrite file"
+          onClose={() => setConflictId(null)}
+        >
           <div className="save-confirm">
             <AlertTriangle size={28} className="save-confirm__icon" />
             <div className="save-confirm__title">File already exists</div>
             <div className="save-confirm__msg">
-              <strong>{fileName.trim()}</strong> already exists in this folder. Do you want to overwrite it?
+              <strong>{fileName.trim()}</strong> already exists in this folder.
+              Do you want to overwrite it?
             </div>
             <div className="save-confirm__actions">
               <button

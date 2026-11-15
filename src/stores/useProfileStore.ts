@@ -40,9 +40,20 @@ export const defaultProfile: Profile = {
     { label: "X", url: "https://x.com/yourname" },
   ],
   skills: [
-    "React", "TypeScript", "Node.js", "CSS", "Python",
-    "PostgreSQL", "Docker", "Git", "Figma", "REST APIs",
-    "GraphQL", "Tailwind", "Linux", "AWS",
+    "React",
+    "TypeScript",
+    "Node.js",
+    "CSS",
+    "Python",
+    "PostgreSQL",
+    "Docker",
+    "Git",
+    "Figma",
+    "REST APIs",
+    "GraphQL",
+    "Tailwind",
+    "Linux",
+    "AWS",
   ],
   projects: [
     {

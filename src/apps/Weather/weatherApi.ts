@@ -32,14 +32,23 @@ export async function geocode(city: string): Promise<GeoResult> {
   const data = await res.json();
   if (!data.results?.length) throw new Error(`City "${city}" not found`);
   const r = data.results[0];
-  return { name: r.name, country: r.country, latitude: r.latitude, longitude: r.longitude };
+  return {
+    name: r.name,
+    country: r.country,
+    latitude: r.latitude,
+    longitude: r.longitude,
+  };
 }
 
-export async function fetchWeather(latitude: number, longitude: number): Promise<WeatherData> {
+export async function fetchWeather(
+  latitude: number,
+  longitude: number,
+): Promise<WeatherData> {
   const params = new URLSearchParams({
     latitude: String(latitude),
     longitude: String(longitude),
-    current: "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code",
+    current:
+      "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code",
     daily: "weather_code,temperature_2m_max,temperature_2m_min",
     forecast_days: "5",
     timezone: "auto",
@@ -95,19 +104,19 @@ export function weatherIcon(code: number): string {
 }
 
 export function weatherColor(code: number): string {
-  if (code === 0) return "#f9c74f";           // clear — golden yellow
-  if (code <= 2) return "#f9a825";            // partly cloudy — warm yellow
-  if (code === 3) return "#90a4ae";           // overcast — steel grey
-  if (code <= 49) return "#b0bec5";           // fog — light grey-blue
-  if (code <= 57) return "#64b5f6";           // drizzle — light blue
-  if (code <= 67) return "#1e88e5";           // rain — mid blue
-  if (code <= 77) return "#90caf9";           // snow — icy blue
-  if (code <= 82) return "#1565c0";           // rain showers — deep blue
-  if (code <= 86) return "#b3e5fc";           // snow showers — pale blue
-  if (code <= 99) return "#f4a261";           // thunderstorm — amber orange
+  if (code === 0) return "#f9c74f"; // clear — golden yellow
+  if (code <= 2) return "#f9a825"; // partly cloudy — warm yellow
+  if (code === 3) return "#90a4ae"; // overcast — steel grey
+  if (code <= 49) return "#b0bec5"; // fog — light grey-blue
+  if (code <= 57) return "#64b5f6"; // drizzle — light blue
+  if (code <= 67) return "#1e88e5"; // rain — mid blue
+  if (code <= 77) return "#90caf9"; // snow — icy blue
+  if (code <= 82) return "#1565c0"; // rain showers — deep blue
+  if (code <= 86) return "#b3e5fc"; // snow showers — pale blue
+  if (code <= 99) return "#f4a261"; // thunderstorm — amber orange
   return "#90a4ae";
 }
 
 export function toF(c: number): number {
-  return Math.round(c * 9 / 5 + 32);
+  return Math.round((c * 9) / 5 + 32);
 }

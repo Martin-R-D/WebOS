@@ -47,7 +47,10 @@ function App() {
         <Window key={w.id} win={w} />
       ))}
       <StartMenu open={startOpen} onClose={() => setStartOpen(false)} />
-      <Taskbar onToggleStart={() => setStartOpen((v) => !v)} startOpen={startOpen} />
+      <Taskbar
+        onToggleStart={() => setStartOpen((v) => !v)}
+        startOpen={startOpen}
+      />
       <ToastManager />
     </Desktop>
   );

@@ -22,7 +22,10 @@ interface WindowStoreState {
   toggleMaximize: (id: string) => void;
   moveWindow: (id: string, x: number, y: number) => void;
   resizeWindow: (id: string, width: number, height: number) => void;
-  setBounds: (id: string, b: { x: number; y: number; width: number; height: number }) => void;
+  setBounds: (
+    id: string,
+    b: { x: number; y: number; width: number; height: number },
+  ) => void;
   setTitle: (id: string, title: string) => void;
   restoreWindow: (id: string) => void;
 }
@@ -83,9 +86,7 @@ export const useWindowStore = create<WindowStoreState>()((set, get) => ({
         topZIndex: newZ,
         focusedId: id,
         windows: state.windows.map((w) =>
-          w.id === id
-            ? { ...w, zIndex: newZ, isMinimized: false }
-            : w,
+          w.id === id ? { ...w, zIndex: newZ, isMinimized: false } : w,
         ),
       };
     });
@@ -134,9 +135,7 @@ export const useWindowStore = create<WindowStoreState>()((set, get) => ({
 
   moveWindow: (id, x, y) => {
     set((state) => ({
-      windows: state.windows.map((w) =>
-        w.id === id ? { ...w, x, y } : w,
-      ),
+      windows: state.windows.map((w) => (w.id === id ? { ...w, x, y } : w)),
     }));
   },
 
@@ -150,17 +149,13 @@ export const useWindowStore = create<WindowStoreState>()((set, get) => ({
 
   setBounds: (id, b) => {
     set((state) => ({
-      windows: state.windows.map((w) =>
-        w.id === id ? { ...w, ...b } : w,
-      ),
+      windows: state.windows.map((w) => (w.id === id ? { ...w, ...b } : w)),
     }));
   },
 
   setTitle: (id, title) => {
     set((state) => ({
-      windows: state.windows.map((w) =>
-        w.id === id ? { ...w, title } : w,
-      ),
+      windows: state.windows.map((w) => (w.id === id ? { ...w, title } : w)),
     }));
   },
 
