@@ -6,11 +6,13 @@ interface Note {
   text: string;
   color: string;
   createdAt: number;
+  pinned: boolean;
 }
 
 interface NotesStoreState {
   notes: Note[];
-  addNote: (text: string, color: string) => void;
+  togglePin: (id: string) => void;
+  addNote: (text: string, color: string) => string;
   deleteNote: (id: string) => void;
   updateNote: (id: string, text: string, color: string) => void;
 }
@@ -19,19 +21,29 @@ export const useNotesStore = create<NotesStoreState>()(
   persist(
     (set) => ({
       notes: [],
+      togglePin: (id) =>
+        set((state) => ({
+          notes: state.notes.map((note) =>
+            note.id === id ? { ...note, pinned: !note.pinned } : note,
+          ),
+        })),
 
-      addNote: (text, color) =>
+      addNote: (text, color) => {
+        const id = crypto.randomUUID();
         set((state) => ({
           notes: [
             ...state.notes,
             {
-              id: crypto.randomUUID(),
+              id,
               text,
               color,
               createdAt: Date.now(),
+              pinned: false,
             },
           ],
-        })),
+        }));
+        return id;
+      },
 
       deleteNote: (id) =>
         set((state) => ({
@@ -47,7 +59,16 @@ export const useNotesStore = create<NotesStoreState>()(
     }),
     {
       name: "webos-notes",
-      version: 1,
+      version: 2,
+      migrate: (persisted) => {
+        const state = persisted as { notes: Note[] };
+        return {
+          notes: state.notes.map((note) => ({
+            ...note,
+            pinned: note.pinned ?? false,
+          })),
+        };
+      },
       partialize: (state) => ({
         notes: state.notes,
       }),

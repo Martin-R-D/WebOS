@@ -25,6 +25,7 @@ export function cx(...classes: (string | false | undefined | null)[]): string {
 }
 
 export function factoryReset() {
+  localStorage.removeItem("webos-notes");
   localStorage.removeItem("webos-calculator-history");
   localStorage.removeItem("webos-filesystem");
   localStorage.removeItem("webos-system");
