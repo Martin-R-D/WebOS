@@ -1,3 +1,4 @@
+import { TodoList } from "./TodoList/TodoList";
 import { UnitConverter } from "./UnitConverter/UnitConverter";
 import type { AppDefinition, AppId } from "../types";
 import { Calculator } from "./Calculator/Calculator";
@@ -16,6 +17,17 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  "todo-list": {
+    id: "todo-list",
+    name: "To-Do List",
+    icon: "ListTodo",
+    component: TodoList,
+    defaultWidth: 600,
+    defaultHeight: 520,
+    minWidth: 300,
+    minHeight: 300,
+    singleInstance: true,
+  },
   "unit-converter": {
     id: "unit-converter",
     name: "Unit Converter",
