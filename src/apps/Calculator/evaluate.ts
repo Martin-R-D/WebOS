@@ -9,15 +9,16 @@ type Token =
   | { kind: "rparen" };
 
 // precedence / associativity ("u" = unary minus, "%" = postfix percent)
-const OPS: Record<string, { prec: number; rightAssoc: boolean; args: number }> = {
-  "+": { prec: 1, rightAssoc: false, args: 2 },
-  "-": { prec: 1, rightAssoc: false, args: 2 },
-  "*": { prec: 2, rightAssoc: false, args: 2 },
-  "/": { prec: 2, rightAssoc: false, args: 2 },
-  "^": { prec: 3, rightAssoc: true, args: 2 },
-  "u": { prec: 4, rightAssoc: true, args: 1 },
-  "%": { prec: 5, rightAssoc: false, args: 1 },
-};
+const OPS: Record<string, { prec: number; rightAssoc: boolean; args: number }> =
+  {
+    "+": { prec: 1, rightAssoc: false, args: 2 },
+    "-": { prec: 1, rightAssoc: false, args: 2 },
+    "*": { prec: 2, rightAssoc: false, args: 2 },
+    "/": { prec: 2, rightAssoc: false, args: 2 },
+    "^": { prec: 3, rightAssoc: true, args: 2 },
+    u: { prec: 4, rightAssoc: true, args: 1 },
+    "%": { prec: 5, rightAssoc: false, args: 1 },
+  };
 
 function tokenize(expr: string): Token[] | null {
   const tokens: Token[] = [];
@@ -26,13 +27,21 @@ function tokenize(expr: string): Token[] | null {
   const prev = () => tokens[tokens.length - 1];
   const prevIsValue = () => {
     const p = prev();
-    return p && (p.kind === "num" || p.kind === "rparen" || (p.kind === "op" && p.value === "%"));
+    return (
+      p &&
+      (p.kind === "num" ||
+        p.kind === "rparen" ||
+        (p.kind === "op" && p.value === "%"))
+    );
   };
 
   while (i < expr.length) {
     const ch = expr[i];
 
-    if (ch === " ") { i++; continue; }
+    if (ch === " ") {
+      i++;
+      continue;
+    }
 
     if (/[0-9.]/.test(ch)) {
       let num = "";
@@ -91,7 +100,10 @@ function toRpn(tokens: Token[]): Token[] | null {
         const top = stack[stack.length - 1];
         if (top.kind !== "op") break;
         const topOp = OPS[top.value];
-        if (topOp.prec > cur.prec || (topOp.prec === cur.prec && !cur.rightAssoc)) {
+        if (
+          topOp.prec > cur.prec ||
+          (topOp.prec === cur.prec && !cur.rightAssoc)
+        ) {
           output.push(stack.pop()!);
         } else {
           break;
@@ -105,7 +117,10 @@ function toRpn(tokens: Token[]): Token[] | null {
       let matched = false;
       while (stack.length > 0) {
         const top = stack.pop()!;
-        if (top.kind === "lparen") { matched = true; break; }
+        if (top.kind === "lparen") {
+          matched = true;
+          break;
+        }
         output.push(top);
       }
       if (!matched) return null; // unbalanced
@@ -141,12 +156,23 @@ function evalRpn(rpn: Token[]): number | null {
       const b = stack.pop()!;
       const a = stack.pop()!;
       switch (token.value) {
-        case "+": stack.push(a + b); break;
-        case "-": stack.push(a - b); break;
-        case "*": stack.push(a * b); break;
-        case "/": stack.push(a / b); break;
-        case "^": stack.push(Math.pow(a, b)); break;
-        default: return null;
+        case "+":
+          stack.push(a + b);
+          break;
+        case "-":
+          stack.push(a - b);
+          break;
+        case "*":
+          stack.push(a * b);
+          break;
+        case "/":
+          stack.push(a / b);
+          break;
+        case "^":
+          stack.push(Math.pow(a, b));
+          break;
+        default:
+          return null;
       }
     }
   }

@@ -14,7 +14,10 @@ describe("evaluateExpression", () => {
     expect(evaluateExpression(expr)).toBe(expected);
   });
 
-  it.each(["", "   ", "1+", "(1+2", "1/0", "abc", "1++"])("returns null for invalid or incomplete input %j", (expr) => {
-    expect(evaluateExpression(expr)).toBeNull();
-  });
+  it.each(["", "   ", "1+", "(1+2", "1/0", "abc", "1++"])(
+    "returns null for invalid or incomplete input %j",
+    (expr) => {
+      expect(evaluateExpression(expr)).toBeNull();
+    },
+  );
 });

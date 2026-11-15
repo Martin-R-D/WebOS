@@ -57,7 +57,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition), filter var(--transition);
+  transition:
+    background var(--transition),
+    filter var(--transition);
 }
 
 .calc__key:hover {
@@ -90,4 +92,43 @@
 
 .calc__key--span3 {
   grid-column: span 3;
+}
+
+.calc__history-toggle {
+  min-height: 44px;
+  text-align: right;
+  padding: 8px 16px;
+}
+.calc__history {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.calc__history h2 {
+  font-size: 18px;
+  margin-top: 12px;
+}
+.calc__history ol {
+  list-style: none;
+}
+.calc__history li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.calc__history button {
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+.calc__history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
 }
