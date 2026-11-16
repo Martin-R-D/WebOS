@@ -15,6 +15,7 @@ export interface SlideElement {
 }
 
 export interface Slide {
+  notes?: string;
   id: string;
   background: string;
   elements: SlideElement[];
@@ -105,6 +106,11 @@ export function validateSlidesContent(content: Record<string, unknown>): void {
       slide.elements.length > 100
     )
       throw new Error("Invalid slide structure.");
+    if (
+      slide.notes !== undefined &&
+      (typeof slide.notes !== "string" || slide.notes.length > 10_000)
+    )
+      throw new Error("Invalid speaker notes.");
     ids.add(slide.id);
     for (const element of slide.elements) {
       if (
