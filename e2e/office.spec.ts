@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 
 async function launch(page: Page, name: string) {
@@ -238,13 +239,11 @@ test("Sheets imports CSV and exports displayed values with an explicit format ch
   await page.goto("/");
   await expect(page.locator(".boot")).toHaveCount(0);
   await launch(page, "Sheets");
-  await page
-    .locator('input[accept=".csv,text/csv"]')
-    .setInputFiles({
-      name: "data.csv",
-      mimeType: "text/csv",
-      buffer: Buffer.from('Name,Amount\r\n"A, B",12.5'),
-    });
+  await page.locator('input[accept=".csv,text/csv"]').setInputFiles({
+    name: "data.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from('Name,Amount\r\n"A, B",12.5'),
+  });
   await expect(
     page.getByRole("gridcell", { name: "A2", exact: true }),
   ).toHaveText("A, B");
@@ -263,4 +262,59 @@ test("Sheets imports CSV and exports displayed values with an explicit format ch
     .getByRole("button", { name: "Export", exact: true })
     .click();
   expect((await download).suggestedFilename()).toBe("Import1.csv");
+});
+
+test("Office recovers unfinished Writer work and round trips a native download", async ({
+  page,
+}) => {
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.goto("/");
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Writer");
+  await page
+    .getByRole("textbox", { name: "Document content" })
+    .fill("Recovered and portable");
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          Object.keys(localStorage).filter((key) =>
+            key.startsWith("webos-office-recovery:"),
+          ).length,
+      ),
+    )
+    .toBe(1);
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Writer");
+  await page
+    .getByRole("button", { name: "Recover Untitled.wdoc", exact: true })
+    .click();
+  await expect(
+    page.getByRole("textbox", { name: "Document content" }),
+  ).toHaveText("Recovered and portable");
+  const downloading = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download", exact: true }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toBe("Untitled.wdoc");
+  const buffer = await readFile((await download.path())!);
+  await page.getByRole("button", { name: "New", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Recover document", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .locator('.window:not([hidden]) input[accept=".wdoc"]')
+    .setInputFiles({
+      name: "Imported.wdoc",
+      mimeType: "application/json",
+      buffer,
+    });
+  await expect(
+    page
+      .locator(".window:not([hidden])")
+      .getByRole("textbox", { name: "Document content" }),
+  ).toHaveText("Recovered and portable");
+  await expect(
+    page.locator(".window:not([hidden]) .office__toolbar strong"),
+  ).toHaveText("Imported.wdoc");
 });

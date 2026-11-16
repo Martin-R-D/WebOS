@@ -52,3 +52,18 @@ export function clearOfficeRecovery(): void {
     if (key?.startsWith(prefix)) localStorage.removeItem(key);
   }
 }
+
+const activeDrafts = new Map<string, number>();
+
+export function claimRecovery(key: string): () => void {
+  activeDrafts.set(key, (activeDrafts.get(key) ?? 0) + 1);
+  return () => {
+    const remaining = (activeDrafts.get(key) ?? 1) - 1;
+    if (remaining > 0) activeDrafts.set(key, remaining);
+    else activeDrafts.delete(key);
+  };
+}
+
+export function availableRecovery(kind: OfficeKind): RecoveryDraft[] {
+  return listRecovery(kind).filter((draft) => !activeDrafts.has(draft.key));
+}

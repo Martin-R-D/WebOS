@@ -6,7 +6,12 @@ import { useRecentFilesStore } from "../../stores/useRecentFilesStore";
 import { registerCloseGuard } from "../../lib/windowCloseGuard";
 import { decodeDocument, documentName, encodeDocument } from "./documents";
 import type { OfficeKind } from "./documents";
-import { listRecovery, removeRecovery, saveRecovery } from "./recovery";
+import {
+  availableRecovery,
+  claimRecovery,
+  removeRecovery,
+  saveRecovery,
+} from "./recovery";
 
 export function useOfficeDocument(
   kind: OfficeKind,
@@ -48,9 +53,12 @@ export function useOfficeDocument(
   const [showSave, setShowSave] = useState(false);
   const [closing, setClosing] = useState(false);
   const [drafts, setDrafts] = useState(() =>
-    listRecovery(kind).filter((draft) => !fileId || draft.fileId === fileId),
+    availableRecovery(kind).filter(
+      (draft) => !fileId || draft.fileId === fileId,
+    ),
   );
-  const recoveryKey = useRef(props.windowId);
+  const [recoveryKey, setRecoveryKey] = useState(props.windowId);
+  useEffect(() => claimRecovery(recoveryKey), [recoveryKey]);
   const closeAfterSave = useRef(false);
   const serialized = encodeDocument(kind, content);
   const dirty = serialized !== saved;
@@ -79,7 +87,7 @@ export function useOfficeDocument(
     const timer = window.setTimeout(() => {
       try {
         saveRecovery({
-          key: recoveryKey.current,
+          key: recoveryKey,
           name: title,
           fileId,
           document: serialized,
@@ -95,7 +103,7 @@ export function useOfficeDocument(
       clearTimeout(timer);
       window.removeEventListener("beforeunload", warn);
     };
-  }, [dirty, serialized, title, fileId]);
+  }, [dirty, serialized, title, fileId, recoveryKey]);
 
   function finishSave(id: string, nextName: string) {
     setFileId(id);
@@ -103,7 +111,7 @@ export function useOfficeDocument(
     setSaved(serialized);
     setShowSave(false);
     setError("");
-    removeRecovery(recoveryKey.current);
+    removeRecovery(recoveryKey);
     useWindowStore.getState().bindFile(props.windowId, id);
     useRecentFilesStore.getState().record(id);
     if (closeAfterSave.current) {
@@ -205,7 +213,7 @@ export function useOfficeDocument(
       setContent(parsed);
       setFileId(draft.fileId);
       setName(draft.name);
-      recoveryKey.current = draft.key;
+      setRecoveryKey(draft.key);
       setDrafts([]);
     },
     dismissDrafts() {
@@ -220,7 +228,7 @@ export function useOfficeDocument(
       save();
     },
     discardAndClose() {
-      removeRecovery(recoveryKey.current);
+      removeRecovery(recoveryKey);
       setSaved(serialized);
       setClosing(false);
       setTimeout(
