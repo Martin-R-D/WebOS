@@ -137,7 +137,7 @@ export function OfficeFrame({
         <Modal
           className="office__dialog"
           label="Recover document"
-          onClose={doc.discardDrafts}
+          onClose={doc.dismissDrafts}
         >
           <p>Recover unfinished work?</p>
           {doc.drafts.map((draft) => (

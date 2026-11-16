@@ -12,6 +12,7 @@ export function useOfficeDocument(
   kind: OfficeKind,
   props: AppProps,
   initial: Record<string, unknown>,
+  validate?: (content: Record<string, unknown>) => void,
 ) {
   const [fileId, setFileId] = useState<string | null>(
     typeof props.launchProps?.fileId === "string"
@@ -22,20 +23,27 @@ export function useOfficeDocument(
     fileId ? state.nodes[fileId] : undefined,
   );
   const [name, setName] = useState(documentName("Untitled", kind));
-  const [error, setError] = useState("");
-  const loadFailed = useRef(false);
-  const [content, setContent] = useState<Record<string, unknown>>(() => {
-    if (!fileId) return initial;
+  const [loaded] = useState(() => {
     try {
+      if (!fileId) return { content: initial, error: "" };
       const file = useFileSystemStore.getState().nodes[fileId];
       if (!file) throw new Error("This file no longer exists.");
-      return decodeDocument(file.content ?? "", kind).content;
+      const parsed = decodeDocument(file.content ?? "", kind).content;
+      validate?.(parsed);
+      return { content: parsed, error: "" };
     } catch (cause) {
-      loadFailed.current = true;
-      setTimeout(() => setError(String(cause)), 0);
-      return initial;
+      return {
+        content: initial,
+        error:
+          cause instanceof Error ? cause.message : "Unable to open document.",
+      };
     }
   });
+  const [error, setError] = useState(loaded.error);
+  const loadFailed = useRef(Boolean(loaded.error));
+  const [content, setContent] = useState<Record<string, unknown>>(
+    loaded.content,
+  );
   const [saved, setSaved] = useState(() => encodeDocument(kind, content));
   const [showSave, setShowSave] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -184,10 +192,23 @@ export function useOfficeDocument(
     recover(key: string) {
       const draft = drafts.find((item) => item.key === key);
       if (!draft) return;
-      setContent(decodeDocument(draft.document, kind).content);
+      const parsed = decodeDocument(draft.document, kind).content;
+      try {
+        validate?.(parsed);
+      } catch (cause) {
+        setError(
+          cause instanceof Error ? cause.message : "Invalid recovery content.",
+        );
+        return;
+      }
+      loadFailed.current = false;
+      setContent(parsed);
       setFileId(draft.fileId);
       setName(draft.name);
       recoveryKey.current = draft.key;
+      setDrafts([]);
+    },
+    dismissDrafts() {
       setDrafts([]);
     },
     discardDrafts() {

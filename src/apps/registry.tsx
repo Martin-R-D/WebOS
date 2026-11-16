@@ -1,3 +1,4 @@
+import { Writer } from "./Office/Writer";
 import { TodoList } from "./TodoList/TodoList";
 import { UnitConverter } from "./UnitConverter/UnitConverter";
 import type { AppDefinition, AppId } from "../types";
@@ -17,6 +18,16 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  writer: {
+    id: "writer",
+    name: "Writer",
+    icon: "FileType",
+    component: Writer,
+    defaultWidth: 900,
+    defaultHeight: 640,
+    minWidth: 320,
+    minHeight: 320,
+  },
   "todo-list": {
     id: "todo-list",
     name: "To-Do List",

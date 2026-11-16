@@ -97,3 +97,9 @@
     min-height: 40px;
   }
 }
+
+.office__toolbar {
+  flex-shrink: 0;
+  max-height: 140px;
+  overflow: auto;
+}
