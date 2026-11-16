@@ -1,3 +1,4 @@
+import "./WriterDesign.css";
 import { FindReplace } from "./search/FindReplace";
 import { validateWriterContent } from "./writerContent";
 import { useEffect, useRef, useState } from "react";
