@@ -192,6 +192,31 @@ export function changeStructure(
       }
       return {
         ...sheet,
+        charts:
+          sheet.id === id
+            ? sheet.charts?.map((chart) => {
+                if (chart.sourceMissing) return chart;
+                const range = adjustTable(
+                  {
+                    start: chart.start,
+                    end: chart.end,
+                    header: chart.header,
+                    filters: [],
+                  },
+                  axis,
+                  index,
+                  deleting,
+                );
+                return range
+                  ? {
+                      ...chart,
+                      start: range.start,
+                      end: range.end,
+                      header: range.header,
+                    }
+                  : { ...chart, sourceMissing: true };
+              })
+            : sheet.charts,
         table:
           sheet.id === id
             ? adjustTable(sheet.table, axis, index, deleting)

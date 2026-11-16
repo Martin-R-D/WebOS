@@ -1,3 +1,5 @@
+import type { SheetChart } from "../charts/model";
+import { validateCharts } from "../charts/model";
 import type { TableSettings } from "./tableData";
 import { validateTable } from "./tableValidation";
 export const ROWS = 1000;
@@ -21,6 +23,7 @@ interface Cell {
 }
 
 export interface Worksheet {
+  charts?: SheetChart[];
   table?: TableSettings;
   id: string;
   name: string;
@@ -106,6 +109,7 @@ export function validateWorkbook(content: Record<string, unknown>): void {
       Array.isArray(sheet.cells)
     )
       throw new Error("Invalid sheet structure.");
+    if (sheet.charts !== undefined) validateCharts(sheet.charts, position);
     if (sheet.table !== undefined) validateTable(sheet.table, position);
     ids.add(sheet.id);
     sheets.push(sheet);
