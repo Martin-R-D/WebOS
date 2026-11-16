@@ -293,7 +293,15 @@ export const useFileSystemStore = create<FsState>()(
             const parentId = nextNodes[e.originalParentId]
               ? e.originalParentId
               : state.rootId;
-            nextNodes[rid] = { ...e.node, parentId };
+            let name = e.node.name;
+            let suffix = 1;
+            const dot = e.node.type === "file" ? name.lastIndexOf(".") : -1;
+            const stem = dot > 0 ? name.slice(0, dot) : name;
+            const extension = dot > 0 ? name.slice(dot) : "";
+            while (hasSiblingName(nextNodes, parentId, name)) {
+              name = `${stem} (restored ${suffix++})${extension}`;
+            }
+            nextNodes[rid] = { ...e.node, name, parentId };
             delete nextDeleted[rid];
           }
           return { nodes: nextNodes, deletedNodes: nextDeleted };
