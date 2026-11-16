@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { TrashPreview } from "./TrashPreview";
 import { Trash2, Trash, RotateCcw, X, FileText, Folder } from "lucide-react";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { notify } from "../../lib/notify";
@@ -17,6 +19,7 @@ function formatTimeAgo(ts: number): string {
 }
 
 export function RecycleBin({}: AppProps) {
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const deletedNodes = useFileSystemStore((s) => s.deletedNodes);
   const restoreNode = useFileSystemStore((s) => s.restoreNode);
   const permanentlyDelete = useFileSystemStore((s) => s.permanentlyDelete);
@@ -24,9 +27,12 @@ export function RecycleBin({}: AppProps) {
 
   // Show only top-level deleted items (not descendants of other deleted items)
   const topLevel = Object.entries(deletedNodes).filter(
-    ([id]) => !Object.keys(deletedNodes).some(
-      (otherId) => otherId !== id && deletedNodes[otherId]?.node.id === deletedNodes[id].node.parentId,
-    ),
+    ([id]) =>
+      !Object.keys(deletedNodes).some(
+        (otherId) =>
+          otherId !== id &&
+          deletedNodes[otherId]?.node.id === deletedNodes[id].node.parentId,
+      ),
   );
 
   const isEmpty = topLevel.length === 0;
@@ -45,7 +51,12 @@ export function RecycleBin({}: AppProps) {
   function handleEmptyRecycleBin() {
     const count = topLevel.length;
     emptyRecycleBin();
-    notify("Recycle Bin", `${count} item(s) permanently deleted`, "Trash2", "#ef4444");
+    notify(
+      "Recycle Bin",
+      `${count} item(s) permanently deleted`,
+      "Trash2",
+      "#ef4444",
+    );
   }
 
   return (
@@ -88,14 +99,20 @@ export function RecycleBin({}: AppProps) {
               const Icon = entry.node.type === "folder" ? Folder : FileText;
               return (
                 <div key={id} className="rb__row">
-                  <span className="rb__col-name">
+                  <button
+                    className="rb__col-name rb__name-button"
+                    onClick={() => setPreviewId(id)}
+                    aria-label={`Preview ${entry.node.name}`}
+                  >
                     <Icon size={16} className="rb__row-icon" />
                     {entry.node.name}
-                  </span>
+                  </button>
                   <span className="rb__col-path" title={entry.originalPath}>
                     {entry.originalPath}
                   </span>
-                  <span className="rb__col-time">{formatTimeAgo(entry.deletedAt)}</span>
+                  <span className="rb__col-time">
+                    {formatTimeAgo(entry.deletedAt)}
+                  </span>
                   <span className="rb__col-actions">
                     <button
                       className="rb__action-btn"
@@ -116,6 +133,9 @@ export function RecycleBin({}: AppProps) {
               );
             })}
         </div>
+      )}
+      {previewId && deletedNodes[previewId] && (
+        <TrashPreview id={previewId} onClose={() => setPreviewId(null)} />
       )}
     </div>
   );

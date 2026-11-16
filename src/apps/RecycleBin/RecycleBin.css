@@ -141,7 +141,9 @@
   background: transparent;
   color: var(--color-text-dim);
   cursor: pointer;
-  transition: background 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    color 0.1s;
 }
 
 .rb__action-btn:hover {
@@ -153,4 +155,50 @@
 .rb__action-btn--danger:hover {
   background: rgba(200, 60, 60, 0.15);
   color: #e06060;
+}
+
+.rb__name-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  padding: 6px 0;
+}
+
+.rb__preview {
+  width: min(640px, 95vw);
+}
+
+.rb__preview .fd-content {
+  overflow: auto;
+  max-height: 65dvh;
+}
+
+.rb__preview dd {
+  margin: 4px 0 12px;
+  overflow-wrap: anywhere;
+}
+
+.rb__preview img {
+  max-width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+.rb__preview pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .rb__row,
+  .rb__list-header {
+    grid-template-columns: minmax(0, 1fr) 72px;
+  }
+  .rb__col-path,
+  .rb__col-time {
+    display: none;
+  }
 }

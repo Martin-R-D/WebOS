@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { RecycleBin } from "./RecycleBin";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { resetAllStores } from "../../test/resetStores";
@@ -90,5 +90,52 @@ describe("RecycleBin app", () => {
     expect(emptyBtn).not.toBeDisabled();
     fireEvent.click(emptyBtn);
     expect(spy).toHaveBeenCalled();
+  });
+  it("previews text safely and restores with a conflict suffix", () => {
+    const fs = useFileSystemStore.getState();
+    const id = fs.createNode(
+      fs.rootId,
+      "preview.txt",
+      "file",
+      "<script>example</script>",
+    );
+    fs.deleteNode(id);
+    fs.createNode(fs.rootId, "preview.txt", "file", "existing");
+    renderApp();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Preview preview.txt" }),
+    );
+    expect(screen.getByText("<script>example</script>")).toBeTruthy();
+    expect(screen.getByText(/numbered/)).toBeTruthy();
+    fireEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", {
+        name: "Restore",
+      }),
+    );
+    expect(useFileSystemStore.getState().nodes[id].name).toBe(
+      "preview (restored 1).txt",
+    );
+    expect(useFileSystemStore.getState().nodes[id].content).toBe(
+      "<script>example</script>",
+    );
+  });
+
+  it("restores to Root when the original folder no longer exists", () => {
+    const fs = useFileSystemStore.getState();
+    const folder = fs.createNode(fs.rootId, "Temporary", "folder");
+    const id = fs.createNode(folder, "orphan.txt", "file", "content");
+    fs.deleteNode(id);
+    const nodes = { ...useFileSystemStore.getState().nodes };
+    delete nodes[folder];
+    useFileSystemStore.setState({ nodes });
+    renderApp();
+    fireEvent.click(screen.getByRole("button", { name: "Preview orphan.txt" }));
+    expect(screen.getByText(/original folder is unavailable/)).toBeTruthy();
+    fireEvent.click(
+      within(screen.getByRole("dialog")).getByRole("button", {
+        name: "Restore",
+      }),
+    );
+    expect(useFileSystemStore.getState().nodes[id].parentId).toBe(fs.rootId);
   });
 });
