@@ -70,6 +70,7 @@ test("all apps and dialogs fit a narrow phone", async ({ page }) => {
     "Text Editor",
     "Unit Converter",
     "To-Do List",
+    "Office",
     "Writer",
     "Slides",
     "Sheets",

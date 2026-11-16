@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Modal } from "../../../shell/Modal/Modal";
-import { useWindowStore } from "../../../stores/useWindowStore";
+import { launchOffice } from "../launchOffice";
 import type { OfficeKind } from "../documents";
 import { officeTemplates } from "./catalog";
 import "./TemplateGallery.css";
@@ -19,18 +19,7 @@ export function TemplateGallery({
   const selected = templates.find((template) => template.id === selectedId)!;
 
   function create() {
-    const current = useWindowStore
-      .getState()
-      .windows.find((window) => window.appId === kind);
-    if (!current) return;
-    useWindowStore.getState().openWindow({
-      appId: current.appId,
-      title: selected.name,
-      icon: current.icon,
-      width: current.width,
-      height: current.height,
-      launchProps: { templateContent: selected.create() },
-    });
+    launchOffice(kind, selected.create());
     onClose();
   }
 
