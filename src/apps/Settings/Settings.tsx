@@ -1,3 +1,4 @@
+import { BackupRestore } from "../BackupRestore/BackupRestore";
 import { useResolvedTheme } from "../../lib/useResolvedTheme";
 import { useState, useEffect } from "react";
 import type { AppProps, ThemeName } from "../../types";
@@ -19,7 +20,13 @@ const ACCENT_COLORS = ["#6c5ce7", "#00cec9", "#ff6a88", "#feca57", "#1dd1a1"];
 
 const THEMES: ThemeName[] = ["dark", "light", "midnight"];
 
-const SECTIONS = ["Personalization", "Account", "System", "About"] as const;
+const SECTIONS = [
+  "Personalization",
+  "Account",
+  "System",
+  "Backup & Restore",
+  "About",
+] as const;
 type Section = (typeof SECTIONS)[number];
 
 export function Settings({}: AppProps) {
@@ -102,6 +109,7 @@ export function Settings({}: AppProps) {
       </nav>
 
       <div className="settings__content">
+        {activeSection === "Backup & Restore" && <BackupRestore />}
         {activeSection === "Personalization" && (
           <>
             <div className="settings__section-title">Personalization</div>
