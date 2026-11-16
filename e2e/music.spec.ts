@@ -38,6 +38,13 @@ test("Music imports audio, plays it and persists playlists", async ({
   await expect(
     page.getByRole("button", { name: "Pause", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Home", exact: true }).click();
+  expect(
+    await page
+      .locator(".music audio")
+      .evaluate((element: HTMLAudioElement) => element.paused),
+  ).toBe(false);
+  await launch();
   await page.getByRole("button", { name: "Pause", exact: true }).click();
   await page.getByLabel("Playlist name", { exact: true }).fill("Favorites");
   await page
@@ -58,6 +65,23 @@ test("Music imports audio, plays it and persists playlists", async ({
   await expect(
     page.getByRole("button", { name: "Play", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "sample.wav", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Pause", exact: true }),
+  ).toBeVisible();
+  const player = await page.locator(".music audio").elementHandle();
+  await page.evaluate(async () => {
+    const path = "/src/stores/useWindowStore.ts";
+    const { useWindowStore } = await import(path);
+    const window = useWindowStore
+      .getState()
+      .windows.find((item: { appId: string }) => item.appId === "music");
+    useWindowStore.getState().closeWindow(window.id);
+  });
+  await expect(page.locator(".music")).toHaveCount(0);
+  expect(
+    await player!.evaluate((element: HTMLAudioElement) => element.paused),
+  ).toBe(true);
   const media = await page.evaluate(async () => {
     const path = "/src/stores/useFileSystemStore.ts";
     const { useFileSystemStore } = await import(path);
@@ -78,7 +102,4 @@ test("Music imports audio, plays it and persists playlists", async ({
       }, media),
     )
     .toBe(false);
-  await expect(
-    page.getByRole("button", { name: "sample.wav", exact: true }),
-  ).toHaveCount(0);
 });
