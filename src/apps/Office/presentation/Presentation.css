@@ -1,0 +1,51 @@
+.presenter {
+  overflow: auto;
+}
+.slides__presentation.presenter > .slides__canvas {
+  max-height: 55vh;
+}
+.presenter__details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+.presenter__details h2 {
+  font-size: 16px;
+}
+.presenter__notes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 180px;
+  overflow: auto;
+}
+.audience {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #111;
+  color: white;
+}
+.audience .slides__canvas {
+  max-height: calc(100dvh - 40px);
+}
+.slides__notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+.slides__notes textarea {
+  width: 100%;
+  min-height: 90px;
+  box-sizing: border-box;
+  font: inherit;
+}
+@media (max-width: 600px) {
+  .presenter__details {
+    grid-template-columns: 1fr;
+  }
+}
