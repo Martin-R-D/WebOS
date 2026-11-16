@@ -42,7 +42,7 @@ export function Music({ launchProps }: AppProps) {
       autoplay.current = false;
       setSelected(launchProps.fileId);
     }
-  }, [launchProps?.fileId]);
+  }, [launchProps]);
   useEffect(() => {
     const element = audio.current;
     if (!element) return;

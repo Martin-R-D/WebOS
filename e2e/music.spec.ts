@@ -46,6 +46,33 @@ test("Music imports audio, plays it and persists playlists", async ({
   ).toBe(false);
   await launch();
   await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await page.getByLabel("Import audio", { exact: true }).setInputFiles({
+    name: "second.wav",
+    mimeType: "audio/wav",
+    buffer: wave(),
+  });
+  await expect(page.getByRole("status")).toHaveText("Imported 1 track(s).");
+  async function openFirstFromExplorer() {
+    await page.evaluate(async () => {
+      const fsPath = "/src/stores/useFileSystemStore.ts";
+      const openPath = "/src/lib/openNode.ts";
+      const { useFileSystemStore } = await import(fsPath);
+      const { openFsNode } = await import(openPath);
+      const file = (
+        Object.values(useFileSystemStore.getState().nodes) as { name: string }[]
+      ).find((node) => node.name === "sample.wav");
+      openFsNode(file);
+    });
+  }
+  await openFirstFromExplorer();
+  await page.getByRole("button", { name: "second.wav", exact: true }).click();
+  await expect(page.locator(".music__player > strong")).toHaveText(
+    "second.wav",
+  );
+  await openFirstFromExplorer();
+  await expect(page.locator(".music__player > strong")).toHaveText(
+    "sample.wav",
+  );
   await page.getByLabel("Playlist name", { exact: true }).fill("Favorites");
   await page
     .getByRole("button", { name: "Create playlist", exact: true })
