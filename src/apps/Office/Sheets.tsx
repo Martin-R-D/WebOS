@@ -1,3 +1,4 @@
+import { ChartsPanel } from "./charts/ChartsPanel";
 import { TablePanel } from "./sheets/TablePanel";
 import { visibleRows } from "./sheets/tableData";
 import { useMemo, useRef, useState } from "react";
@@ -51,6 +52,7 @@ export function Sheets(props: AppProps) {
   } | null>(null);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState("");
+  const [chartsOpen, setChartsOpen] = useState(false);
   const [dataOpen, setDataOpen] = useState(false);
   const [visibleOnly, setVisibleOnly] = useState(true);
   const [feedback, setFeedback] = useState("");
@@ -258,7 +260,20 @@ export function Sheets(props: AppProps) {
         </>
       }
     >
-      <button onClick={() => setDataOpen((open) => !open)}>
+      <button
+        onClick={() => {
+          setChartsOpen((open) => !open);
+          setDataOpen(false);
+        }}
+      >
+        Charts
+      </button>
+      <button
+        onClick={() => {
+          setDataOpen((open) => !open);
+          setChartsOpen(false);
+        }}
+      >
         Sort and filter
       </button>
       {Boolean(sheet.table?.filters.length) && (
@@ -578,6 +593,17 @@ export function Sheets(props: AppProps) {
         onCopy={captureCopy}
         evaluate={evaluate}
       />
+      {chartsOpen && (
+        <ChartsPanel
+          key={`charts-${sheet.id}`}
+          sheet={sheet}
+          start={start}
+          end={end}
+          evaluate={evaluate}
+          onChange={updateSheet}
+          onClose={() => setChartsOpen(false)}
+        />
+      )}
       <nav className="sheets__tabs" aria-label="Workbook sheets">
         {workbook.sheets.map((item) => (
           <button

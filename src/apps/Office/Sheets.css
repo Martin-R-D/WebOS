@@ -1,6 +1,6 @@
 .sheets__grid {
   flex: 1;
-  min-height: 80px;
+  min-height: 0;
   overflow: auto;
   background: white;
   color: #202020;
@@ -91,9 +91,6 @@
   gap: 8px;
 }
 
-.sheets__grid {
-  min-height: 0;
-}
 @media (max-height: 500px) {
   .sheets__data {
     max-height: 80px;
@@ -108,4 +105,37 @@
 .sheets__filter-values label {
   overflow-wrap: anywhere;
   max-width: 100%;
+}
+
+.sheets__charts {
+  max-height: 360px;
+  overflow: auto;
+  flex-shrink: 0;
+  padding: 8px;
+  border-top: 1px solid var(--color-border);
+}
+.sheets__charts input,
+.sheets__charts select {
+  max-width: 100%;
+  min-width: 0;
+}
+.sheets__charts table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.sheets__charts td,
+.sheets__charts th {
+  border: 1px solid var(--color-border);
+  padding: 4px;
+  overflow-wrap: anywhere;
+}
+
+.office:has(.sheets__charts) {
+  overflow-y: auto;
+}
+.office:has(.sheets__charts) > * {
+  flex-shrink: 0;
+}
+.office:has(.sheets__charts) .sheets__grid {
+  flex: 0 0 180px;
 }
