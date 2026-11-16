@@ -1,4 +1,3 @@
-import { useNotificationStore } from "../../stores/useNotificationStore";
 import { useState } from "react";
 import { Modal } from "../Modal/Modal";
 import { appRegistry } from "../../apps/registry";
@@ -6,8 +5,7 @@ import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useNotesStore } from "../../stores/useNotesStore";
 import { useTodoStore } from "../../stores/useTodoStore";
 import { searchIndex } from "./searchIndex";
-import type { SearchCategory } from "./searchIndex";
-import { activateResult } from "./activateResult";
+import type { SearchCategory, SearchResult } from "./searchIndex";
 import "./SystemSearch.css";
 
 const categories = {
@@ -17,7 +15,13 @@ const categories = {
   tasks: "Tasks",
 };
 
-export function SystemSearch({ onClose }: { onClose: () => void }) {
+export function SystemSearch({
+  onClose,
+  onSelect,
+}: {
+  onClose: () => void;
+  onSelect: (result: SearchResult) => void;
+}) {
   const nodes = useFileSystemStore((state) => state.nodes);
   const notes = useNotesStore((state) => state.notes);
   const tasks = useTodoStore((state) => state.tasks);
@@ -91,21 +95,7 @@ export function SystemSearch({ onClose }: { onClose: () => void }) {
                     <li key={result.id}>
                       <button
                         onClick={() => {
-                          onClose();
-                          window.setTimeout(() => {
-                            try {
-                              activateResult(result);
-                            } catch (cause) {
-                              useNotificationStore.getState().push({
-                                title: "Search",
-                                message:
-                                  cause instanceof Error
-                                    ? cause.message
-                                    : "Unable to open this result.",
-                                icon: "Search",
-                              });
-                            }
-                          }, 0);
+                          onSelect(result);
                         }}
                       >
                         <strong>{result.title}</strong>

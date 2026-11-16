@@ -1,7 +1,13 @@
 .system-search {
   box-sizing: border-box;
   width: min(680px, 95vw);
-  max-height: min(80dvh, 720px);
+  max-height: min(calc(var(--viewport-height, 100dvh) - 24px), 720px);
+  position: fixed;
+  top: calc(var(--viewport-top, 0px) + 12px);
+  bottom: auto;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
   overflow: auto;
   border: 1px solid var(--color-border);
   border-radius: 12px;

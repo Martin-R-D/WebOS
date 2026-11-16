@@ -22,6 +22,7 @@ export function StickyNotes({ launchProps }: AppProps) {
   const deleteNote = useNotesStore((s) => s.deleteNote);
   const updateNote = useNotesStore((s) => s.updateNote);
 
+  const pendingFocus = useRef<string | null>(null);
   useEffect(() => {
     const id = launchProps?.noteId;
     if (
@@ -29,15 +30,19 @@ export function StickyNotes({ launchProps }: AppProps) {
       !useNotesStore.getState().notes.some((note) => note.id === id)
     )
       return;
+    pendingFocus.current = id;
     setQuery("");
     setEditingId(id);
-    const frame = requestAnimationFrame(() => {
-      const input = inputs.current.get(id);
-      input?.scrollIntoView({ block: "center" });
-      input?.focus();
-    });
-    return () => cancelAnimationFrame(frame);
   }, [launchProps?.noteId, launchProps?.navigationToken]);
+
+  useEffect(() => {
+    if (query || !pendingFocus.current) return;
+    const input = inputs.current.get(pendingFocus.current);
+    if (!input) return;
+    pendingFocus.current = null;
+    input.scrollIntoView({ block: "center" });
+    input.focus();
+  }, [query, editingId, launchProps?.navigationToken]);
 
   function handleAddNote() {
     setQuery("");

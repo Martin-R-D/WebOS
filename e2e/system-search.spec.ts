@@ -21,6 +21,20 @@ test("System search opens apps and reveals notes and completed tasks in existing
   await page.getByLabel("Search notes").fill("hidden");
   await page.getByRole("button", { name: "Search WebOS", exact: true }).click();
   await page.getByLabel("Search WebOS content").fill("grocery");
+  await page.evaluate(() =>
+    document.documentElement.style.setProperty("--viewport-height", "320px"),
+  );
+  const bounds = await page
+    .getByRole("dialog", { name: "Search WebOS", exact: true })
+    .boundingBox();
+  expect(bounds!.y).toBeGreaterThanOrEqual(0);
+  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(320);
+  await page.evaluate(() =>
+    document.documentElement.style.setProperty(
+      "--viewport-height",
+      `${window.visualViewport?.height ?? window.innerHeight}px`,
+    ),
+  );
   await page
     .getByRole("region", { name: "Notes results" })
     .getByRole("button")

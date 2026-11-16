@@ -18,6 +18,7 @@ export function TodoList({ launchProps }: AppProps) {
   >(null);
   const [message, setMessage] = useState("");
   const rows = useRef(new Map<string, HTMLLIElement>());
+  const pendingFocus = useRef<string | null>(null);
   useEffect(() => {
     const id = launchProps?.taskId;
     if (
@@ -25,14 +26,18 @@ export function TodoList({ launchProps }: AppProps) {
       !useTodoStore.getState().tasks.some((task) => task.id === id)
     )
       return;
+    pendingFocus.current = id;
     setFilter("All");
-    const frame = requestAnimationFrame(() => {
-      const row = rows.current.get(id);
-      row?.scrollIntoView({ block: "center" });
-      row?.focus();
-    });
-    return () => cancelAnimationFrame(frame);
   }, [launchProps?.taskId, launchProps?.navigationToken]);
+
+  useEffect(() => {
+    if (filter !== "All" || !pendingFocus.current) return;
+    const row = rows.current.get(pendingFocus.current);
+    if (!row) return;
+    pendingFocus.current = null;
+    row.scrollIntoView({ block: "center" });
+    row.focus();
+  }, [filter, launchProps?.navigationToken]);
   const completed = tasks.filter((task) => task.completed).length;
   const visible = tasks
     .filter(
