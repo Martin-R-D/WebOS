@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pin, Plus, Trash2 } from "lucide-react";
 import type { AppProps } from "../../types";
 import { useNotesStore } from "../../stores/useNotesStore";
@@ -12,7 +12,7 @@ const COLORS = [
   { name: "Purple", value: "#E1BEE7" },
 ];
 
-export function StickyNotes({}: AppProps) {
+export function StickyNotes({ launchProps }: AppProps) {
   const [query, setQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const inputs = useRef(new Map<string, HTMLTextAreaElement>());
@@ -21,6 +21,23 @@ export function StickyNotes({}: AppProps) {
   const addNote = useNotesStore((s) => s.addNote);
   const deleteNote = useNotesStore((s) => s.deleteNote);
   const updateNote = useNotesStore((s) => s.updateNote);
+
+  useEffect(() => {
+    const id = launchProps?.noteId;
+    if (
+      typeof id !== "string" ||
+      !useNotesStore.getState().notes.some((note) => note.id === id)
+    )
+      return;
+    setQuery("");
+    setEditingId(id);
+    const frame = requestAnimationFrame(() => {
+      const input = inputs.current.get(id);
+      input?.scrollIntoView({ block: "center" });
+      input?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [launchProps?.noteId, launchProps?.navigationToken]);
 
   function handleAddNote() {
     setQuery("");

@@ -1,3 +1,4 @@
+import { SystemSearch } from "./shell/SystemSearch/SystemSearch";
 import { useResolvedTheme } from "./lib/useResolvedTheme";
 import { useVisualViewport } from "./lib/useVisualViewport";
 import { useState, useEffect } from "react";
@@ -20,6 +21,7 @@ function App() {
   const locked = useSystemStore((s) => s.locked);
   const setBooted = useSystemStore((s) => s.setBooted);
   const setLocked = useSystemStore((s) => s.setLocked);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [startOpen, setStartOpen] = useState(false);
 
   useKeyboardShortcuts();
@@ -48,7 +50,12 @@ function App() {
         <Window key={w.id} win={w} />
       ))}
       <StartMenu open={startOpen} onClose={() => setStartOpen(false)} />
+      {searchOpen && <SystemSearch onClose={() => setSearchOpen(false)} />}
       <Taskbar
+        onOpenSearch={() => {
+          setStartOpen(false);
+          setSearchOpen(true);
+        }}
         onToggleStart={() => setStartOpen((v) => !v)}
         startOpen={startOpen}
       />

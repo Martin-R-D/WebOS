@@ -1,11 +1,17 @@
 import { appRegistry } from "../../apps/registry";
 import { useState } from "react";
-import { Home, LayoutGrid, Layers, Bell, X } from "lucide-react";
+import { Home, LayoutGrid, Layers, Bell, X, Search } from "lucide-react";
 import { useWindowStore } from "../../stores/useWindowStore";
 import { useNotificationStore } from "../../stores/useNotificationStore";
 import { NotificationPanel } from "../Taskbar/NotificationPanel";
 
-export function MobileNav({ onToggleStart }: { onToggleStart: () => void }) {
+export function MobileNav({
+  onToggleStart,
+  onOpenSearch,
+}: {
+  onToggleStart: () => void;
+  onOpenSearch?: () => void;
+}) {
   const windows = useWindowStore((s) => s.windows);
   const focusedId = useWindowStore((s) => s.focusedId);
   const showDesktop = useWindowStore((s) => s.showDesktop);
@@ -35,6 +41,16 @@ export function MobileNav({ onToggleStart }: { onToggleStart: () => void }) {
       >
         <LayoutGrid size={20} />
         Apps
+      </button>
+      <button
+        aria-label="Search WebOS"
+        onClick={() => {
+          setPanel(null);
+          onOpenSearch?.();
+        }}
+      >
+        <Search size={20} />
+        Search
       </button>
       <button
         aria-expanded={panel === "apps"}
