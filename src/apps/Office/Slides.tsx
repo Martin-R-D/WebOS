@@ -1,3 +1,4 @@
+import { PresenterView } from "./presentation/PresenterView";
 import { useRef, useState } from "react";
 import type { AppProps } from "../../types";
 import { Modal } from "../../shell/Modal/Modal";
@@ -204,6 +205,17 @@ export function Slides(props: AppProps) {
             onSelect={setSelectedId}
             onChange={updateElement}
           />
+          <label className="slides__notes">
+            Speaker notes
+            <textarea
+              aria-label="Slide speaker notes"
+              value={active.notes ?? ""}
+              maxLength={10_000}
+              onChange={(event) =>
+                updateSlide({ ...active, notes: event.target.value })
+              }
+            />
+          </label>
           <label>
             Slide background{" "}
             <input
@@ -455,50 +467,15 @@ export function Slides(props: AppProps) {
         </Modal>
       )}
       {presenting && (
-        <Modal
-          className="slides__presentation"
-          label="Presentation"
+        <PresenterView
+          slide={active}
+          next={slides[index + 1]}
+          index={index}
+          count={slides.length}
+          onPrevious={() => setActiveId(slides[index - 1].id)}
+          onNext={() => setActiveId(slides[index + 1].id)}
           onClose={() => setPresenting(false)}
-        >
-          <SlideCanvas slide={active} />
-          <div className="office__toolbar">
-            <button
-              disabled={index === 0}
-              onClick={() => setActiveId(slides[index - 1].id)}
-            >
-              Previous
-            </button>
-            <span>
-              Slide {index + 1} of {slides.length}
-            </span>
-            <button
-              disabled={index === slides.length - 1}
-              onClick={() => setActiveId(slides[index + 1].id)}
-            >
-              Next
-            </button>
-            <button
-              onClick={(event) => {
-                event.currentTarget
-                  .closest("dialog")
-                  ?.requestFullscreen?.()
-                  .catch(() =>
-                    doc.setError("Fullscreen is unavailable in this browser."),
-                  );
-              }}
-            >
-              Fullscreen
-            </button>
-            <button
-              onClick={() => {
-                if (document.fullscreenElement) void document.exitFullscreen();
-                setPresenting(false);
-              }}
-            >
-              Exit presentation
-            </button>
-          </div>
-        </Modal>
+        />
       )}
       <div hidden ref={printRef}>
         {slides.map((slide) => (
