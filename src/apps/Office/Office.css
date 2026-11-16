@@ -1,0 +1,99 @@
+.office {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+}
+.office__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+}
+.office button,
+.office select,
+.office input {
+  font: inherit;
+}
+.office button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.office__toolbar strong {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.office__toolbar span {
+  font-size: 12px;
+}
+.office__error {
+  padding: 8px;
+  background: #742b32;
+  color: white;
+}
+.office__dialog {
+  max-width: min(440px, 95vw);
+  padding: 24px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.office__dialog::backdrop {
+  background: #0008;
+}
+.office__dialog button {
+  padding: 8px;
+  margin: 4px;
+}
+.writer__surface {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background: #8882;
+}
+.writer__surface .tiptap {
+  max-width: 760px;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 32px;
+  margin: auto;
+  background: white;
+  color: #202020;
+  outline: none;
+  overflow-wrap: anywhere;
+}
+.writer__surface img {
+  max-width: 100%;
+  height: auto;
+}
+.writer__surface table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+.writer__surface td,
+.writer__surface th {
+  border: 1px solid #aaa;
+  padding: 6px;
+  vertical-align: top;
+}
+.writer__surface .selectedCell {
+  background: #b7d7ff;
+}
+@media (max-width: 600px) {
+  .writer__surface {
+    padding: 8px;
+  }
+  .writer__surface .tiptap {
+    padding: 14px;
+  }
+  .office__toolbar button {
+    min-height: 40px;
+  }
+}
