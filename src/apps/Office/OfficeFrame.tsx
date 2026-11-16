@@ -26,7 +26,10 @@ export function OfficeFrame({
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
   return (
-    <section className="office" aria-label={`${kind} document`}>
+    <section
+      className={`office office--${kind}`}
+      aria-label={`${kind} document`}
+    >
       <header className="office__toolbar">
         <strong>{doc.title}</strong>
         <span role="status">{doc.dirty ? "Unsaved changes" : "Saved"}</span>
