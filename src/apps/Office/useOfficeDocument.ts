@@ -30,7 +30,21 @@ export function useOfficeDocument(
   const [name, setName] = useState(documentName("Untitled", kind));
   const [loaded] = useState(() => {
     try {
-      if (!fileId) return { content: initial, error: "" };
+      if (!fileId) {
+        const template = props.launchProps?.templateContent;
+        if (template !== undefined) {
+          if (
+            !template ||
+            typeof template !== "object" ||
+            Array.isArray(template)
+          )
+            throw new Error("Invalid template content.");
+          const content = structuredClone(template) as Record<string, unknown>;
+          validate?.(content);
+          return { content, error: "" };
+        }
+        return { content: initial, error: "" };
+      }
       const file = useFileSystemStore.getState().nodes[fileId];
       if (!file) throw new Error("This file no longer exists.");
       const parsed = decodeDocument(file.content ?? "", kind).content;
@@ -49,7 +63,12 @@ export function useOfficeDocument(
   const [content, setContent] = useState<Record<string, unknown>>(
     loaded.content,
   );
-  const [saved, setSaved] = useState(() => encodeDocument(kind, content));
+  const [saved, setSaved] = useState(() =>
+    encodeDocument(
+      kind,
+      props.launchProps?.templateContent ? initial : content,
+    ),
+  );
   const [showSave, setShowSave] = useState(false);
   const [closing, setClosing] = useState(false);
   const [drafts, setDrafts] = useState(() =>

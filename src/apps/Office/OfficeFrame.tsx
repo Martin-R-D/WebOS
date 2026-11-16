@@ -1,5 +1,6 @@
+import { TemplateGallery } from "./templates/TemplateGallery";
 import type { ReactNode } from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { SaveDialog } from "../../shell/SaveDialog/SaveDialog";
 import { Modal } from "../../shell/Modal/Modal";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
@@ -23,6 +24,7 @@ export function OfficeFrame({
   children: ReactNode;
   extra?: ReactNode;
 }) {
+  const [templatesOpen, setTemplatesOpen] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
   return (
     <section className="office" aria-label={`${kind} document`}>
@@ -59,6 +61,7 @@ export function OfficeFrame({
         >
           Open
         </button>
+        <button onClick={() => setTemplatesOpen(true)}>Templates</button>
         <button onClick={() => doc.save()}>Save</button>
         <button onClick={() => doc.setShowSave(true)}>Save As</button>
         <button onClick={() => downloadDocument(doc.title, doc.serialized)}>
@@ -103,6 +106,9 @@ export function OfficeFrame({
           }}
         />
       </header>
+      {templatesOpen && (
+        <TemplateGallery kind={kind} onClose={() => setTemplatesOpen(false)} />
+      )}
       {doc.error && (
         <div className="office__error" role="alert">
           {doc.error}
