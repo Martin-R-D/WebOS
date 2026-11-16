@@ -25,9 +25,13 @@ describe("cx", () => {
   it("supports conditional classes", () => {
     const focused = true;
     const maximized = false;
-    expect(cx("window", focused && "window--focused", maximized && "window--maximized")).toBe(
-      "window window--focused",
-    );
+    expect(
+      cx(
+        "window",
+        focused && "window--focused",
+        maximized && "window--maximized",
+      ),
+    ).toBe("window window--focused");
   });
   it("returns an empty string when nothing is truthy", () => {
     expect(cx(false, null)).toBe("");
@@ -56,10 +60,13 @@ describe("formatClock", () => {
 describe("factoryReset", () => {
   const original = window.location;
   afterEach(() => {
-    Object.defineProperty(window, "location", { value: original, configurable: true });
+    Object.defineProperty(window, "location", {
+      value: original,
+      configurable: true,
+    });
   });
 
-  it("removes all webos storage keys and reloads, leaving unrelated keys alone", () => {
+  it("removes all webos storage keys and reloads, leaving unrelated keys alone", async () => {
     const reload = vi.fn();
     Object.defineProperty(window, "location", {
       value: { ...original, reload },
@@ -70,7 +77,7 @@ describe("factoryReset", () => {
     localStorage.setItem("webos-profile", "x");
     localStorage.setItem("unrelated", "keep");
 
-    factoryReset();
+    await factoryReset();
 
     expect(localStorage.getItem("webos-filesystem")).toBeNull();
     expect(localStorage.getItem("webos-system")).toBeNull();

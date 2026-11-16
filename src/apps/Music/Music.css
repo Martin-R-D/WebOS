@@ -1,0 +1,59 @@
+.music {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text);
+  padding: 12px;
+  gap: 12px;
+}
+.music__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.music button,
+.music select,
+.music input:not([type="range"]):not([type="checkbox"]) {
+  background: var(--color-surface);
+  color: inherit;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  max-width: 100%;
+}
+.music label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.music__library {
+  flex: 1 0 120px;
+  overflow: auto;
+}
+.music__track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.music__track > button:first-child {
+  flex: 1;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.music button[aria-pressed="true"] {
+  outline: 2px solid var(--color-accent);
+}
+.music__player {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.music__player > label input {
+  flex: 1;
+  min-width: 100px;
+}

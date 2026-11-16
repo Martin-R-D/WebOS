@@ -1,3 +1,4 @@
+import { replaceAudio } from "./audioStorage";
 import { clearOfficeRecovery } from "../apps/Office/recovery";
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -25,7 +26,9 @@ export function cx(...classes: (string | false | undefined | null)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-export function factoryReset() {
+export async function factoryReset() {
+  await replaceAudio([]);
+  localStorage.removeItem("webos-music");
   clearOfficeRecovery();
   localStorage.removeItem("webos-widgets");
   localStorage.removeItem("webos-focus");

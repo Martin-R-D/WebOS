@@ -1,3 +1,4 @@
+import { useMusicStore } from "../stores/useMusicStore";
 import { useWidgetsStore } from "../stores/useWidgetsStore";
 import { useFocusStore } from "../stores/useFocusStore";
 import { useBookmarksStore } from "../stores/useBookmarksStore";
@@ -16,6 +17,7 @@ import { useNotificationStore } from "../stores/useNotificationStore";
 import { useEditorSettingsStore } from "../stores/useEditorSettingsStore";
 
 export function resetAllStores() {
+  useMusicStore.setState(useMusicStore.getInitialState(), true);
   useWidgetsStore.setState(useWidgetsStore.getInitialState(), true);
   useFocusStore.setState(useFocusStore.getInitialState(), true);
   useBookmarksStore.setState(useBookmarksStore.getInitialState(), true);

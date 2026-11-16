@@ -57,20 +57,33 @@ export function Settings({}: AppProps) {
     }
   }
 
-  function handleResetFs() {
+  async function handleResetFs() {
     if (window.confirm("Reset the file system? All files will be deleted.")) {
-      useFileSystemStore.getState().resetFileSystem();
+      try {
+        await useFileSystemStore.getState().resetFileSystem();
+      } catch {
+        window.alert(
+          "Could not clear audio storage. Try again before reloading.",
+        );
+        return;
+      }
       location.reload();
     }
   }
 
-  function handleFactoryReset() {
+  async function handleFactoryReset() {
     if (
       window.confirm(
         "Factory reset WebOS? All settings, files, and profile data will be erased.",
       )
     ) {
-      factoryReset();
+      try {
+        await factoryReset();
+      } catch {
+        window.alert(
+          "Could not clear audio storage. Your saved workspace has been kept.",
+        );
+      }
     }
   }
 
