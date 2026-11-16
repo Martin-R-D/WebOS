@@ -103,7 +103,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     icon: "ListTodo",
     component: TodoList,
     defaultWidth: 600,
-    defaultHeight: 520,
+    defaultHeight: 740,
     minWidth: 300,
     minHeight: 300,
     singleInstance: true,
