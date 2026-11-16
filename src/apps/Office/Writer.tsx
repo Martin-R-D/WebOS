@@ -1,3 +1,4 @@
+import { FindReplace } from "./search/FindReplace";
 import { validateWriterContent } from "./writerContent";
 import { useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
@@ -24,6 +25,7 @@ export function Writer(props: AppProps) {
   const { content, setError } = doc;
   const imageInput = useRef<HTMLInputElement>(null);
   const textInput = useRef<HTMLInputElement>(null);
+  const [findOpen, setFindOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
   const [link, setLink] = useState("");
   const editor = useEditor({
@@ -124,6 +126,7 @@ export function Writer(props: AppProps) {
           >
             Export HTML
           </button>
+          <button onClick={() => setFindOpen((open) => !open)}>Find</button>
           <button onClick={print}>Print</button>
           <button onClick={() => textInput.current?.click()}>
             Import text
@@ -324,6 +327,9 @@ export function Writer(props: AppProps) {
           Redo
         </button>
       </div>
+      {findOpen && (
+        <FindReplace editor={editor} onClose={() => setFindOpen(false)} />
+      )}
       <div className="writer__surface">
         <EditorContent editor={editor} />
       </div>
