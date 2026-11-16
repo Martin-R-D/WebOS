@@ -1,12 +1,11 @@
+import { importOfficeFile } from "./importOffice";
 import { TemplateGallery } from "./templates/TemplateGallery";
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 import { SaveDialog } from "../../shell/SaveDialog/SaveDialog";
 import { Modal } from "../../shell/Modal/Modal";
-import { useFileSystemStore } from "../../stores/useFileSystemStore";
 import { useWindowStore } from "../../stores/useWindowStore";
-import { openFsNode } from "../../lib/openNode";
-import { decodeDocument, downloadDocument, officeKind } from "./documents";
+import { downloadDocument, officeKind } from "./documents";
 import type { OfficeKind } from "./documents";
 import type { useOfficeDocument } from "./useOfficeDocument";
 import "./Office.css";
@@ -84,19 +83,7 @@ export function OfficeFrame({
             const file = event.target.files?.[0];
             if (!file) return;
             try {
-              if (file.size > 4_000_000)
-                throw new Error("Import files must be smaller than 4 MB.");
-              if (officeKind(file.name) !== kind)
-                throw new Error("Choose a native document for this app.");
-              const raw = await file.text();
-              decodeDocument(raw, kind);
-              const fs = useFileSystemStore.getState();
-              const id = fs.createNode(fs.rootId, file.name, "file", raw);
-              if (!id)
-                throw new Error(
-                  "A file with this name already exists in the root folder.",
-                );
-              openFsNode(fs.getNode(id)!);
+              await importOfficeFile(file, kind);
             } catch (cause) {
               doc.setError(
                 cause instanceof Error ? cause.message : "Import failed.",

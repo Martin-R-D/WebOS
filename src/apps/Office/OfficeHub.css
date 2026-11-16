@@ -1,0 +1,59 @@
+.office-hub {
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 16px;
+  color: var(--color-text);
+}
+.office-hub button,
+.office-hub input,
+.office-hub select {
+  font: inherit;
+  padding: 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.office-hub__create {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 12px;
+}
+.office-hub__create article {
+  border: 1px solid var(--color-border);
+  padding: 12px;
+  border-radius: 8px;
+}
+.office-hub__create button {
+  display: block;
+  margin: 6px 0;
+}
+.office-hub__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.office-hub__tools [aria-pressed="true"] {
+  outline: 2px solid var(--color-accent);
+}
+.office-hub__files {
+  list-style: none;
+  padding: 0;
+}
+.office-hub__files li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 0;
+  align-items: center;
+}
+.office-hub__open {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  text-align: left;
+  gap: 4px;
+  min-width: min(200px, 100%);
+  overflow-wrap: anywhere;
+}

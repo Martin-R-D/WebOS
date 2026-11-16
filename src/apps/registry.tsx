@@ -1,3 +1,4 @@
+import { OfficeHub } from "./Office/OfficeHub";
 import { Sheets } from "./Office/Sheets";
 import { Slides } from "./Office/Slides";
 import { Writer } from "./Office/Writer";
@@ -20,6 +21,17 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  office: {
+    id: "office",
+    name: "Office",
+    icon: "PanelsTopLeft",
+    component: OfficeHub,
+    defaultWidth: 840,
+    defaultHeight: 640,
+    minWidth: 300,
+    minHeight: 300,
+    singleInstance: true,
+  },
   sheets: {
     id: "sheets",
     name: "Sheets",
