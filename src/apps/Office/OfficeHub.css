@@ -57,3 +57,69 @@
   min-width: min(200px, 100%);
   overflow-wrap: anywhere;
 }
+
+.office-hub.app-design {
+  padding: 24px;
+}
+.office-hub__create article {
+  padding: 20px;
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--card-color) 15%, var(--color-surface)),
+    var(--color-surface)
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--card-color) 35%, var(--color-border));
+  box-shadow: 0 8px 24px #0001;
+}
+.office-hub__create article:nth-child(1) {
+  --card-color: #4788ed;
+}
+.office-hub__create article:nth-child(2) {
+  --card-color: #eb8751;
+}
+.office-hub__create article:nth-child(3) {
+  --card-color: #2cab82;
+}
+.office-hub__create h2 {
+  margin: 0 0 20px;
+  font-size: 23px;
+  letter-spacing: -0.04em;
+  border-left: 4px solid var(--card-color);
+  padding-left: 12px;
+}
+.office-hub__create button {
+  width: 100%;
+  text-align: left;
+  font-size: 12px;
+}
+.office-hub__create button:first-of-type {
+  font-weight: 650;
+  background: color-mix(in srgb, var(--card-color) 15%, var(--color-surface));
+}
+.office-hub__tools {
+  margin: 24px 0 16px;
+}
+.office-hub__files {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.office-hub__files li {
+  padding: 12px;
+}
+.office-hub__open {
+  border-color: transparent !important;
+  gap: 5px;
+}
+.office-hub__open span {
+  font-size: 12px;
+  color: var(--color-text-dim);
+}
+@media (max-width: 600px) {
+  .office-hub.app-design {
+    padding: 14px;
+  }
+}

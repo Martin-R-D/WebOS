@@ -1,3 +1,5 @@
+import { AppHeading } from "../shared/AppHeading";
+import { PanelsTopLeft } from "lucide-react";
 import { useRef, useState } from "react";
 import type { AppProps } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
@@ -25,8 +27,13 @@ export function OfficeHub(_props: AppProps) {
   const names = { writer: "Writer", slides: "Slides", sheets: "Sheets" };
 
   return (
-    <section className="office-hub" aria-label="Office">
-      <h1>Office</h1>
+    <section className="office-hub app-design" aria-label="Office">
+      <AppHeading
+        icon={PanelsTopLeft}
+        title="Office"
+        subtitle="A PLACE FOR YOUR IDEAS"
+      />
+
       <div className="office-hub__create">
         {(["writer", "slides", "sheets"] as const).map((kind) => (
           <article key={kind}>
