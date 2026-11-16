@@ -1,3 +1,7 @@
+import type { SearchResult } from "./shell/SystemSearch/searchIndex";
+import { activateResult } from "./shell/SystemSearch/activateResult";
+import { useNotificationStore } from "./stores/useNotificationStore";
+import { SystemSearch } from "./shell/SystemSearch/SystemSearch";
 import { useResolvedTheme } from "./lib/useResolvedTheme";
 import { useVisualViewport } from "./lib/useVisualViewport";
 import { useState, useEffect } from "react";
@@ -20,7 +24,30 @@ function App() {
   const locked = useSystemStore((s) => s.locked);
   const setBooted = useSystemStore((s) => s.setBooted);
   const setLocked = useSystemStore((s) => s.setLocked);
+  const [pendingSearchResult, setPendingSearchResult] =
+    useState<SearchResult | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [startOpen, setStartOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchOpen || !pendingSearchResult) return;
+    const frame = requestAnimationFrame(() => {
+      try {
+        activateResult(pendingSearchResult);
+      } catch (cause) {
+        useNotificationStore.getState().push({
+          title: "Search",
+          message:
+            cause instanceof Error
+              ? cause.message
+              : "Unable to open this result.",
+          icon: "Search",
+        });
+      }
+      setPendingSearchResult(null);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [searchOpen, pendingSearchResult]);
 
   useKeyboardShortcuts();
   useVisualViewport();
@@ -48,7 +75,21 @@ function App() {
         <Window key={w.id} win={w} />
       ))}
       <StartMenu open={startOpen} onClose={() => setStartOpen(false)} />
+      {searchOpen && (
+        <SystemSearch
+          onClose={() => setSearchOpen(false)}
+          onSelect={(result) => {
+            setPendingSearchResult(result);
+            setSearchOpen(false);
+          }}
+        />
+      )}
       <Taskbar
+        onOpenSearch={() => {
+          setStartOpen(false);
+          setPendingSearchResult(null);
+          setSearchOpen(true);
+        }}
         onToggleStart={() => setStartOpen((v) => !v)}
         startOpen={startOpen}
       />

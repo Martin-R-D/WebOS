@@ -12,7 +12,7 @@ export default defineConfig({
   projects: [
     {
       name: "phone",
-      grepInvert: /desktop drag/,
+      grepInvert: /desktop drag|desktop search/,
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },
@@ -25,7 +25,7 @@ export default defineConfig({
     },
     {
       name: "webkit-phone",
-      grepInvert: /desktop drag/,
+      grepInvert: /desktop drag|desktop search/,
       use: {
         browserName: "webkit",
         viewport: { width: 390, height: 844 },
@@ -35,7 +35,7 @@ export default defineConfig({
     },
     {
       name: "desktop",
-      grep: /desktop drag/,
+      grep: /desktop drag|desktop search/,
       use: {
         browserName: "chromium",
         viewport: { width: 1280, height: 900 },

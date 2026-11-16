@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AppProps } from "../../types";
 import { useTodoStore } from "../../stores/useTodoStore";
 import { Modal } from "../../shell/Modal/Modal";
@@ -7,7 +7,7 @@ import "./TodoList.css";
 
 const filters = ["All", "Active", "Completed"] as const;
 
-export function TodoList(_props: AppProps) {
+export function TodoList({ launchProps }: AppProps) {
   const { tasks, add, edit, toggle, remove, clearCompleted } = useTodoStore();
   const [title, setTitle] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]>("All");
@@ -17,6 +17,27 @@ export function TodoList(_props: AppProps) {
     { id: string } | "completed" | null
   >(null);
   const [message, setMessage] = useState("");
+  const rows = useRef(new Map<string, HTMLLIElement>());
+  const pendingFocus = useRef<string | null>(null);
+  useEffect(() => {
+    const id = launchProps?.taskId;
+    if (
+      typeof id !== "string" ||
+      !useTodoStore.getState().tasks.some((task) => task.id === id)
+    )
+      return;
+    pendingFocus.current = id;
+    setFilter("All");
+  }, [launchProps?.taskId, launchProps?.navigationToken]);
+
+  useEffect(() => {
+    if (filter !== "All" || !pendingFocus.current) return;
+    const row = rows.current.get(pendingFocus.current);
+    if (!row) return;
+    pendingFocus.current = null;
+    row.scrollIntoView({ block: "center" });
+    row.focus();
+  }, [filter, launchProps?.navigationToken]);
   const completed = tasks.filter((task) => task.completed).length;
   const visible = tasks
     .filter(
@@ -90,7 +111,18 @@ export function TodoList(_props: AppProps) {
       <p role="status">{message}</p>
       <ul className="todos__list">
         {visible.map((task) => (
-          <li key={task.id} className="todos__row">
+          <li
+            key={task.id}
+            className="todos__row"
+            tabIndex={-1}
+            data-search-target={
+              launchProps?.taskId === task.id ? "true" : undefined
+            }
+            ref={(element) => {
+              if (element) rows.current.set(task.id, element);
+              else rows.current.delete(task.id);
+            }}
+          >
             <input
               type="checkbox"
               aria-label={`Complete ${task.title}`}

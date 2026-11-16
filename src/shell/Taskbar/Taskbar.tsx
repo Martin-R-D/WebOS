@@ -49,11 +49,16 @@ function TaskbarWeather() {
 }
 
 interface TaskbarProps {
+  onOpenSearch?: () => void;
   onToggleStart: () => void;
   startOpen: boolean;
 }
 
-export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
+export function Taskbar({
+  onToggleStart,
+  startOpen,
+  onOpenSearch,
+}: TaskbarProps) {
   const compact = useCompact();
   const windows = useWindowStore((s) => s.windows);
   const focusedId = useWindowStore((s) => s.focusedId);
@@ -116,7 +121,10 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
 
   const runningAppIds = new Set(windows.map((w) => w.appId));
 
-  if (compact) return <MobileNav onToggleStart={onToggleStart} />;
+  if (compact)
+    return (
+      <MobileNav onToggleStart={onToggleStart} onOpenSearch={onOpenSearch} />
+    );
 
   return (
     <div className="taskbar">
@@ -128,6 +136,14 @@ export function Taskbar({ onToggleStart, startOpen }: TaskbarProps) {
         <span>Start</span>
       </button>
 
+      <button
+        className="taskbar__start"
+        aria-label="Search WebOS"
+        onClick={onOpenSearch}
+      >
+        <Icons.Search size={16} />
+        Search
+      </button>
       <div className="taskbar__apps">
         {/* Pinned apps that are NOT running */}
         {pinnedApps
