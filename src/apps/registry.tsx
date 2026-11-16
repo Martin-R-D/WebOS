@@ -114,7 +114,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     icon: "ArrowLeftRight",
     component: UnitConverter,
     defaultWidth: 440,
-    defaultHeight: 560,
+    defaultHeight: 740,
     minWidth: 300,
     minHeight: 320,
     singleInstance: true,
