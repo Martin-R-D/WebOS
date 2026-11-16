@@ -1,0 +1,32 @@
+.backup-restore {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.backup-restore button,
+.backup-restore input[type="file"] {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 10px;
+  border-radius: 6px;
+  max-width: 100%;
+}
+.backup-restore label {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.backup-restore__preview {
+  border: 1px solid var(--color-border);
+  padding: 14px;
+  border-radius: 8px;
+}
+.backup-restore dd {
+  margin: 4px 0 10px;
+  overflow-wrap: anywhere;
+}
+.backup-restore__preview button {
+  margin: 8px 8px 0 0;
+}
