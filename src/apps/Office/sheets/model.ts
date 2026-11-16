@@ -1,3 +1,5 @@
+import type { TableSettings } from "./tableData";
+import { validateTable } from "./tableValidation";
 export const ROWS = 1000;
 export const COLUMNS = 52;
 
@@ -19,6 +21,7 @@ interface Cell {
 }
 
 export interface Worksheet {
+  table?: TableSettings;
   id: string;
   name: string;
   cells: Record<string, Cell>;
@@ -103,6 +106,7 @@ export function validateWorkbook(content: Record<string, unknown>): void {
       Array.isArray(sheet.cells)
     )
       throw new Error("Invalid sheet structure.");
+    if (sheet.table !== undefined) validateTable(sheet.table, position);
     ids.add(sheet.id);
     sheets.push(sheet);
     for (const [key, cell] of Object.entries(sheet.cells)) {

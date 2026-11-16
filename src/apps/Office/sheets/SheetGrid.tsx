@@ -14,7 +14,9 @@ export function SheetGrid({
   onPaste,
   onCopy,
   evaluate,
+  rows,
 }: {
+  rows: number[];
   sheet: Worksheet;
   start: string;
   end: string;
@@ -30,10 +32,10 @@ export function SheetGrid({
   const [draft, setDraft] = useState("");
   const rowOffsets = useMemo(() => {
     const offsets = [32];
-    for (let row = 0; row < ROWS; row++)
-      offsets.push(offsets[row] + (sheet.heights[row] ?? 28));
+    for (let index = 0; index < rows.length; index++)
+      offsets.push(offsets[index] + (sheet.heights[rows[index]] ?? 28));
     return offsets;
-  }, [sheet.heights]);
+  }, [sheet.heights, rows]);
   const columnOffsets = useMemo(() => {
     const offsets = [48];
     for (let column = 0; column < COLUMNS; column++)
@@ -45,7 +47,7 @@ export function SheetGrid({
     rowOffsets.findIndex((top) => top >= scrollTop) - 3,
   );
   const last = Math.min(
-    ROWS,
+    rows.length,
     first + Math.ceil((viewport.current?.clientHeight ?? 600) / 24) + 8,
   );
   const a = position(start)!;
@@ -66,7 +68,23 @@ export function SheetGrid({
     }[event.key];
     if (delta) {
       event.preventDefault();
-      const nextRow = Math.max(0, Math.min(ROWS - 1, location.row + delta[0]));
+      const nextRow = Math.max(
+        0,
+        Math.min(
+          ROWS - 1,
+          delta[0]
+            ? rows[
+                Math.max(
+                  0,
+                  Math.min(
+                    rows.length - 1,
+                    rows.indexOf(location.row) + delta[0],
+                  ),
+                )
+              ]
+            : location.row,
+        ),
+      );
       const nextColumn = Math.max(
         0,
         Math.min(COLUMNS - 1, location.column + delta[1]),
@@ -74,7 +92,7 @@ export function SheetGrid({
       const next = address(nextRow, nextColumn);
       onSelect(next, event.shiftKey);
       viewport.current?.scrollTo({
-        top: Math.max(0, rowOffsets[nextRow] - 80),
+        top: Math.max(0, rowOffsets[Math.max(0, rows.indexOf(nextRow))] - 80),
         left: Math.max(0, columnOffsets[nextColumn] - 100),
       });
       requestAnimationFrame(() =>
@@ -126,7 +144,7 @@ export function SheetGrid({
       <div
         style={{
           width: columnOffsets[COLUMNS],
-          height: rowOffsets[ROWS],
+          height: rowOffsets[rows.length],
           position: "relative",
         }}
       >
@@ -147,7 +165,7 @@ export function SheetGrid({
           ))}
         </div>
         {Array.from({ length: last - first }, (_, offset) => {
-          const row = first + offset;
+          const row = rows[first + offset];
           const height = sheet.heights[row] ?? 28;
           return (
             <div
@@ -156,7 +174,7 @@ export function SheetGrid({
               aria-rowindex={row + 1}
               style={{
                 position: "absolute",
-                top: rowOffsets[row],
+                top: rowOffsets[first + offset],
                 height,
                 left: 0,
                 width: columnOffsets[COLUMNS],
