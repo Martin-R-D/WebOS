@@ -1,3 +1,5 @@
+import { AppHeading } from "../shared/AppHeading";
+import { Images } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppProps } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
@@ -80,7 +82,13 @@ export function Photos({ launchProps }: AppProps) {
   }
 
   return (
-    <div className="photos" ref={container}>
+    <div className="photos app-design" ref={container}>
+      <AppHeading
+        icon={Images}
+        title="Photos"
+        subtitle="YOUR MOMENTS"
+        detail={`${images.length} images`}
+      />
       <div className="photos__toolbar">
         <label>
           Folder{" "}
