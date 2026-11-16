@@ -112,3 +112,14 @@ it("searches inside table cells without joining adjacent cells", () => {
     }),
   ).toHaveLength(0);
 });
+
+it("handles astral letters, emoji and isolated surrogate characters", () => {
+  const doc = schema.node(
+    "doc",
+    null,
+    schema.node("paragraph", null, schema.text("𐐀cat cat𐐀 😀cat \udc00cat")),
+  );
+  expect(
+    findMatches(doc, { query: "cat", matchCase: false, wholeWord: true }),
+  ).toHaveLength(2);
+});

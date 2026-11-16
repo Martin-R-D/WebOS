@@ -112,3 +112,15 @@
     max-height: 50px;
   }
 }
+
+.writer__match {
+  background: #fef08a;
+  color: #202020;
+}
+.writer__match--current {
+  background: #fb923c;
+  outline: 1px solid #9a3412;
+}
+.writer__find input:not([type="checkbox"]) {
+  width: min(180px, 100%);
+}

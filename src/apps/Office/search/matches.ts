@@ -23,15 +23,8 @@ export function findMatches(doc: Node, options: SearchOptions): SearchMatch[] {
       const start = match.index;
       const end = start + match[0].length;
       const before =
-        start > 0
-          ? String.fromCodePoint(
-              text.codePointAt(
-                start - (/[\uDC00-\uDFFF]/.test(text[start - 1]) ? 2 : 1),
-              )!,
-            )
-          : "";
-      const after =
-        end < text.length ? String.fromCodePoint(text.codePointAt(end)!) : "";
+        Array.from(text.slice(Math.max(0, start - 2), start)).at(-1) ?? "";
+      const after = Array.from(text.slice(end, end + 2))[0] ?? "";
       if (
         options.wholeWord &&
         (/[\p{L}\p{N}_]/u.test(before) || /[\p{L}\p{N}_]/u.test(after))
