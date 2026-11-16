@@ -32,7 +32,7 @@ export function Writer(props: AppProps) {
       TextStyleKit,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TableKit,
-      Image.configure({ allowBase64: true }),
+      Image.configure({ allowBase64: true, inline: true }),
     ],
     content: doc.content.body ?? empty,
     editorProps: {
@@ -51,6 +51,9 @@ export function Writer(props: AppProps) {
       bold: current?.isActive("bold"),
       italic: current?.isActive("italic"),
       underline: current?.isActive("underline"),
+      block: current?.getAttributes("heading").level?.toString() ?? "paragraph",
+      font: current?.getAttributes("textStyle").fontFamily ?? "Arial",
+      size: current?.getAttributes("textStyle").fontSize ?? "16px",
       text: current?.getText() ?? "",
     }),
   });
@@ -159,7 +162,7 @@ export function Writer(props: AppProps) {
         </button>
         <select
           aria-label="Paragraph style"
-          defaultValue="paragraph"
+          value={state?.block ?? "paragraph"}
           onChange={(event) => {
             if (event.target.value === "paragraph")
               editor.chain().focus().setParagraph().run();
@@ -180,6 +183,7 @@ export function Writer(props: AppProps) {
         </select>
         <select
           aria-label="Font"
+          value={state?.font ?? "Arial"}
           onChange={(event) =>
             editor.chain().focus().setFontFamily(event.target.value).run()
           }
@@ -190,7 +194,7 @@ export function Writer(props: AppProps) {
         </select>
         <select
           aria-label="Font size"
-          defaultValue="16px"
+          value={state?.size ?? "16px"}
           onChange={(event) =>
             editor.chain().focus().setFontSize(event.target.value).run()
           }
@@ -251,6 +255,27 @@ export function Writer(props: AppProps) {
           Link
         </button>
         <button onClick={() => imageInput.current?.click()}>Image</button>
+        <label>
+          Image width
+          <select
+            aria-label="Image width"
+            defaultValue="320"
+            onChange={(event) =>
+              editor
+                .chain()
+                .focus()
+                .updateAttributes("image", {
+                  width: Number(event.target.value),
+                  height: null,
+                })
+                .run()
+            }
+          >
+            <option value="160">Small</option>
+            <option value="320">Medium</option>
+            <option value="640">Large</option>
+          </select>
+        </label>
         <button
           onClick={() =>
             editor

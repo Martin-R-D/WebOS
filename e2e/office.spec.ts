@@ -58,3 +58,29 @@ test("Writer formats, saves, reopens and protects unsaved work", async ({
     .click();
   await expect(page.locator(".office")).toHaveCount(0);
 });
+
+test("Writer embeds and sizes images and inserts tables", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Writer");
+  await page
+    .locator('input[accept="image/png,image/jpeg,image/webp"]')
+    .setInputFiles({
+      name: "pixel.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+        "base64",
+      ),
+    });
+  const image = page
+    .getByRole("textbox", { name: "Document content" })
+    .getByRole("img", { name: "pixel.png" });
+  await expect(image).toHaveAttribute("src", /^data:image\/png;base64,/);
+  await image.click();
+  await page.getByLabel("Image width").selectOption("160");
+  await expect(image).toHaveAttribute("width", "160");
+  await page.getByRole("button", { name: "Table", exact: true }).click();
+  await expect(page.locator(".tiptap table")).toHaveCount(1);
+  await expect(page.locator(".tiptap tr")).toHaveCount(3);
+});

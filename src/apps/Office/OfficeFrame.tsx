@@ -83,6 +83,8 @@ export function OfficeFrame({
             try {
               if (file.size > 4_000_000)
                 throw new Error("Import files must be smaller than 4 MB.");
+              if (officeKind(file.name) !== kind)
+                throw new Error("Choose a native document for this app.");
               const raw = await file.text();
               decodeDocument(raw, kind);
               const fs = useFileSystemStore.getState();
