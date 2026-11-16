@@ -361,6 +361,8 @@ export function Desktop({ children }: { children?: ReactNode }) {
                 appDef.icon
               ] ?? Icons.FileText;
             label = node.name.replace(/\.app$/, "");
+          } else if (node.name.toLowerCase().endsWith(".wslides")) {
+            Icon = Icons.Presentation;
           } else if (node.name.toLowerCase().endsWith(".wdoc")) {
             Icon = Icons.FileType;
           } else if (isImageFile(node.name)) {

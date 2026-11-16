@@ -55,11 +55,13 @@ export function openFsNode(node: FsNode) {
   if (!node.name.endsWith(".app"))
     useRecentFilesStore.getState().record(node.id);
 
-  const appId: AppId = node.name.toLowerCase().endsWith(".wdoc")
-    ? "writer"
-    : isImageFile(node.name)
-      ? "paint"
-      : "text-editor";
+  const appId: AppId = node.name.toLowerCase().endsWith(".wslides")
+    ? "slides"
+    : node.name.toLowerCase().endsWith(".wdoc")
+      ? "writer"
+      : isImageFile(node.name)
+        ? "paint"
+        : "text-editor";
   const existing = windows.find(
     (w) => w.appId === appId && w.launchProps?.fileId === node.id,
   );

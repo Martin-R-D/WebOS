@@ -438,6 +438,8 @@ export function FileExplorer({ launchProps }: AppProps) {
                     appDef.icon
                   ] ?? FileText;
                 displayName = node.name.replace(/\.app$/, "");
+              } else if (node.name.toLowerCase().endsWith(".wslides")) {
+                NodeIcon = Icons.Presentation;
               } else if (node.name.toLowerCase().endsWith(".wdoc")) {
                 NodeIcon = Icons.FileType;
               } else if (isImageFile(node.name)) {
