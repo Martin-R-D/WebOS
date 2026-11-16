@@ -102,3 +102,22 @@ it("does not overwrite malformed files", () => {
   act(() => result.current.save());
   expect(useFileSystemStore.getState().nodes[id].content).toBe("broken");
 });
+
+it("does not offer another open window's recovery draft", async () => {
+  const first = renderHook(() =>
+    useOfficeDocument("writer", { windowId: "first-editor" }, {}),
+  );
+  act(() => first.result.current.setContent({ body: "active work" }));
+  await waitFor(() => expect(listRecovery("writer")).toHaveLength(1), {
+    timeout: 2000,
+  });
+  const second = renderHook(() =>
+    useOfficeDocument("writer", { windowId: "second-editor" }, {}),
+  );
+  expect(second.result.current.drafts).toHaveLength(0);
+  first.unmount();
+  const reopened = renderHook(() =>
+    useOfficeDocument("writer", { windowId: "third-editor" }, {}),
+  );
+  expect(reopened.result.current.drafts).toHaveLength(1);
+});

@@ -103,3 +103,12 @@
   max-height: 140px;
   overflow: auto;
 }
+
+@media (max-height: 500px) {
+  .office__toolbar {
+    max-height: 64px;
+  }
+  .sheets__dimensions {
+    max-height: 50px;
+  }
+}
