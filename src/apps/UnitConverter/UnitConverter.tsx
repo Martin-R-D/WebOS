@@ -1,3 +1,5 @@
+import { AppHeading } from "../shared/AppHeading";
+import { ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
 import type { AppProps } from "../../types";
 import { useConverterStore } from "../../stores/useConverterStore";
@@ -30,7 +32,12 @@ export function UnitConverter(_props: AppProps) {
   }
 
   return (
-    <section className="converter" aria-label="Unit Converter">
+    <section className="converter app-design" aria-label="Unit Converter">
+      <AppHeading
+        icon={ArrowLeftRight}
+        title="Unit Converter"
+        subtitle="EVERYDAY CALCULATIONS"
+      />
       <label>
         Category
         <select
