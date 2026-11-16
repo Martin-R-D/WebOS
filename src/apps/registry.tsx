@@ -41,7 +41,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     icon: "Timer",
     component: FocusTimer,
     defaultWidth: 480,
-    defaultHeight: 560,
+    defaultHeight: 780,
     minWidth: 300,
     minHeight: 300,
     singleInstance: true,

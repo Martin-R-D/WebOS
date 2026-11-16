@@ -1,3 +1,5 @@
+import { AppHeading } from "../shared/AppHeading";
+import { Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AppProps } from "../../types";
 import {
@@ -21,7 +23,12 @@ export function FocusTimer({}: AppProps) {
   );
   const today = state.completed.filter((entry) => entry.day === localDay(now));
   return (
-    <div className="focus-timer">
+    <div className="focus-timer app-design">
+      <AppHeading
+        icon={Timer}
+        title="Focus Timer"
+        subtitle="MAKE ROOM TO FOCUS"
+      />
       <h2>{labels[state.phase]}</h2>
       <output aria-label="Time remaining">
         {String(Math.floor(seconds / 60)).padStart(2, "0")}:
