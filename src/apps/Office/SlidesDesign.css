@@ -1,0 +1,116 @@
+.office--slides {
+  --editor-color: #e78a51;
+  background: var(--color-bg);
+}
+
+.office--slides .office__toolbar {
+  background: var(--color-surface);
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.office--slides > header.office__toolbar {
+  border-top: 3px solid var(--editor-color);
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--editor-color) 15%, var(--color-surface)),
+    var(--color-surface)
+  );
+}
+
+.office--slides
+  :is(.office__toolbar, .slides__editor)
+  :is(button, select, input),
+.office--slides textarea {
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.office--slides .slides__navigator {
+  padding: 12px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.office--slides .slides__navigator button {
+  padding: 6px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.office--slides .slides__navigator button[aria-current] {
+  outline-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface));
+}
+
+.office--slides .slides__editor {
+  padding: 24px;
+  background:
+    radial-gradient(
+      ellipse at top,
+      color-mix(in srgb, var(--color-accent) 10%, transparent),
+      transparent
+    ),
+    var(--color-bg);
+}
+
+.office--slides .slides__editor > .slides__canvas {
+  box-shadow: 0 8px 28px #0003;
+}
+
+.office--slides .slides__properties {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.office--slides .slides__notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  margin-top: 20px;
+  color: var(--color-text-dim);
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .office--slides .slides__editor {
+    padding: 10px;
+  }
+}
+
+.office--slides .slides__editor > label:not(.slides__notes) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px 12px 0;
+}
+
+.office--slides .slides__properties input[type="number"] {
+  width: 96px;
+}
+
+.office--slides :is(button, select, input, textarea):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .office--slides .slides__navigator {
+    flex-basis: 110px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .office--slides .slides__navigator button {
+    margin-bottom: 0;
+  }
+}
