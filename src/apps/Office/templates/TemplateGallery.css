@@ -1,0 +1,20 @@
+.templates {
+  width: min(560px, 95vw);
+  max-height: 85vh;
+  overflow: auto;
+  box-sizing: border-box;
+}
+.templates__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.templates__choices [aria-pressed="true"] {
+  outline: 2px solid #2563eb;
+}
+.templates__preview {
+  padding: 16px;
+  margin: 16px 0;
+  border: 1px solid var(--color-border);
+  overflow-wrap: anywhere;
+}
