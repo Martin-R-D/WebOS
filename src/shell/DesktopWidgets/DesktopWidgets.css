@@ -1,0 +1,92 @@
+.widgets {
+  position: absolute;
+  inset: 0 0 80px;
+  pointer-events: none;
+  z-index: 1;
+}
+.widgets button,
+.widgets select {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding: 6px;
+}
+.widgets__add {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  pointer-events: auto;
+  z-index: 2;
+}
+.widgets__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: var(--color-bg);
+}
+.widgets__card {
+  position: absolute;
+  pointer-events: auto;
+  width: 240px;
+  height: 220px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 16px #0004;
+}
+.widgets__card--large {
+  width: 320px;
+  height: 300px;
+}
+.widgets__card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+.widgets__handle {
+  touch-action: none;
+  cursor: grab;
+}
+.widgets__content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.widgets__content p {
+  margin: 6px 0;
+}
+.widgets__time {
+  display: block;
+  font-size: 28px;
+}
+.widgets__task {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0;
+}
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+  .widgets__items {
+    position: absolute;
+    top: 56px;
+    right: 8px;
+    left: 100px;
+    bottom: 4px;
+    overflow: auto;
+  }
+  .widgets__card,
+  .widgets__card--large {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+    margin-bottom: 12px;
+  }
+}

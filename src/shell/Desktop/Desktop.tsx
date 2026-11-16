@@ -1,3 +1,4 @@
+import { DesktopWidgets } from "../DesktopWidgets/DesktopWidgets";
 import { PropertiesDialog } from "../FileDialogs/PropertiesDialog";
 import { useState, type ReactNode } from "react";
 import * as Icons from "lucide-react";
@@ -268,6 +269,7 @@ export function Desktop({ children }: { children?: ReactNode }) {
       onDragOver={handleDesktopDragOver}
       onDrop={handleDesktopDrop}
     >
+      <DesktopWidgets />
       <div className="desktop__icons">
         {APP_SHORTCUTS.map((appId) => {
           const app = appRegistry[appId];

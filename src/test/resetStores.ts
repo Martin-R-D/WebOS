@@ -1,3 +1,4 @@
+import { useWidgetsStore } from "../stores/useWidgetsStore";
 import { useFocusStore } from "../stores/useFocusStore";
 import { useBookmarksStore } from "../stores/useBookmarksStore";
 import { useExplorerSettingsStore } from "../stores/useExplorerSettingsStore";
@@ -15,6 +16,7 @@ import { useNotificationStore } from "../stores/useNotificationStore";
 import { useEditorSettingsStore } from "../stores/useEditorSettingsStore";
 
 export function resetAllStores() {
+  useWidgetsStore.setState(useWidgetsStore.getInitialState(), true);
   useFocusStore.setState(useFocusStore.getInitialState(), true);
   useBookmarksStore.setState(useBookmarksStore.getInitialState(), true);
   useExplorerSettingsStore.setState(
