@@ -110,7 +110,6 @@ describe("RecycleBin app", () => {
     fireEvent.click(
       within(screen.getByRole("dialog")).getByRole("button", {
         name: "Restore",
-        exact: true,
       }),
     );
     expect(useFileSystemStore.getState().nodes[id].name).toBe(
@@ -135,7 +134,6 @@ describe("RecycleBin app", () => {
     fireEvent.click(
       within(screen.getByRole("dialog")).getByRole("button", {
         name: "Restore",
-        exact: true,
       }),
     );
     expect(useFileSystemStore.getState().nodes[id].parentId).toBe(fs.rootId);
