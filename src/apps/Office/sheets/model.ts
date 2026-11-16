@@ -13,7 +13,7 @@ export interface CellStyle {
   decimals?: number;
 }
 
-export interface Cell {
+interface Cell {
   raw: string;
   style?: CellStyle;
 }
@@ -69,7 +69,10 @@ export function validSheetName(
     name.trim() === name &&
     name.length > 0 &&
     name.length <= 31 &&
-    !Array.from(name).some((character) => "!:'[]/*?\\".includes(character)) &&
+    !Array.from(name).some(
+      (character) =>
+        character.charCodeAt(0) < 32 || "!:'[]/*?\\".includes(character),
+    ) &&
     !sheets.some(
       (sheet) =>
         sheet.id !== exceptId &&

@@ -72,6 +72,7 @@ test("all apps and dialogs fit a narrow phone", async ({ page }) => {
     "To-Do List",
     "Writer",
     "Slides",
+    "Sheets",
   ]) {
     await launch(page, name);
     const win = page.locator(".window:not([hidden])");

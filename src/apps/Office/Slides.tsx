@@ -249,8 +249,9 @@ export function Slides(props: AppProps) {
                       type="number"
                       min="8"
                       max="200"
-                      value={selected.fontSize}
-                      onChange={(event) =>
+                      key={`${selected.id}-${selected.fontSize}`}
+                      defaultValue={selected.fontSize}
+                      onBlur={(event) =>
                         updateElement({
                           ...selected,
                           fontSize: Math.max(
@@ -319,8 +320,9 @@ export function Slides(props: AppProps) {
                     aria-label={`Element ${key}`}
                     type="number"
                     min={key === "width" || key === "height" ? 20 : 0}
-                    value={Math.round(selected[key])}
-                    onChange={(event) => {
+                    key={`${selected.id}-${key}-${selected[key]}`}
+                    defaultValue={Math.round(selected[key])}
+                    onBlur={(event) => {
                       const limit =
                         key === "x"
                           ? 1280 - selected.width

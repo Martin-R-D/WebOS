@@ -17,6 +17,7 @@ export interface FsNode {
 export type AppId =
   | "writer"
   | "slides"
+  | "sheets"
   | "file-explorer"
   | "text-editor"
   | "terminal"

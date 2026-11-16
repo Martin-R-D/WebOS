@@ -170,3 +170,97 @@ test("Slides desktop drag moves and resizes an element", async ({ page }) => {
     ),
   ).toBeCloseTo(width + 50, 0);
 });
+
+test("Sheets calculates, copies formulas, manages sheets and reopens a workbook", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Sheets");
+  async function setCell(key: string, raw: string) {
+    await page.getByLabel("Selected range").fill(key);
+    await page.getByLabel("Formula or value").fill(raw);
+    await page
+      .getByRole("button", { name: "Apply value", exact: true })
+      .click();
+  }
+  await setCell("A1", "10");
+  await setCell("A2", "20");
+  await setCell("B1", "=SUM(A1:A2)");
+  await expect(
+    page.getByRole("gridcell", { name: "B1", exact: true }),
+  ).toHaveText("30");
+  await page
+    .getByRole("button", { name: "Copy selection", exact: true })
+    .click();
+  await page.getByLabel("Selected range").fill("B2");
+  await page.getByRole("button", { name: "Paste data", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Paste", exact: true })
+    .click();
+  await expect(page.getByLabel("Formula or value")).toHaveValue("=SUM(A2:A3)");
+  await expect(
+    page.getByRole("gridcell", { name: "B2", exact: true }),
+  ).toHaveText("20");
+  await page.getByRole("button", { name: "Add sheet", exact: true }).click();
+  await setCell("A1", "=Sheet1!B1*2");
+  await expect(
+    page.getByRole("gridcell", { name: "A1", exact: true }),
+  ).toHaveText("60");
+  await page.getByRole("button", { name: "Save As", exact: true }).click();
+  await page.getByLabel("File name").fill("Budget.wsheet");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Save", exact: true })
+    .click();
+  await page.reload();
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "File Explorer");
+  await page.getByRole("button", { name: "Actions for Budget.wsheet" }).click();
+  await page
+    .locator(".ctx-menu")
+    .getByRole("button", { name: "Open", exact: true })
+    .click();
+  await page
+    .getByRole("navigation", { name: "Workbook sheets" })
+    .getByRole("button", { name: "Sheet2", exact: true })
+    .click();
+  await expect(
+    page.getByRole("gridcell", { name: "A1", exact: true }),
+  ).toHaveText("60");
+  expect(await page.getByRole("gridcell").count()).toBeLessThan(2000);
+});
+
+test("Sheets imports CSV and exports displayed values with an explicit format choice", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".boot")).toHaveCount(0);
+  await launch(page, "Sheets");
+  await page
+    .locator('input[accept=".csv,text/csv"]')
+    .setInputFiles({
+      name: "data.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from('Name,Amount\r\n"A, B",12.5'),
+    });
+  await expect(
+    page.getByRole("gridcell", { name: "A2", exact: true }),
+  ).toHaveText("A, B");
+  await page.getByLabel("Selected range").fill("B2");
+  await page.getByLabel("Number format").selectOption("currency");
+  await expect(
+    page.getByRole("gridcell", { name: "B2", exact: true }),
+  ).toHaveText("$12.50");
+  await page.getByRole("button", { name: "Export CSV", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Export CSV", exact: true }),
+  ).toContainText("does not preserve formulas");
+  const download = page.waitForEvent("download");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Export", exact: true })
+    .click();
+  expect((await download).suggestedFilename()).toBe("Import1.csv");
+});
