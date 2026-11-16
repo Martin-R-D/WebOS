@@ -14,9 +14,9 @@ export function contentBytes(content = ""): number {
   return new TextEncoder().encode(content).length;
 }
 
-export function fileProperties(nodes: Record<string, FsNode>, id: string) {
+export function filePath(nodes: Record<string, FsNode>, id: string): string {
   const node = nodes[id];
-  if (!node) return null;
+  if (!node) return "";
   const parts: string[] = [];
   const ancestors = new Set<string>();
   let current: FsNode | undefined = node;
@@ -25,6 +25,14 @@ export function fileProperties(nodes: Record<string, FsNode>, id: string) {
     parts.unshift(current.name);
     current = nodes[current.parentId];
   }
+
+  return "/" + parts.join("/");
+}
+
+export function fileProperties(nodes: Record<string, FsNode>, id: string) {
+  const node = nodes[id];
+  if (!node) return null;
+  const path = filePath(nodes, id);
 
   const children = new Map<string, FsNode[]>();
   for (const item of Object.values(nodes)) {
@@ -50,5 +58,5 @@ export function fileProperties(nodes: Record<string, FsNode>, id: string) {
       queue.push(...(children.get(item.id) ?? []));
     }
   }
-  return { path: "/" + parts.join("/"), bytes, files, folders };
+  return { path, bytes, files, folders };
 }
