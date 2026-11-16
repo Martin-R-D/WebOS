@@ -42,3 +42,70 @@
 .focus-timer input[type="number"] {
   width: 90px;
 }
+
+.focus-timer.app-design {
+  padding: 24px;
+}
+.focus-timer .app-heading {
+  text-align: left;
+}
+.focus-timer > h2 {
+  font-size: 12px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+  margin: 8px 0 18px;
+}
+.focus-timer output {
+  display: grid;
+  place-items: center;
+  width: min(230px, 85%);
+  aspect-ratio: 1;
+  margin: auto;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--color-surface) 62%,
+    var(--app-tint) 63%
+  );
+  border: 8px solid
+    color-mix(in srgb, var(--color-accent) 55%, var(--color-surface));
+  box-shadow:
+    0 0 0 8px var(--app-tint),
+    0 16px 40px #0001;
+  font-size: clamp(42px, 14cqw, 62px);
+  font-weight: 650;
+  letter-spacing: -0.06em;
+}
+.focus-timer > p {
+  color: var(--color-text-dim);
+  line-height: 1.6;
+  font-size: 12px;
+}
+.focus-timer__actions {
+  margin: 20px 0;
+}
+.focus-timer__actions button:first-child {
+  background: var(--color-text);
+  color: var(--color-bg);
+  min-width: 110px;
+  border-radius: 24px;
+  font-weight: 700;
+}
+.focus-timer fieldset {
+  border-radius: 16px;
+  padding: 16px;
+  background: var(--color-surface);
+}
+.focus-timer legend {
+  padding: 0 8px;
+  color: var(--color-text-dim);
+  font-size: 11px;
+}
+.focus-timer > p:nth-last-child(2) {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--app-tint);
+  color: var(--color-text);
+  font-weight: 600;
+}
