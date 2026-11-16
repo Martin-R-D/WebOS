@@ -1,3 +1,5 @@
+import { AppHeading } from "../shared/AppHeading";
+import { Music2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { AppProps } from "../../types";
 import { useFileSystemStore } from "../../stores/useFileSystemStore";
@@ -200,7 +202,13 @@ export function Music({ launchProps }: AppProps) {
     }
   }
   return (
-    <div className="music">
+    <div className="music app-design">
+      <AppHeading
+        icon={Music2}
+        title="Music"
+        subtitle="YOUR SOUNDTRACK"
+        detail={`${tracks.length} tracks`}
+      />
       <div className="music__toolbar">
         <label>
           Import audio
@@ -281,6 +289,9 @@ export function Music({ launchProps }: AppProps) {
               aria-pressed={selected === track.id}
               onClick={() => choose(track.id)}
             >
+              <span className="music__track-icon" aria-hidden="true">
+                ♫
+              </span>
               {track.name}
             </button>
             {list ? (

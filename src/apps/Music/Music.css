@@ -57,3 +57,102 @@
   flex: 1;
   min-width: 100px;
 }
+
+.music.app-design {
+  padding: 24px;
+  gap: 16px;
+}
+.music__toolbar {
+  gap: 10px;
+}
+.music > .music__toolbar {
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.music__library {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 8px;
+  background: var(--color-surface);
+}
+.music__library > p {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--color-text-dim);
+  line-height: 1.7;
+}
+.music__track {
+  margin: 0;
+  padding: 8px;
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+}
+.music__track:last-child {
+  border: 0;
+}
+.music__track > button:first-child {
+  border-color: transparent;
+  font-weight: 600;
+  padding: 14px;
+}
+.music__track-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+  border-radius: 9px;
+  background: var(--app-tint);
+  color: var(--color-text);
+}
+.music__player {
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  background: linear-gradient(125deg, var(--app-tint), var(--color-surface));
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 24px #0001;
+}
+.music__player > strong {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.music__player > span {
+  color: var(--color-text-dim);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.music__player .music__toolbar > button:nth-child(2) {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-radius: 24px;
+  padding-inline: 24px;
+  font-weight: 700;
+}
+@container (max-width: 440px) {
+  .music__track > select {
+    width: 100%;
+  }
+  .music__player {
+    padding: 14px;
+  }
+}
+@media (max-width: 600px) {
+  .music.app-design {
+    padding: 14px;
+  }
+}
+
+.music input[type="file"]::file-selector-button {
+  padding: 7px 12px;
+  margin-right: 10px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--app-tint);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
