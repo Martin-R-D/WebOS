@@ -1,3 +1,4 @@
+import { adjustTable } from "./tableStructure";
 import { address, COLUMNS, columnName, position, ROWS } from "./model";
 import type { Workbook, Worksheet } from "./model";
 
@@ -191,6 +192,10 @@ export function changeStructure(
       }
       return {
         ...sheet,
+        table:
+          sheet.id === id
+            ? adjustTable(sheet.table, axis, index, deleting)
+            : sheet.table,
         cells,
         ...(sheet.id === id
           ? axis === "row"
