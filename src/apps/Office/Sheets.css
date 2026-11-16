@@ -79,3 +79,33 @@
   max-width: 100%;
   min-height: 100px;
 }
+
+.sheets__data {
+  max-height: 200px;
+}
+.sheets__filter-values {
+  max-height: 100px;
+  overflow: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sheets__grid {
+  min-height: 0;
+}
+@media (max-height: 500px) {
+  .sheets__data {
+    max-height: 80px;
+  }
+}
+
+.sheets__data select,
+.sheets__data input {
+  max-width: 100%;
+  min-width: 0;
+}
+.sheets__filter-values label {
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
