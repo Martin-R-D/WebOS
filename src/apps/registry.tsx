@@ -1,3 +1,4 @@
+import { Photos } from "./Photos/Photos";
 import { OfficeHub } from "./Office/OfficeHub";
 import { Sheets } from "./Office/Sheets";
 import { Slides } from "./Office/Slides";
@@ -21,6 +22,16 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  photos: {
+    id: "photos",
+    name: "Photos",
+    icon: "Images",
+    component: Photos,
+    defaultWidth: 900,
+    defaultHeight: 640,
+    minWidth: 300,
+    minHeight: 300,
+  },
   office: {
     id: "office",
     name: "Office",
