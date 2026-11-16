@@ -86,9 +86,9 @@ test("Music imports audio, plays it and persists playlists", async ({
     const path = "/src/stores/useFileSystemStore.ts";
     const { useFileSystemStore } = await import(path);
     const fs = useFileSystemStore.getState();
-    const file = Object.values(fs.nodes).find(
-      (node: { name: string }) => node.name === "sample.wav",
-    ) as { id: string; content: string };
+    const file = (
+      Object.values(fs.nodes) as { id: string; name: string; content: string }[]
+    ).find((node) => node.name === "sample.wav")!;
     fs.deleteNode(file.id);
     fs.permanentlyDelete(file.id);
     return file.content.slice(12);
