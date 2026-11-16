@@ -1,3 +1,4 @@
+import "./SlidesDesign.css";
 import { PresenterView } from "./presentation/PresenterView";
 import { useRef, useState } from "react";
 import type { AppProps } from "../../types";
