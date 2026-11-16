@@ -30,7 +30,7 @@ export const appRegistry: Record<AppId, AppDefinition> = {
     icon: "Music",
     component: Music,
     defaultWidth: 800,
-    defaultHeight: 600,
+    defaultHeight: 720,
     minWidth: 300,
     minHeight: 300,
     singleInstance: true,
