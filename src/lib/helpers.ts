@@ -27,6 +27,7 @@ export function cx(...classes: (string | false | undefined | null)[]): string {
 
 export function factoryReset() {
   clearOfficeRecovery();
+  localStorage.removeItem("webos-focus");
   localStorage.removeItem("webos-bookmarks");
   localStorage.removeItem("webos-explorer-settings");
   localStorage.removeItem("webos-todos");
