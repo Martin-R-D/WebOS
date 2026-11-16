@@ -56,6 +56,7 @@ const SYSTEM_APP_FILES: [string, string][] = [
   ["File Explorer.app", "file-explorer"],
   ["Writer.app", "writer"],
   ["Office.app", "office"],
+  ["Photos.app", "photos"],
   ["Slides.app", "slides"],
   ["Sheets.app", "sheets"],
   ["Text Editor.app", "text-editor"],
@@ -384,7 +385,7 @@ export const useFileSystemStore = create<FsState>()(
     }),
     {
       name: "webos-filesystem",
-      version: 13,
+      version: 14,
       partialize: (state) => ({
         nodes: state.nodes,
         rootId: state.rootId,
@@ -397,7 +398,7 @@ export const useFileSystemStore = create<FsState>()(
           deletedNodes?: Record<string, DeletedEntry>;
         };
         if (!state.deletedNodes) state.deletedNodes = {};
-        if (version < 13) {
+        if (version < 14) {
           // ensure the System Apps folder exists
           let sysFolder = Object.values(state.nodes).find(
             (n) =>

@@ -16,7 +16,7 @@ export function isImageFile(name: string): boolean {
  * Open a filesystem node in the right app:
  *  - folder      -> File Explorer
  *  - *.app file  -> launch the referenced app
- *  - image file  -> Paint
+ *  - image file  -> Photos
  *  - other file  -> Text Editor
  * Reuses an already-open window for the same target when possible.
  */
@@ -62,7 +62,7 @@ export function openFsNode(node: FsNode) {
       : node.name.toLowerCase().endsWith(".wdoc")
         ? "writer"
         : isImageFile(node.name)
-          ? "paint"
+          ? "photos"
           : "text-editor";
   const existing = windows.find(
     (w) => w.appId === appId && w.launchProps?.fileId === node.id,

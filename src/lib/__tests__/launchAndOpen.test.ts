@@ -9,7 +9,9 @@ import type { FsNode } from "../../types";
 
 const wins = () => useWindowStore.getState().windows;
 const fsNode = (name: string): FsNode =>
-  Object.values(useFileSystemStore.getState().nodes).find((n) => n.name === name)!;
+  Object.values(useFileSystemStore.getState().nodes).find(
+    (n) => n.name === name,
+  )!;
 
 describe("launchApp", () => {
   beforeEach(resetAllStores);
@@ -54,12 +56,18 @@ describe("launchApp", () => {
 });
 
 describe("isImageFile", () => {
-  it.each(["a.png", "a.JPG", "photo.jpeg", "x.gif", "x.webp", "x.bmp"])("%s is an image", (name) => {
-    expect(isImageFile(name)).toBe(true);
-  });
-  it.each(["a.txt", "png", "archive.png.zip", "notes", ""])("%s is not an image", (name) => {
-    expect(isImageFile(name)).toBe(false);
-  });
+  it.each(["a.png", "a.JPG", "photo.jpeg", "x.gif", "x.webp", "x.bmp"])(
+    "%s is an image",
+    (name) => {
+      expect(isImageFile(name)).toBe(true);
+    },
+  );
+  it.each(["a.txt", "png", "archive.png.zip", "notes", ""])(
+    "%s is not an image",
+    (name) => {
+      expect(isImageFile(name)).toBe(false);
+    },
+  );
 });
 
 describe("openFsNode", () => {
@@ -70,7 +78,9 @@ describe("openFsNode", () => {
     openFsNode(docs);
     expect(wins()).toHaveLength(1);
     expect(wins()[0]).toMatchObject({
-      appId: "file-explorer", title: "Documents", launchProps: { folderId: docs.id },
+      appId: "file-explorer",
+      title: "Documents",
+      launchProps: { folderId: docs.id },
     });
   });
 
@@ -88,7 +98,10 @@ describe("openFsNode", () => {
   });
 
   it("falls back to the text editor when a .app shortcut points at an unknown app", () => {
-    const bogus: FsNode = { ...fsNode("Calculator.app"), content: "not-an-app" };
+    const bogus: FsNode = {
+      ...fsNode("Calculator.app"),
+      content: "not-an-app",
+    };
     openFsNode(bogus);
     expect(wins().map((w) => w.appId)).toEqual(["text-editor"]);
   });
@@ -97,15 +110,26 @@ describe("openFsNode", () => {
     const file = fsNode("readme.txt");
     openFsNode(file);
     expect(wins()[0]).toMatchObject({
-      appId: "text-editor", title: "readme.txt", launchProps: { fileId: file.id },
+      appId: "text-editor",
+      title: "readme.txt",
+      launchProps: { fileId: file.id },
     });
   });
 
-  it("opens image files in Paint", () => {
+  it("opens image files in Photos", () => {
     const store = useFileSystemStore.getState();
-    const id = store.createNode(fsNode("Pictures").id, "drawing.PNG", "file", "data:image/png;base64,AAAA");
+    const id = store.createNode(
+      fsNode("Pictures").id,
+      "drawing.PNG",
+      "file",
+      "data:image/png;base64,AAAA",
+    );
     openFsNode(store.getNode(id)!);
-    expect(wins()[0]).toMatchObject({ appId: "paint", title: "drawing.PNG", launchProps: { fileId: id } });
+    expect(wins()[0]).toMatchObject({
+      appId: "photos",
+      title: "drawing.PNG",
+      launchProps: { fileId: id },
+    });
   });
 
   it("does not open the same file twice", () => {
