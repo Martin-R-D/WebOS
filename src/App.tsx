@@ -1,3 +1,4 @@
+import { FocusRuntime } from "./apps/FocusTimer/FocusRuntime";
 import type { SearchResult } from "./shell/SystemSearch/searchIndex";
 import { activateResult } from "./shell/SystemSearch/activateResult";
 import { useNotificationStore } from "./stores/useNotificationStore";
@@ -71,6 +72,7 @@ function App() {
 
   return (
     <Desktop>
+      <FocusRuntime />
       {windows.map((w) => (
         <Window key={w.id} win={w} />
       ))}

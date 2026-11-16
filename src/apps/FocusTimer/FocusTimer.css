@@ -1,0 +1,44 @@
+.focus-timer {
+  height: 100%;
+  overflow: auto;
+  padding: 20px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  text-align: center;
+}
+.focus-timer output {
+  display: block;
+  font-size: clamp(40px, 9vw, 64px);
+  font-variant-numeric: tabular-nums;
+}
+.focus-timer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+.focus-timer button,
+.focus-timer input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: inherit;
+}
+.focus-timer fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border);
+}
+.focus-timer fieldset label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.focus-timer input[type="number"] {
+  width: 90px;
+}
