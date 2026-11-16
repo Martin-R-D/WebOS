@@ -1,3 +1,4 @@
+import { clearOfficeRecovery } from "../apps/Office/recovery";
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
@@ -25,6 +26,7 @@ export function cx(...classes: (string | false | undefined | null)[]): string {
 }
 
 export function factoryReset() {
+  clearOfficeRecovery();
   localStorage.removeItem("webos-bookmarks");
   localStorage.removeItem("webos-explorer-settings");
   localStorage.removeItem("webos-todos");

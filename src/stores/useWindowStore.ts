@@ -1,3 +1,4 @@
+import { canCloseWindow } from "../lib/windowCloseGuard";
 import { create } from "zustand";
 import type { AppId, WindowState } from "../types";
 
@@ -73,6 +74,7 @@ export const useWindowStore = create<WindowStoreState>()((set, get) => ({
   },
 
   closeWindow: (id) => {
+    if (!canCloseWindow(id)) return;
     set((state) => {
       const remaining = state.windows.filter((w) => w.id !== id);
       let newFocused: string | null = null;
