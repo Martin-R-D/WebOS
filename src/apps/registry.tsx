@@ -1,3 +1,4 @@
+import { Slides } from "./Office/Slides";
 import { Writer } from "./Office/Writer";
 import { TodoList } from "./TodoList/TodoList";
 import { UnitConverter } from "./UnitConverter/UnitConverter";
@@ -18,6 +19,16 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  slides: {
+    id: "slides",
+    name: "Slides",
+    icon: "Presentation",
+    component: Slides,
+    defaultWidth: 1000,
+    defaultHeight: 700,
+    minWidth: 320,
+    minHeight: 320,
+  },
   writer: {
     id: "writer",
     name: "Writer",
