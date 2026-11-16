@@ -139,3 +139,29 @@ describe("openFsNode", () => {
     expect(wins()).toHaveLength(1);
   });
 });
+
+describe("audio file opening", () => {
+  beforeEach(resetAllStores);
+  it("retargets the single Music window when another audio file opens", () => {
+    const fs = useFileSystemStore.getState();
+    const first = fs.createNode(
+      fs.rootId,
+      "first.wav",
+      "file",
+      "webos-audio:first",
+    );
+    const second = fs.createNode(
+      fs.rootId,
+      "second.wav",
+      "file",
+      "webos-audio:second",
+    );
+    openFsNode(fs.getNode(first)!);
+    openFsNode(fs.getNode(second)!);
+    expect(wins()).toHaveLength(1);
+    expect(wins()[0]).toMatchObject({
+      appId: "music",
+      launchProps: { fileId: second },
+    });
+  });
+});

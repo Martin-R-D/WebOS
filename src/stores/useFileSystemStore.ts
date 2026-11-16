@@ -1,3 +1,6 @@
+import { audioId, deleteAudio } from "../lib/audioStorage";
+import { useMusicStore } from "./useMusicStore";
+import { notify } from "../lib/notify";
 import { useRecentFilesStore } from "./useRecentFilesStore";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -28,7 +31,7 @@ interface FsState {
   updateContent: (id: string, content: string) => void;
   moveNode: (id: string, newParentId: string) => void;
   getPath: (id: string) => string;
-  resetFileSystem: () => void;
+  resetFileSystem: () => Promise<void>;
   restoreNode: (id: string) => void;
   permanentlyDelete: (id: string) => void;
   emptyRecycleBin: () => void;
@@ -57,6 +60,7 @@ const SYSTEM_APP_FILES: [string, string][] = [
   ["Writer.app", "writer"],
   ["Office.app", "office"],
   ["Photos.app", "photos"],
+  ["Music.app", "music"],
   ["Focus Timer.app", "focus-timer"],
   ["Slides.app", "slides"],
   ["Sheets.app", "sheets"],
@@ -325,6 +329,17 @@ export const useFileSystemStore = create<FsState>()(
               }
             }
           }
+          const media = toRemove
+            .map((rid) => audioId(nextDeleted[rid]?.node.content))
+            .filter((id): id is string => !!id);
+          useMusicStore.getState().removeFiles(toRemove);
+          void deleteAudio(media).catch(() =>
+            notify(
+              "Music",
+              "Could not clean up deleted audio storage.",
+              "Music",
+            ),
+          );
           for (const rid of toRemove) {
             delete nextDeleted[rid];
           }
@@ -333,6 +348,17 @@ export const useFileSystemStore = create<FsState>()(
       },
 
       emptyRecycleBin: () => {
+        const deleted = Object.values(get().deletedNodes);
+        useMusicStore
+          .getState()
+          .removeFiles(deleted.map((entry) => entry.node.id));
+        void deleteAudio(
+          deleted
+            .map((entry) => audioId(entry.node.content))
+            .filter((id): id is string => !!id),
+        ).catch(() =>
+          notify("Music", "Could not clean up deleted audio storage.", "Music"),
+        );
         set({ deletedNodes: {} });
       },
 
@@ -379,14 +405,25 @@ export const useFileSystemStore = create<FsState>()(
         return "/" + parts.join("/");
       },
 
-      resetFileSystem: () => {
+      resetFileSystem: async () => {
+        const state = get();
+        const files = [
+          ...Object.values(state.nodes),
+          ...Object.values(state.deletedNodes).map((entry) => entry.node),
+        ];
+        useMusicStore.getState().removeFiles(files.map((node) => node.id));
         useRecentFilesStore.getState().clear();
         set({ ...buildSeed(), deletedNodes: {} });
+        await deleteAudio(
+          files
+            .map((node) => audioId(node.content))
+            .filter((id): id is string => !!id),
+        );
       },
     }),
     {
       name: "webos-filesystem",
-      version: 15,
+      version: 16,
       partialize: (state) => ({
         nodes: state.nodes,
         rootId: state.rootId,
@@ -399,7 +436,7 @@ export const useFileSystemStore = create<FsState>()(
           deletedNodes?: Record<string, DeletedEntry>;
         };
         if (!state.deletedNodes) state.deletedNodes = {};
-        if (version < 15) {
+        if (version < 16) {
           // ensure the System Apps folder exists
           let sysFolder = Object.values(state.nodes).find(
             (n) =>

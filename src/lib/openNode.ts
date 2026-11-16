@@ -55,19 +55,27 @@ export function openFsNode(node: FsNode) {
   if (!node.name.endsWith(".app"))
     useRecentFilesStore.getState().record(node.id);
 
-  const appId: AppId = node.name.toLowerCase().endsWith(".wsheet")
-    ? "sheets"
-    : node.name.toLowerCase().endsWith(".wslides")
-      ? "slides"
-      : node.name.toLowerCase().endsWith(".wdoc")
-        ? "writer"
-        : isImageFile(node.name)
-          ? "photos"
-          : "text-editor";
+  const appId: AppId = /\.(mp3|wav|ogg|m4a|aac|webm|flac)$/i.test(node.name)
+    ? "music"
+    : node.name.toLowerCase().endsWith(".wsheet")
+      ? "sheets"
+      : node.name.toLowerCase().endsWith(".wslides")
+        ? "slides"
+        : node.name.toLowerCase().endsWith(".wdoc")
+          ? "writer"
+          : isImageFile(node.name)
+            ? "photos"
+            : "text-editor";
   const existing = windows.find(
-    (w) => w.appId === appId && w.launchProps?.fileId === node.id,
+    (w) =>
+      w.appId === appId &&
+      (appId === "music" || w.launchProps?.fileId === node.id),
   );
   if (existing) {
+    if (appId === "music")
+      useWindowStore
+        .getState()
+        .setLaunchProps(existing.id, { fileId: node.id });
     focusWindow(existing.id);
     return;
   }

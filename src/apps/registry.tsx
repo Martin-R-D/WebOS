@@ -1,3 +1,4 @@
+import { Music } from "./Music/Music";
 import { FocusTimer } from "./FocusTimer/FocusTimer";
 import { Photos } from "./Photos/Photos";
 import { OfficeHub } from "./Office/OfficeHub";
@@ -23,6 +24,17 @@ import { Calendar } from "./Calendar/Calendar";
 import { RecycleBin } from "./RecycleBin/RecycleBin";
 
 export const appRegistry: Record<AppId, AppDefinition> = {
+  music: {
+    id: "music",
+    name: "Music",
+    icon: "Music",
+    component: Music,
+    defaultWidth: 800,
+    defaultHeight: 600,
+    minWidth: 300,
+    minHeight: 300,
+    singleInstance: true,
+  },
   "focus-timer": {
     id: "focus-timer",
     name: "Focus Timer",
