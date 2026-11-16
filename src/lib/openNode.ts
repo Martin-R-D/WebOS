@@ -55,7 +55,11 @@ export function openFsNode(node: FsNode) {
   if (!node.name.endsWith(".app"))
     useRecentFilesStore.getState().record(node.id);
 
-  const appId: AppId = isImageFile(node.name) ? "paint" : "text-editor";
+  const appId: AppId = node.name.toLowerCase().endsWith(".wdoc")
+    ? "writer"
+    : isImageFile(node.name)
+      ? "paint"
+      : "text-editor";
   const existing = windows.find(
     (w) => w.appId === appId && w.launchProps?.fileId === node.id,
   );
@@ -68,7 +72,7 @@ export function openFsNode(node: FsNode) {
   openWindow({
     appId,
     title: node.name,
-    icon: appId === "paint" ? "Image" : "FileText",
+    icon: def.icon,
     width: def.defaultWidth,
     height: def.defaultHeight,
     launchProps: { fileId: node.id },

@@ -54,6 +54,7 @@ function makeNode(
 
 const SYSTEM_APP_FILES: [string, string][] = [
   ["File Explorer.app", "file-explorer"],
+  ["Writer.app", "writer"],
   ["Text Editor.app", "text-editor"],
   ["Terminal.app", "terminal"],
   ["Calculator.app", "calculator"],
@@ -372,7 +373,7 @@ export const useFileSystemStore = create<FsState>()(
     }),
     {
       name: "webos-filesystem",
-      version: 9,
+      version: 10,
       partialize: (state) => ({
         nodes: state.nodes,
         rootId: state.rootId,
@@ -385,7 +386,7 @@ export const useFileSystemStore = create<FsState>()(
           deletedNodes?: Record<string, DeletedEntry>;
         };
         if (!state.deletedNodes) state.deletedNodes = {};
-        if (version < 9) {
+        if (version < 10) {
           // ensure the System Apps folder exists
           let sysFolder = Object.values(state.nodes).find(
             (n) =>

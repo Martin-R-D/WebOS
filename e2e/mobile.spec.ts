@@ -51,6 +51,7 @@ test("phone edits survive app switching, Home, rotation and saving", async ({
   );
 });
 test("all apps and dialogs fit a narrow phone", async ({ page }) => {
+  test.setTimeout(90_000);
   await page.setViewportSize({ width: 320, height: 640 });
   for (const name of [
     "About Me",
@@ -69,6 +70,7 @@ test("all apps and dialogs fit a narrow phone", async ({ page }) => {
     "Text Editor",
     "Unit Converter",
     "To-Do List",
+    "Writer",
   ]) {
     await launch(page, name);
     const win = page.locator(".window:not([hidden])");

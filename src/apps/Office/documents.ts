@@ -21,7 +21,12 @@ export function officeKind(name: string): OfficeKind | undefined {
 
 export function documentName(name: string, kind: OfficeKind): string {
   const trimmed = name.trim();
-  if (!trimmed || /[/\\\u0000-\u001f]/.test(trimmed)) {
+  if (
+    !trimmed ||
+    trimmed.includes("/") ||
+    trimmed.includes("\\") ||
+    Array.from(trimmed).some((character) => character.charCodeAt(0) < 32)
+  ) {
     throw new Error("Enter a file name without slashes or control characters.");
   }
   if (officeKind(trimmed) && officeKind(trimmed) !== kind) {
