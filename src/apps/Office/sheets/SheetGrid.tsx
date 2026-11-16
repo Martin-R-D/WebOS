@@ -208,7 +208,9 @@ export function SheetGrid({
                   textAlign: cell?.style?.align ?? "left",
                   whiteSpace: cell?.style?.wrap ? "pre-wrap" : "nowrap",
                   border: cell?.style?.border ? "1px solid #444" : undefined,
-                  outline: selected ? "2px solid #2563eb" : undefined,
+                  outline: selected
+                    ? "2px solid var(--color-accent)"
+                    : undefined,
                   outlineOffset: -2,
                 };
                 if (editing === key)

@@ -1,3 +1,4 @@
+import "./SheetsDesign.css";
 import { ChartsPanel } from "./charts/ChartsPanel";
 import { TablePanel } from "./sheets/TablePanel";
 import { visibleRows } from "./sheets/tableData";
@@ -260,22 +261,26 @@ export function Sheets(props: AppProps) {
         </>
       }
     >
-      <button
-        onClick={() => {
-          setChartsOpen((open) => !open);
-          setDataOpen(false);
-        }}
-      >
-        Charts
-      </button>
-      <button
-        onClick={() => {
-          setDataOpen((open) => !open);
-          setChartsOpen(false);
-        }}
-      >
-        Sort and filter
-      </button>
+      <div className="office__toolbar" aria-label="Data tools">
+        <button
+          aria-pressed={chartsOpen}
+          onClick={() => {
+            setChartsOpen((open) => !open);
+            setDataOpen(false);
+          }}
+        >
+          Charts
+        </button>
+        <button
+          aria-pressed={dataOpen}
+          onClick={() => {
+            setDataOpen((open) => !open);
+            setChartsOpen(false);
+          }}
+        >
+          Sort and filter
+        </button>
+      </div>
       {Boolean(sheet.table?.filters.length) && (
         <div className="office__toolbar">
           <strong>Filters active</strong>

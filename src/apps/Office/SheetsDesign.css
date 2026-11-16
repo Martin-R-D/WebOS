@@ -1,0 +1,71 @@
+.office--sheets {
+  --editor-color: #2cab82;
+}
+
+.office--sheets .office__toolbar {
+  background: var(--color-surface);
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.office--sheets > header.office__toolbar {
+  border-top: 3px solid var(--editor-color);
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--editor-color) 15%, var(--color-surface)),
+    var(--color-surface)
+  );
+}
+
+.office--sheets
+  :is(.office__toolbar, .sheets__tabs)
+  :is(button, select, input) {
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.office--sheets button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.office--sheets .sheets__tabs {
+  padding: 10px;
+  gap: 8px;
+  background: var(--color-surface);
+}
+
+.office--sheets .sheets__tabs [aria-current="true"] {
+  outline: none;
+  box-shadow: inset 0 -3px var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+}
+
+.office--sheets .sheets__formula-label input {
+  background: var(--color-surface);
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 45%,
+    var(--color-border)
+  );
+}
+
+.office--sheets .sheets__column-headers :is(button, span),
+.office--sheets .sheets__row-header {
+  background: #eaf4ef;
+  color: #214333;
+  border-color: #c5d9ce;
+  font-weight: 600;
+}
+
+.office--sheets .office__toolbar button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface));
+}
+
+.office--sheets .sheets__dimensions input {
+  width: 84px;
+}
