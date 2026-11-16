@@ -1,3 +1,5 @@
+import { AppHeading } from "../shared/AppHeading";
+import { ListChecks } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { AppProps } from "../../types";
 import { useTodoStore } from "../../stores/useTodoStore";
@@ -75,7 +77,12 @@ export function TodoList({ launchProps }: AppProps) {
   }
 
   return (
-    <section className="todos" aria-label="To-Do List">
+    <section className="todos app-design" aria-label="To-Do List">
+      <AppHeading
+        icon={ListChecks}
+        title="My tasks"
+        subtitle="A LITTLE PROGRESS, EVERY DAY"
+      />
       <form className="todos__add" onSubmit={addTask}>
         <label>
           New task
@@ -123,12 +130,14 @@ export function TodoList({ launchProps }: AppProps) {
               else rows.current.delete(task.id);
             }}
           >
-            <input
-              type="checkbox"
-              aria-label={`Complete ${task.title}`}
-              checked={task.completed}
-              onChange={() => toggle(task.id)}
-            />
+            <label className="todos__check">
+              <input
+                type="checkbox"
+                aria-label={`Complete ${task.title}`}
+                checked={task.completed}
+                onChange={() => toggle(task.id)}
+              />
+            </label>
             {editingId === task.id ? (
               <div className="todos__edit">
                 <label>
